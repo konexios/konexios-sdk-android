@@ -26,6 +26,7 @@ import com.kronossdk.api.models.AccountResponse;
 import com.kronossdk.api.models.ActionModel;
 import com.kronossdk.api.models.ActionResponseModel;
 import com.kronossdk.api.models.ActionTypeModel;
+import com.kronossdk.api.models.ActionTypeResponseModel;
 import com.kronossdk.api.models.ConfigResponse;
 import com.kronossdk.api.models.GatewayModel;
 import com.kronossdk.api.models.GatewayResponse;
@@ -286,9 +287,9 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getDeviceActionTypes(final DeviceActionTypesListener listener) {
-        mService.getActionTypes().enqueue(new Callback<List<ActionTypeModel>>() {
+        mService.getActionTypes().enqueue(new Callback<ActionTypeResponseModel>() {
             @Override
-            public void onResponse(Call<List<ActionTypeModel>> call, Response<List<ActionTypeModel>> response) {
+            public void onResponse(Call<ActionTypeResponseModel> call, Response<ActionTypeResponseModel> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onActionTypesReceived(response.body());
@@ -298,7 +299,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             }
 
             @Override
-            public void onFailure(Call<List<ActionTypeModel>> call, Throwable t) {
+            public void onFailure(Call<ActionTypeResponseModel> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getActionTypes error");
                 listener.onActionTypesFailed("Fatal error");
             }

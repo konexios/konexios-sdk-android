@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.firebase.crash.FirebaseCrash;
 import com.kronossdk.api.Constants;
 import com.kronossdk.api.ServerEndpoint;
+import com.kronossdk.api.mqtt.common.NoSSLv3SocketFactory;
 import com.kronossdk.api.rest.IotConnectAPIService;
 
 import java.io.IOException;
@@ -62,6 +63,7 @@ public abstract class RetrofitHolder {
                     return response;
                 }
             })
+            .sslSocketFactory(new NoSSLv3SocketFactory())
             .build();
 
     private static Retrofit retrofit;

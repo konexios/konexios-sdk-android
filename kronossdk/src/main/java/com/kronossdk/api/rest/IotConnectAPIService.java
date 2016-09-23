@@ -56,7 +56,7 @@ public interface IotConnectAPIService {
 
     //device-action api
     @GET("/api/v1/kronos/devices/actions/types")
-    Call<List<ActionTypeModel>> getActionTypes();
+    Call<ActionTypeResponseModel> getActionTypes();
 
     @GET("/api/v1/kronos/devices/{hid}/actions")
     Call<ActionResponseModel> getActions(@Path("hid") String hid);
