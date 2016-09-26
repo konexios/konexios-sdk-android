@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "20007657981",
+    "firebase_url": "https://kronossdk-a053e.firebaseio.com",
+    "project_id": "kronossdk-a053e",
+    "storage_bucket": "kronossdk-a053e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20007657981:android:055c360ddfa7137e",
+        "android_client_info": {
+          "package_name": "com.kronossdk.sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "20007657981-1sbali89c86r5b5ov1usmra784etri3q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9jyfBSFi0AlEtaygyEiQa0372vqB7su0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20007657981:android:2d0a4b36c5a40619",
+        "android_client_info": {
+          "package_name": "com.kronossdk.api"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "20007657981-1sbali89c86r5b5ov1usmra784etri3q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9jyfBSFi0AlEtaygyEiQa0372vqB7su0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
