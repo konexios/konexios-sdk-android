@@ -400,7 +400,53 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "registerDevice error");
                 listener.onDeviceRegistrationFailed();
+            }
+        });
+    }
+
+    @Override
+    public void registerReceivedEvent(String eventHid) {
+        mService.putReceived(eventHid).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerReceivedEvent response");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "registerReceivedEvent error");
+            }
+        });
+    }
+
+    @Override
+    public void eventHandlingSucceed(String eventHid) {
+        mService.putSucceeded(eventHid).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "eventHandlingSucceed response");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "eventHandlingSucceed error");
+            }
+        });
+    }
+
+    @Override
+    public void eventHandlingFailed(String eventHid) {
+        mService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "eventHandlingSucceed response");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "eventHandlingSucceed error");
             }
         });
     }
