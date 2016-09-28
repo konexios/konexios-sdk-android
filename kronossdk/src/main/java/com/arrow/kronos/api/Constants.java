@@ -23,8 +23,8 @@ public final class Constants {
     public static final String MQTT_CONNECT_URL_DEV_DEMO = "tcp://pegasus.arrowconnect.io:1883";
     public static final String MQTT_CLIENT_PREFIX_DEMO = "/pegasus";
 
-    public static final String DEFAULT_API_KEY = "ac34e6065f32a27aa0f6a238d00dccbf8c3c233378ca933475bc223c965a556f";
-    public static final String DEFAULT_API_SECRET = "9MbQGOeWtsfREAxd9DlJ2PmI1rZZEzCor+eSZv/Yja8=";
+    public static final String DEFAULT_API_KEY = "5a3264fb990a18e0e180efbbfadd5d95db3baed93defcb1d5a35966c6b98fef5";
+    public static final String DEFAULT_API_SECRET = "E9Y8y8A88R/x5JV2nfB7H/1A3eET85PSeURpk4QKp4c=";
 
     public final static int HEART_BEAT_INTERVAL = 60; //1 minute
 
