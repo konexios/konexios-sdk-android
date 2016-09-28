@@ -155,6 +155,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             gatewayModel.setSoftwareName(swName);
             gatewayModel.setUid(uid);
             gatewayModel.setType(GatewayType.Mobile);
+            gatewayModel.setUserHid(userHid);
             gatewayModel.setSoftwareVersion(
                     String.format("%d.%d", Constants.MAJOR, Constants.MINOR));
 
