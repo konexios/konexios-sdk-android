@@ -34,6 +34,8 @@ import com.arrow.kronos.api.models.AccountResponse;
 public class LoginActivity extends AppCompatActivity {
     private final static String TAG = LoginActivity.class.getSimpleName();
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
+    // DEV
+    public static final String BASE_IOT_CONNECT_URL_DEV = "http://pegasuskronos01-dev.cloudapp.net:28880";
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -75,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
 
         ConnectionType type = ConnectionType.MQTT;
         mKronosApiService = KronosApiServiceFactory.createKronosApiService(type);
-        mKronosApiService.setRestEndpoint(ServerEndpoint.DEV);
+        mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV);
     }
 
     /**
