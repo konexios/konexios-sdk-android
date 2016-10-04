@@ -34,6 +34,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     private final static int DEFAULT_CONNECTION_TIMEOUT_SECS = 60;
     private final static int DEFAULT_KEEP_ALIVE_INTERVAL_SECS = 60;
     private static final int QOS = 0;
+
     private final IMqttActionListener mMqttTelemetryCallback = new IMqttActionListener() {
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
@@ -174,5 +175,9 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     @Override
     public void onGatewayRegistered(ConfigResponse aws) {
         //nothing to do here
+    }
+
+    @Override
+    public void setMqttEndpoint(String host, String prefix) {
     }
 }

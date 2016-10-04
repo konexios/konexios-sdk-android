@@ -125,7 +125,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void setRestEndpoint(ServerEndpoint endpoint) {
+    public void setRestEndpoint(String endpoint) {
         mService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
