@@ -36,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
     // DEV
     public static final String BASE_IOT_CONNECT_URL_DEV = "http://pegasuskronos01-dev.cloudapp.net:28880";
+    public static final String DEFAULT_API_KEY = "5a3264fb990a18e0e180efbbfadd5d95db3baed93defcb1d5a35966c6b98fef5";
+    public static final String DEFAULT_API_SECRET = "E9Y8y8A88R/x5JV2nfB7H/1A3eET85PSeURpk4QKp4c=";
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -77,7 +79,8 @@ public class LoginActivity extends AppCompatActivity {
 
         ConnectionType type = ConnectionType.MQTT;
         mKronosApiService = KronosApiServiceFactory.createKronosApiService(type);
-        mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV);
+        mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
+                DEFAULT_API_SECRET);
     }
 
     /**
