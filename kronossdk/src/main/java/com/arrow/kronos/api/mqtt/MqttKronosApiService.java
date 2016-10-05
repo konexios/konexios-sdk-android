@@ -16,15 +16,6 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
     private String mHost;
     private String mMqttPrefix;
 
-    @Override
-    public void setRestEndpoint(ServerEndpoint endpoint) {
-        super.setRestEndpoint(endpoint);
-        mHost = endpoint == ServerEndpoint.DEMO ? Constants.MQTT_CONNECT_URL_DEV_DEMO :
-                Constants.MQTT_CONNECT_URL_DEV;
-        mMqttPrefix = endpoint == ServerEndpoint.DEMO ? Constants.MQTT_CLIENT_PREFIX_DEMO :
-                Constants.MQTT_CLIENT_PREFIX_DEV;
-    }
-
     protected MqttConnectOptions getMqttOptions() {
         String userName = mMqttPrefix + ":" + mGatewayHid;
         String apiKey = ApiRequestSigner.getInstance().getApiKey() != null ? ApiRequestSigner.getInstance().getApiKey() :
@@ -48,5 +39,11 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
     @Override
     public boolean hasBatchMode() {
         return true;
+    }
+
+    @Override
+    public void setMqttEndpoint(String host, String prefix) {
+        mHost = host;
+        mMqttPrefix = prefix;
     }
 }

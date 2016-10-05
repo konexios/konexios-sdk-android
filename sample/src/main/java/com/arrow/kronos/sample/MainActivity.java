@@ -24,6 +24,9 @@ import static com.arrow.kronos.api.Constants.Preference.KEY_GATEWAY_ID;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
 
+    public static final String MQTT_CONNECT_URL_DEV = "tcp://pegasusqueue01-dev.cloudapp.net:46953";
+    public static final String MQTT_CLIENT_PREFIX_DEV = "/themis.dev";
+
     private KronosApiService mTelemetrySendService;
 
     private AccountResponse mAccountResponse;
@@ -52,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTelemetrySendService = KronosApiServiceFactory.getKronosApiService();
         //initialize service with a context and bind it with activity's lifecycle
         mTelemetrySendService.initialize(this);
+
+        mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
         //register new gateway and initiate persistent connection (it makes sense only in case when some of {ConnectionType.MQTT, ConnectionType.AWS,
         // ConnectionType.IBM} is chosen)
         mTelemetrySendService.connect();

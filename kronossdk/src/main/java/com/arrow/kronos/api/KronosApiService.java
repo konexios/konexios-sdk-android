@@ -24,10 +24,17 @@ import java.util.List;
 public interface KronosApiService {
 
     /**
-     * sets endpoint server environment demo or dev
-     * @param endpoint - enum {DEMO, DEV}
+     * sets endpoint server environment url
+     * @param endpoint - String url like "http://pegasuskronos01-dev.cloudapp.net:28880"
      */
-    void setRestEndpoint(ServerEndpoint endpoint);
+    void setRestEndpoint(String endpoint);
+
+    /**
+     *  sets mqtt server host and userName prefix
+     * @param host String contains host like "tcp://pegasusqueue01-dev.cloudapp.net:46953"
+     * @param prefix String contains prefix like "/themis.dev"
+     */
+    void setMqttEndpoint(String host, String prefix);
 
     /**
      *initialize service with a context and bind it with activity's lifecycle
