@@ -63,4 +63,8 @@ public final class RestApiKronosApiService extends AbstractKronosApiService {
     public boolean hasBatchMode() {
         return true;
     }
+
+    @Override
+    public void setMqttEndpoint(String host, String prefix) {
+    }
 }

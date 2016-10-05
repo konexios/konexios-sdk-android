@@ -66,13 +66,10 @@ public abstract class RetrofitHolder {
 
     private static Retrofit retrofit;
 
-    public static IotConnectAPIService getIotConnectAPIService(ServerEndpoint endpoint) {
-
-        String baseUrl = endpoint == ServerEndpoint.DEMO ? Constants.BASE_IOT_CONNECT_URL_DEMO :
-                Constants.BASE_IOT_CONNECT_URL_DEV;
-        if (retrofit == null || !retrofit.baseUrl().toString().equals(baseUrl)) {
+    public static IotConnectAPIService getIotConnectAPIService(String endpoint) {
+        if (retrofit == null || !retrofit.baseUrl().toString().equals(endpoint)) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
+                    .baseUrl(endpoint)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build();
