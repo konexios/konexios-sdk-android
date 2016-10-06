@@ -7,6 +7,8 @@ import com.arrow.kronos.api.models.ActionModel;
 import com.arrow.kronos.api.models.ActionResponseModel;
 import com.arrow.kronos.api.models.ActionTypeResponseModel;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.GatewayCommand;
+import com.arrow.kronos.api.models.GatewayLogsResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.models.HistoricalEventResponse;
@@ -22,29 +24,51 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by osminin on 3/15/2016.
  */
 public interface IotConnectAPIService {
 
+    @POST("/api/v1/kronos/accounts")
+    Call<AccountResponse> registerAccount(@Body AccountRequest accountRequest);
+
+    //GatewayApi
     @POST("/api/v1/kronos/gateways")
     Call<GatewayResponse> registerGateway(@Body GatewayModel gatewayModel);
 
     @PUT("/api/v1/kronos/gateways/{hid}/checkin")
     Call<Void> checkin(@Path("hid") String hid);
 
-    @POST("/api/v1/kronos/accounts")
-    Call<AccountResponse> registerAccount(@Body AccountRequest accountRequest);
-
     @GET("/api/v1/kronos/gateways/{hid}/config")
     Call<ConfigResponse> getConfig(@Path("hid") String hid);
 
     @PUT("/api/v1/kronos/gateways/{hid}")
-    Call<ResponseBody> updateGateway(@Path("hid") String hid, @Body GatewayModel gatewayModel);
+    Call<GatewayResponse> updateGateway(@Path("hid") String hid, @Body GatewayModel gatewayModel);
 
     @PUT("/api/v1/kronos/gateways/{hid}/heartbeat")
     Call<ResponseBody> heartBeat(@Path("hid") String hid);
+
+    @GET("/api/v1/kronos/gateways")
+    Call<List<GatewayModel>> findAllGateways();
+
+    @GET("/api/v1/kronos/gateways/{hid}")
+    Call<GatewayModel> findGateway(@Path("hid") String hid);
+
+    @POST("/api/v1/kronos/gateways/{hid}/commands/device-command")
+    Call<ResponseBody> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
+
+    @GET("/api/v1/kronos/gateways/{hid}/logs")
+    Call<GatewayLogsResponse> getGatewayLogs(@Path("hid") String hid,
+                                             @Query("createdDateFrom") String createdDateFrom,
+                                             @Query("createdDateTo") String createdDateTo,
+                                             @Query("userHids") String[] userHids,
+                                             @Query("types") String[] types,
+                                             @Query("sortField") String sortField,
+                                             @Query("sortDirection") String sortDirection,
+                                             @Query("_page") int page,
+                                             @Query("_size") int size);
 
     @POST("/api/v1/kronos/devices")
     Call<GatewayResponse> registerDevice(@Body RegisterDeviceRequest deviceRequest);

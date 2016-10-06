@@ -3,9 +3,17 @@ package com.arrow.kronos.api;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
 import com.arrow.kronos.api.listeners.DeviceActionsListener;
 import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
+import com.arrow.kronos.api.listeners.FindGatewayListener;
+import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
+import com.arrow.kronos.api.listeners.GatewayRegisterListener;
+import com.arrow.kronos.api.listeners.GatewayUpdateListener;
+import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
+import com.arrow.kronos.api.listeners.GetGatewayLogsListener;
+import com.arrow.kronos.api.listeners.GetGatewaysListener;
 import com.arrow.kronos.api.listeners.PostDeviceActionListener;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
@@ -13,6 +21,9 @@ import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.listeners.UpdateDeviceActionListener;
 import com.arrow.kronos.api.models.AccountRequest;
 import com.arrow.kronos.api.models.ActionModel;
+import com.arrow.kronos.api.models.GatewayCommand;
+import com.arrow.kronos.api.models.GatewayLogsQuery;
+import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.RegisterDeviceRequest;
 
 import java.util.List;
@@ -108,4 +119,24 @@ public interface KronosApiService {
     void eventHandlingSucceed(String eventHid);
 
     void eventHandlingFailed(String eventHid);
+
+    //Gateways api
+
+    void findAllGateways(GetGatewaysListener listener);
+
+    void registerGateway(GatewayModel gatewayModel, GatewayRegisterListener listener);
+
+    void findGateway(String hid, FindGatewayListener listener);
+
+    void updateGateway(String hid, GatewayModel gatewayModel, GatewayUpdateListener listener);
+
+    void checkinGateway(String hid, CheckinGatewayListener listener);
+
+    void sendCommandGateway(String hid, GatewayCommand command);
+
+    void getGatewayConfig(String hid, GetGatewayConfigListener listener);
+
+    void gatewayHeartbeat(String hid, GatewayHeartbeatListener listener);
+
+    void getGatewayLogs(String hid, GatewayLogsQuery query, GetGatewayLogsListener listener);
 }

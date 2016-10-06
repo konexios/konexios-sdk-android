@@ -1,6 +1,5 @@
 package com.arrow.kronos.api.mqtt;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -27,7 +26,7 @@ import java.util.List;
  * Created by osminin on 6/17/2016.
  */
 
-public abstract class AbstractMqttKronosApiService extends AbstractKronosApiService implements AbstractKronosApiService.GatewayRegisterListener {
+public abstract class AbstractMqttKronosApiService extends AbstractKronosApiService implements AbstractKronosApiService.InternalGatewayRegisterListener {
     private static final String TAG = AbstractMqttKronosApiService.class.getName();
     protected static final String MESSAGE_TOPIC_PREFIX = "krs.tel.gts.";
     private static final String SUBSCRIBE_TOPIC_PREFIX = "krs.cmd.stg.";
