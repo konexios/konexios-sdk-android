@@ -14,7 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
  * Created by osminin on 9/2/2016.
  */
 
-public final class IbmKronosApiService extends AbstractMqttKronosApiService implements AbstractKronosApiService.GatewayRegisterListener {
+public final class IbmKronosApiService extends AbstractMqttKronosApiService implements AbstractKronosApiService.InternalGatewayRegisterListener {
     private static final String TAG = IbmKronosApiService.class.getName();
 
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";

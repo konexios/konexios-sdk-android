@@ -12,9 +12,16 @@ import android.util.Log;
 
 import com.arrow.kronos.api.common.ApiRequestSigner;
 import com.arrow.kronos.api.common.RetrofitHolder;
+import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
 import com.arrow.kronos.api.listeners.DeviceActionsListener;
 import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
+import com.arrow.kronos.api.listeners.FindGatewayListener;
+import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
+import com.arrow.kronos.api.listeners.GatewayUpdateListener;
+import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
+import com.arrow.kronos.api.listeners.GetGatewayLogsListener;
+import com.arrow.kronos.api.listeners.GetGatewaysListener;
 import com.arrow.kronos.api.listeners.PostDeviceActionListener;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
@@ -26,6 +33,9 @@ import com.arrow.kronos.api.models.ActionModel;
 import com.arrow.kronos.api.models.ActionResponseModel;
 import com.arrow.kronos.api.models.ActionTypeResponseModel;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.GatewayCommand;
+import com.arrow.kronos.api.models.GatewayLogsQuery;
+import com.arrow.kronos.api.models.GatewayLogsResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.models.GatewayType;
@@ -55,7 +65,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     private IotConnectAPIService mService;
     private Gson mGson = new Gson();
     protected Handler mServiceThreadHandler;
-    private GatewayRegisterListener mGatewayRegisterListener;
+    private InternalGatewayRegisterListener mGatewayRegisterListener;
     private String mGatewayId;
     protected ServerCommandsListener mServerCommandsListener;
     private String mApiKey;
@@ -126,6 +136,14 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         return mGson;
     }
 
+    protected String getApiKey() {
+        return mApiKey;
+    }
+
+    protected String getApiSecret() {
+        return mApiSecret;
+    }
+
     @Override
     public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
         mApiKey = apiKey;
@@ -141,7 +159,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         mServiceThreadHandler = new Handler();
     }
 
-    protected final void registerGateway(final GatewayRegisterListener listener) {
+    protected final void registerGateway(final InternalGatewayRegisterListener listener) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         mGatewayRegisterListener = listener;
         String gatewayHid = prefs.getString(Constants.Preference.KEY_GATEWAY_ID, null);
@@ -185,7 +203,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         }
     }
 
-    private void getConfig(final String gatewayId, final GatewayRegisterListener listener) {
+    private void getConfig(final String gatewayId, final InternalGatewayRegisterListener listener) {
         Call<ConfigResponse> call = mService.getConfig(gatewayId);
         mGatewayRegisterListener = listener;
         mGatewayId = gatewayId;
@@ -443,14 +461,6 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         });
     }
 
-    protected String getApiKey() {
-        return mApiKey;
-    }
-
-    protected String getApiSecret() {
-        return mApiSecret;
-    }
-
     @Override
     public void eventHandlingFailed(String eventHid) {
         mService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
@@ -466,7 +476,198 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         });
     }
 
-    public interface GatewayRegisterListener {
+    @Override
+    public void findAllGateways(final GetGatewaysListener listener) {
+        mService.findAllGateways().enqueue(new Callback<List<GatewayModel>>() {
+            @Override
+            public void onResponse(Call<List<GatewayModel>> call, Response<List<GatewayModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "findAllGateways response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewaysReceived(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
+                    listener.onGatewaysFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<GatewayModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
+                listener.onGatewaysFailed();
+            }
+        });
+    }
+
+    @Override
+    public void registerGateway(GatewayModel gatewayModel, final com.arrow.kronos.api.listeners.GatewayRegisterListener listener) {
+        mService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
+            @Override
+            public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayRegistered(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
+                    listener.onGatewayRegisterFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GatewayResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
+                listener.onGatewayRegisterFailed();
+            }
+        });
+    }
+
+    @Override
+    public void findGateway(String hid, final FindGatewayListener listener) {
+        mService.findGateway(hid).enqueue(new Callback<GatewayModel>() {
+            @Override
+            public void onResponse(Call<GatewayModel> call, Response<GatewayModel> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "findGateway response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayFound(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
+                    listener.onGatewayFindError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GatewayModel> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
+                listener.onGatewayFindError();
+            }
+        });
+    }
+
+    @Override
+    public void updateGateway(String hid, GatewayModel gatewayModel, final GatewayUpdateListener listener) {
+        mService.updateGateway(hid, gatewayModel).enqueue(new Callback<GatewayResponse>() {
+            @Override
+            public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateGateway response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayUpdated(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
+                    listener.onGatewayUpdateFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GatewayResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
+                listener.onGatewayUpdateFailed();
+            }
+        });
+    }
+
+    @Override
+    public void checkinGateway(String hid, final CheckinGatewayListener listener) {
+        mService.checkin(hid).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "checkin response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onCheckinGatewaySuccess();
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
+                    listener.onCheckinGatewayError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
+                listener.onCheckinGatewayError();
+            }
+        });
+    }
+
+    @Override
+    public void sendCommandGateway(String hid, GatewayCommand command) {
+        mService.sendGatewayCommand(hid, command).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @Override
+    public void getGatewayConfig(String hid, final GetGatewayConfigListener listener) {
+        mService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
+            @Override
+            public void onResponse(Call<ConfigResponse> call, Response<ConfigResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayConfigReceived(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
+                    listener.onGatewayConfigFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ConfigResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
+                listener.onGatewayConfigFailed();
+            }
+        });
+    }
+
+    @Override
+    public void gatewayHeartbeat(String hid, final GatewayHeartbeatListener listener) {
+        mService.heartBeat(hid).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "heartBeat response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayHeartbeatSuccess();
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
+                    listener.onGatewayHeartbeatFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
+                listener.onGatewayHeartbeatFailed();
+            }
+        });
+    }
+
+    @Override
+    public void getGatewayLogs(String hid, GatewayLogsQuery query, final GetGatewayLogsListener listener) {
+        mService.getGatewayLogs(hid, "", "", new String []{}, new String []{}, "", "", 0, 0).enqueue(new Callback<GatewayLogsResponse>() {
+            @Override
+            public void onResponse(Call<GatewayLogsResponse> call, Response<GatewayLogsResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayLogs response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayLogsReceived();
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
+                    listener.onGatewayLogsFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GatewayLogsResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
+                listener.onGatewayLogsFailed();
+            }
+        });
+    }
+
+    public interface InternalGatewayRegisterListener {
         void onGatewayRegistered(String gatewayHid);
 
         void onGatewayRegistered(ConfigResponse aws);
