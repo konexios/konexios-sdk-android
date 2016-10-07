@@ -57,7 +57,7 @@ public interface IotConnectAPIService {
     Call<GatewayModel> findGateway(@Path("hid") String hid);
 
     @POST("/api/v1/kronos/gateways/{hid}/commands/device-command")
-    Call<ResponseBody> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
+    Call<GatewayResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
 
     @GET("/api/v1/kronos/gateways/{hid}/logs")
     Call<GatewayLogsResponse> getGatewayLogs(@Path("hid") String hid,
