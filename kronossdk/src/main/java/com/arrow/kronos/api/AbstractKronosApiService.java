@@ -17,6 +17,7 @@ import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
 import com.arrow.kronos.api.listeners.DeviceActionsListener;
 import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
+import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
@@ -587,16 +588,23 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void sendCommandGateway(String hid, GatewayCommand command) {
-        mService.sendGatewayCommand(hid, command).enqueue(new Callback<ResponseBody>() {
+    public void sendCommandGateway(String hid, GatewayCommand command, final GatewayCommandsListener listener) {
+        mService.sendGatewayCommand(hid, command).enqueue(new Callback<GatewayResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
+            public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "sendGatewayCommand response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGatewayCommandSent(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
+                    listener.onGatewayCommandFailed();
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+            public void onFailure(Call<GatewayResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
+                listener.onGatewayCommandFailed();
             }
         });
     }

@@ -8,6 +8,7 @@ import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
 import com.arrow.kronos.api.listeners.DeviceActionsListener;
 import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
+import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
@@ -132,7 +133,7 @@ public interface KronosApiService {
 
     void checkinGateway(String hid, CheckinGatewayListener listener);
 
-    void sendCommandGateway(String hid, GatewayCommand command);
+    void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
 
     void getGatewayConfig(String hid, GetGatewayConfigListener listener);
 
