@@ -7,6 +7,7 @@ import com.arrow.kronos.api.models.ActionModel;
 import com.arrow.kronos.api.models.ActionResponseModel;
 import com.arrow.kronos.api.models.ActionTypeResponseModel;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.FindAllDevicesResponse;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.GatewayLogsResponse;
 import com.arrow.kronos.api.models.GatewayModel;
@@ -20,6 +21,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -31,6 +33,7 @@ import retrofit2.http.Query;
  */
 public interface IotConnectAPIService {
 
+    //Account api
     @POST("/api/v1/kronos/accounts")
     Call<AccountResponse> registerAccount(@Body AccountRequest accountRequest);
 
@@ -70,9 +73,6 @@ public interface IotConnectAPIService {
                                              @Query("_page") int page,
                                              @Query("_size") int size);
 
-    @POST("/api/v1/kronos/devices")
-    Call<GatewayResponse> registerDevice(@Body RegisterDeviceRequest deviceRequest);
-
     @POST("/api/v1/kronos/telemetries")
     Call<ResponseBody> sendTelemetry(@Body RequestBody body);
 
@@ -101,8 +101,22 @@ public interface IotConnectAPIService {
     @PUT("/api/v1/kronos/devices/{hid}/actions/{index}")
     Call<ResponseBody> updateAction(@Path("hid") String hid, @Path("index") int index,
                                     @Body ActionModel action);
+    @DELETE("/api/v1/kronos/devices/{hid}/actions/{index}")
+    Call<ResponseBody> deleteAction(@Path("hid") String hid, @Path("index") int index);
 
+    //Device api
     @GET("/api/v1/kronos/devices/{hid}/events")
     Call<HistoricalEventResponse> getHistoricalEvents(@Path("hid") String hid);
+
+    @GET("/api/v1/kronos/devices")
+    Call<FindAllDevicesResponse> findAllDevices(@Query("userHid") String userHid,
+                                                @Query("uid") String uid,
+                                                @Query("type") String type,
+                                                @Query("gatewayHid") String gatewayHid,
+                                                @Query("enabled") String enabled,
+                                                @Query("_page") int page,
+                                                @Query("_size") int size);
+    @POST("/api/v1/kronos/devices")
+    Call<GatewayResponse> createOrUpdateDevice(@Body RegisterDeviceRequest deviceRequest);
 
 }

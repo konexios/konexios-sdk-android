@@ -1,10 +1,12 @@
-
 package com.arrow.kronos.api.models;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Datum {
+public class Datum implements Parcelable {
 
     @SerializedName("createdBy")
     @Expose
@@ -26,7 +28,7 @@ public class Datum {
     private String type;
 
     /**
-     * 
+     *
      * @return
      *     The createdBy
      */
@@ -35,7 +37,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @param createdBy
      *     The createdBy
      */
@@ -44,7 +46,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @return
      *     The createdDate
      */
@@ -53,7 +55,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @param createdDate
      *     The createdDate
      */
@@ -62,7 +64,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @return
      *     The objectHid
      */
@@ -71,7 +73,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @param objectHid
      *     The objectHid
      */
@@ -80,7 +82,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @return
      *     The parameters
      */
@@ -89,7 +91,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @param parameters
      *     The parameters
      */
@@ -98,7 +100,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @return
      *     The productName
      */
@@ -107,7 +109,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @param productName
      *     The productName
      */
@@ -116,7 +118,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @return
      *     The type
      */
@@ -125,7 +127,7 @@ public class Datum {
     }
 
     /**
-     * 
+     *
      * @param type
      *     The type
      */
@@ -133,4 +135,41 @@ public class Datum {
         this.type = type;
     }
 
+
+    protected Datum(Parcel in) {
+        createdBy = in.readString();
+        createdDate = (CreatedDate) in.readValue(CreatedDate.class.getClassLoader());
+        objectHid = in.readString();
+        parameters = (Parameters) in.readValue(Parameters.class.getClassLoader());
+        productName = in.readString();
+        type = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(createdBy);
+        dest.writeValue(createdDate);
+        dest.writeString(objectHid);
+        dest.writeValue(parameters);
+        dest.writeString(productName);
+        dest.writeString(type);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Datum> CREATOR = new Parcelable.Creator<Datum>() {
+        @Override
+        public Datum createFromParcel(Parcel in) {
+            return new Datum(in);
+        }
+
+        @Override
+        public Datum[] newArray(int size) {
+            return new Datum[size];
+        }
+    };
 }

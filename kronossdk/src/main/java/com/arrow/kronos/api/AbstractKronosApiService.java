@@ -13,9 +13,11 @@ import android.util.Log;
 import com.arrow.kronos.api.common.ApiRequestSigner;
 import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
+import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
 import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
 import com.arrow.kronos.api.listeners.DeviceActionsListener;
 import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
+import com.arrow.kronos.api.listeners.FindDevicesListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
@@ -34,6 +36,7 @@ import com.arrow.kronos.api.models.ActionModel;
 import com.arrow.kronos.api.models.ActionResponseModel;
 import com.arrow.kronos.api.models.ActionTypeResponseModel;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.FindAllDevicesResponse;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.GatewayLogsQuery;
 import com.arrow.kronos.api.models.GatewayLogsResponse;
@@ -413,10 +416,10 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void registerDevice(RegisterDeviceRequest req, final RegisterDeviceListener listener) {
-        mService.registerDevice(req).enqueue(new Callback<GatewayResponse>() {
+        mService.createOrUpdateDevice(req).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerDevice response");
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "createOrUpdateDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceRegistered(response.body());
                 } else {
@@ -426,7 +429,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "registerDevice error");
+                FirebaseCrash.logcat(Log.ERROR, TAG, "createOrUpdateDevice error");
                 listener.onDeviceRegistrationFailed();
             }
         });
@@ -673,6 +676,52 @@ public abstract class AbstractKronosApiService implements KronosApiService {
                 listener.onGatewayLogsFailed();
             }
         });
+    }
+
+    @Override
+    public void deleteDeviceAction(String deviceHid, int index, final DeleteDeviceActionListener listener) {
+        mService.deleteAction(deviceHid, index).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onDeviceActionDeleted();
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
+                    listener.onDeviceActionDeleteFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
+                listener.onDeviceActionDeleteFailed();
+            }
+        });
+    }
+
+    @Override
+    public void findAllDevices(String userHid, String uid, String type, String gatewayHid,
+                               String enabled, int page, int size, final FindDevicesListener listener) {
+        mService.findAllDevices(userHid, uid, type, gatewayHid, enabled, page, size).
+                enqueue(new Callback<FindAllDevicesResponse>() {
+                    @Override
+                    public void onResponse(Call<FindAllDevicesResponse> call, Response<FindAllDevicesResponse> response) {
+                        FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
+                        if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                            listener.onDevicesFond(response.body());
+                        } else {
+                            FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
+                            listener.onDevicesFindFailed();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<FindAllDevicesResponse> call, Throwable t) {
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
+                        listener.onDevicesFindFailed();
+                    }
+                });
     }
 
     public interface InternalGatewayRegisterListener {

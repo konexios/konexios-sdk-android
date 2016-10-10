@@ -1,10 +1,12 @@
-
 package com.arrow.kronos.api.models;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CreatedDate {
+public class CreatedDate implements Parcelable {
 
     @SerializedName("epochSecond")
     @Expose
@@ -14,7 +16,7 @@ public class CreatedDate {
     private Integer nano;
 
     /**
-     * 
+     *
      * @return
      *     The epochSecond
      */
@@ -23,7 +25,7 @@ public class CreatedDate {
     }
 
     /**
-     * 
+     *
      * @param epochSecond
      *     The epochSecond
      */
@@ -32,7 +34,7 @@ public class CreatedDate {
     }
 
     /**
-     * 
+     *
      * @return
      *     The nano
      */
@@ -41,7 +43,7 @@ public class CreatedDate {
     }
 
     /**
-     * 
+     *
      * @param nano
      *     The nano
      */
@@ -49,4 +51,43 @@ public class CreatedDate {
         this.nano = nano;
     }
 
+
+    protected CreatedDate(Parcel in) {
+        epochSecond = in.readByte() == 0x00 ? null : in.readInt();
+        nano = in.readByte() == 0x00 ? null : in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (epochSecond == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(epochSecond);
+        }
+        if (nano == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(nano);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<CreatedDate> CREATOR = new Parcelable.Creator<CreatedDate>() {
+        @Override
+        public CreatedDate createFromParcel(Parcel in) {
+            return new CreatedDate(in);
+        }
+
+        @Override
+        public CreatedDate[] newArray(int size) {
+            return new CreatedDate[size];
+        }
+    };
 }
