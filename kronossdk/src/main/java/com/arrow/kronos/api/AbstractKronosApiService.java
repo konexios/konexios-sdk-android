@@ -27,6 +27,7 @@ import com.arrow.kronos.api.listeners.GatewayUpdateListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
 import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
+import com.arrow.kronos.api.listeners.GetNodesListListener;
 import com.arrow.kronos.api.listeners.PostDeviceActionListener;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
@@ -49,6 +50,9 @@ import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.models.GatewayType;
 import com.arrow.kronos.api.models.HistoricalEventResponse;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
+import com.arrow.kronos.api.models.ListResultModel;
+import com.arrow.kronos.api.models.NodeModel;
+import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
@@ -794,6 +798,75 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             public void onFailure(Call<AuditLogsResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
                 listener.onGatewayLogsFailed();
+            }
+        });
+    }
+
+    //node api
+
+
+    @Override
+    public void getNodesList(final GetNodesListListener listener) {
+        mService.getListExistingNodes().enqueue(new Callback<ListResultModel<NodeModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<NodeModel>> call, Response<ListResultModel<NodeModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getNodesList response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onGetListNodesSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
+                    listener.onGetListNodesFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<NodeModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
+                listener.onGetListNodesFailed();
+            }
+        });
+    }
+
+    @Override
+    public void createNewNode(NodeRegistrationModel node, final CommonRequestListener listener) {
+        mService.createNewNode(node).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNode response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
+                listener.onRequestError();
+            }
+        });
+    }
+
+    @Override
+    public void updateExistingNode(String nodeHid, NodeRegistrationModel node, final CommonRequestListener listener) {
+        mService.updateExistingNode(nodeHid, node).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNode response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
+                listener.onRequestError();
             }
         });
     }
