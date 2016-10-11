@@ -13,7 +13,7 @@ public class AuditLogModel implements Parcelable {
     private String createdBy;
     @SerializedName("createdDate")
     @Expose
-    private CreatedDate createdDate;
+    private Date createdDate;
     @SerializedName("objectHid")
     @Expose
     private String objectHid;
@@ -50,17 +50,17 @@ public class AuditLogModel implements Parcelable {
      * @return
      * The createdDate
      */
-    public CreatedDate getCreatedDate() {
+    public Date getCreatedDate() {
         return createdDate;
     }
 
     /**
      *
-     * @param createdDate
-     * The createdDate
+     * @param date
+     * The date
      */
-    public void setCreatedDate(CreatedDate createdDate) {
-        this.createdDate = createdDate;
+    public void setCreatedDate(Date date) {
+        this.createdDate = date;
     }
 
     /**
@@ -138,7 +138,7 @@ public class AuditLogModel implements Parcelable {
 
     protected AuditLogModel(Parcel in) {
         createdBy = in.readString();
-        createdDate = (CreatedDate) in.readValue(CreatedDate.class.getClassLoader());
+        createdDate = (Date) in.readValue(Date.class.getClassLoader());
         objectHid = in.readString();
         parameters = (Parameters) in.readValue(Parameters.class.getClassLoader());
         productName = in.readString();

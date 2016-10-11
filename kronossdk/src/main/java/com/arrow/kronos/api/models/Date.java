@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CreatedDate implements Parcelable {
+public class Date implements Parcelable {
 
     @SerializedName("epochSecond")
     @Expose
@@ -52,7 +52,7 @@ public class CreatedDate implements Parcelable {
     }
 
 
-    protected CreatedDate(Parcel in) {
+    protected Date(Parcel in) {
         epochSecond = in.readByte() == 0x00 ? null : in.readInt();
         nano = in.readByte() == 0x00 ? null : in.readInt();
     }
@@ -79,15 +79,15 @@ public class CreatedDate implements Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CreatedDate> CREATOR = new Parcelable.Creator<CreatedDate>() {
+    public static final Parcelable.Creator<Date> CREATOR = new Parcelable.Creator<Date>() {
         @Override
-        public CreatedDate createFromParcel(Parcel in) {
-            return new CreatedDate(in);
+        public Date createFromParcel(Parcel in) {
+            return new Date(in);
         }
 
         @Override
-        public CreatedDate[] newArray(int size) {
-            return new CreatedDate[size];
+        public Date[] newArray(int size) {
+            return new Date[size];
         }
     };
 }

@@ -16,6 +16,9 @@ import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.models.HistoricalEventResponse;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
+import com.arrow.kronos.api.models.ListResultModel;
+import com.arrow.kronos.api.models.NodeModel;
+import com.arrow.kronos.api.models.NodeRegistrationModel;
 
 import java.util.List;
 
@@ -137,5 +140,15 @@ public interface IotConnectAPIService {
                                                 @Query("sortDirection") String sortDirection,
                                                 @Query("_page") int page,
                                                 @Query("_size") int size);
+    //node api
+
+    @GET("/api/v1/kronos/nodes")
+    Call<ListResultModel<NodeModel>> getListExistingNodes();
+
+    @POST("/api/v1/kronos/nodes")
+    Call<CommonResponse> createNewNode(@Body NodeRegistrationModel model);
+
+    @PUT("/api/v1/kronos/nodes/{hid}")
+    Call<CommonResponse>  updateExistingNode(@Path("hid") String nodeHid, @Body NodeRegistrationModel model);
 
 }
