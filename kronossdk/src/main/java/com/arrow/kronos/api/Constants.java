@@ -13,9 +13,6 @@ public final class Constants {
 
     public final static String SP_CLOUD_HERATBEAT_INTERVAL = "com.arrow.jmyiotgateway.cloud_service_heartbeat";
 
-    public static final String DEFAULT_API_KEY = "***REMOVED***";
-    public static final String DEFAULT_API_SECRET = "***REMOVED***";
-
     public final static int HEART_BEAT_INTERVAL = 60; //1 minute
 
     public static class Preference {

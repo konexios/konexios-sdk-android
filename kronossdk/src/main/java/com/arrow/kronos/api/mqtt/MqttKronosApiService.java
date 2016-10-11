@@ -1,6 +1,8 @@
 package com.arrow.kronos.api.mqtt;
 
 
+import android.text.TextUtils;
+
 import com.arrow.kronos.api.Constants;
 import com.arrow.kronos.api.ServerEndpoint;
 import com.arrow.kronos.api.common.ApiRequestSigner;
@@ -18,8 +20,8 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
 
     protected MqttConnectOptions getMqttOptions() {
         String userName = mMqttPrefix + ":" + mGatewayHid;
-        String apiKey = ApiRequestSigner.getInstance().getApiKey() != null ? ApiRequestSigner.getInstance().getApiKey() :
-                Constants.DEFAULT_API_KEY;
+        String apiKey = ApiRequestSigner.getInstance().getApiKey();
+        apiKey = !TextUtils.isEmpty(apiKey) ? apiKey : getApiKey();
         MqttConnectOptions connOpts = super.getMqttOptions();
         connOpts.setUserName(userName);
         connOpts.setPassword(apiKey.toCharArray());

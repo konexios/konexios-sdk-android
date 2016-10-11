@@ -58,6 +58,8 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     private GatewayRegisterListener mGatewayRegisterListener;
     private String mGatewayId;
     protected ServerCommandsListener mServerCommandsListener;
+    private String mApiKey;
+    private String mApiSecret;
 
     private Callback<GatewayResponse> mGatewayResponseCallback = new Callback<GatewayResponse>() {
         @Override
@@ -125,7 +127,11 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void setRestEndpoint(String endpoint) {
+    public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
+        mApiKey = apiKey;
+        mApiSecret = apiSecret;
+        RetrofitHolder.setApiKey(apiKey);
+        RetrofitHolder.setApiSecret(apiSecret);
         mService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
@@ -435,6 +441,14 @@ public abstract class AbstractKronosApiService implements KronosApiService {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "eventHandlingSucceed error");
             }
         });
+    }
+
+    protected String getApiKey() {
+        return mApiKey;
+    }
+
+    protected String getApiSecret() {
+        return mApiSecret;
     }
 
     @Override
