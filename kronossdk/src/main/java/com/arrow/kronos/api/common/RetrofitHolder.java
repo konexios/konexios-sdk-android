@@ -1,6 +1,7 @@
 package com.arrow.kronos.api.common;
 
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.arrow.kronos.api.Constants;
@@ -41,10 +42,12 @@ public abstract class RetrofitHolder {
                     String nowAsISO = df.format(new Date()).replace(" ", "T");
 
                     String body = bodyToString(chain.request().body());
-                    if (requestSigner.getSecretKey() == null || requestSigner.getSecretKey().isEmpty()) {
-                        requestSigner.setSecretKey(Constants.DEFAULT_API_SECRET);
+                    if (TextUtils.isEmpty(requestSigner.getSecretKey()) &&
+                            !TextUtils.isEmpty(sApiSecret)) {
+                        requestSigner.setSecretKey(sApiSecret);
                     }
-                    String apiKey = requestSigner.getApiKey()== null ? Constants.DEFAULT_API_KEY : requestSigner.getApiKey();
+                    String apiKey = TextUtils.isEmpty(requestSigner.getApiKey()) ?
+                            sApiKey : requestSigner.getApiKey();
                     String signature = requestSigner.method(chain.request().method())
                             .canonicalUri(chain.request().url().uri().getPath())
                             .apiKey(apiKey).timestamp(nowAsISO).payload(body).signV1();
@@ -65,6 +68,16 @@ public abstract class RetrofitHolder {
             .build();
 
     private static Retrofit retrofit;
+    private static String sApiKey;
+    private static String sApiSecret;
+
+    public static void setApiKey(String apiKey) {
+        RetrofitHolder.sApiKey = apiKey;
+    }
+
+    public static void setApiSecret(String apiSecret) {
+        RetrofitHolder.sApiSecret = apiSecret;
+    }
 
     public static IotConnectAPIService getIotConnectAPIService(String endpoint) {
         if (retrofit == null || !retrofit.baseUrl().toString().equals(endpoint)) {

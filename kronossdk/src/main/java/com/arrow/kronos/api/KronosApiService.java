@@ -26,8 +26,10 @@ public interface KronosApiService {
     /**
      * sets endpoint server environment url
      * @param endpoint - String url like "http://pegasuskronos01-dev.cloudapp.net:28880"
+     * @param apiKey
+     * @param apiSecret
      */
-    void setRestEndpoint(String endpoint);
+    void setRestEndpoint(String endpoint, String apiKey, String apiSecret);
 
     /**
      *  sets mqtt server host and userName prefix
