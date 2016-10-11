@@ -24,12 +24,9 @@ import com.arrow.kronos.api.KronosApiServiceFactory;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
 import com.arrow.kronos.api.models.AccountResponse;
 import com.arrow.kronos.api.models.GatewayResponse;
-import com.arrow.kronos.api.models.RegisterDeviceRequest;
-
-import retrofit2.Call;
+import com.arrow.kronos.api.models.DeviceRegistrationModel;
 
 import static com.arrow.kronos.api.Constants.Preference.KEY_GATEWAY_ID;
-import static org.spongycastle.asn1.x500.style.RFC4519Style.uid;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -105,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void registerDevice() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String gatewayHid = sp.getString(KEY_GATEWAY_ID, "");
-        RegisterDeviceRequest payload = new RegisterDeviceRequest();
+        DeviceRegistrationModel payload = new DeviceRegistrationModel();
         //some random values to show registering process
         payload.setUid("android-7cfe-e895-1988-cfc60033c5565");
         payload.setName("AndroidInternal");

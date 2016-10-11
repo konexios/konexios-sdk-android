@@ -4,7 +4,7 @@ package com.arrow.kronos.api.models;
  * Created by osminin on 10/6/2016.
  */
 
-public final class GatewayLogsQuery {
+public final class AuditLogsQuery {
     private String createdDateFrom;
     private String createdDateTo;
     private String[] userHids;
@@ -14,7 +14,7 @@ public final class GatewayLogsQuery {
     private int page;
     private int size;
 
-    public GatewayLogsQuery(String createdDateFrom, String createdDateTo, String[] userHids, String[] types, String sortField, String sortDirection, int page, int size) {
+    public AuditLogsQuery(String createdDateFrom, String createdDateTo, String[] userHids, String[] types, String sortField, String sortDirection, int page, int size) {
         this.createdDateFrom = createdDateFrom;
         this.createdDateTo = createdDateTo;
         this.userHids = userHids;

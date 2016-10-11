@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Datum implements Parcelable {
+public class AuditLogModel implements Parcelable {
 
     @SerializedName("createdBy")
     @Expose
@@ -30,7 +30,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @return
-     *     The createdBy
+     * The createdBy
      */
     public String getCreatedBy() {
         return createdBy;
@@ -39,7 +39,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @param createdBy
-     *     The createdBy
+     * The createdBy
      */
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
@@ -48,7 +48,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @return
-     *     The createdDate
+     * The createdDate
      */
     public CreatedDate getCreatedDate() {
         return createdDate;
@@ -57,7 +57,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @param createdDate
-     *     The createdDate
+     * The createdDate
      */
     public void setCreatedDate(CreatedDate createdDate) {
         this.createdDate = createdDate;
@@ -66,7 +66,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @return
-     *     The objectHid
+     * The objectHid
      */
     public String getObjectHid() {
         return objectHid;
@@ -75,7 +75,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @param objectHid
-     *     The objectHid
+     * The objectHid
      */
     public void setObjectHid(String objectHid) {
         this.objectHid = objectHid;
@@ -84,7 +84,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @return
-     *     The parameters
+     * The parameters
      */
     public Parameters getParameters() {
         return parameters;
@@ -93,7 +93,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @param parameters
-     *     The parameters
+     * The parameters
      */
     public void setParameters(Parameters parameters) {
         this.parameters = parameters;
@@ -102,7 +102,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @return
-     *     The productName
+     * The productName
      */
     public String getProductName() {
         return productName;
@@ -111,7 +111,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @param productName
-     *     The productName
+     * The productName
      */
     public void setProductName(String productName) {
         this.productName = productName;
@@ -120,7 +120,7 @@ public class Datum implements Parcelable {
     /**
      *
      * @return
-     *     The type
+     * The type
      */
     public String getType() {
         return type;
@@ -129,14 +129,14 @@ public class Datum implements Parcelable {
     /**
      *
      * @param type
-     *     The type
+     * The type
      */
     public void setType(String type) {
         this.type = type;
     }
 
 
-    protected Datum(Parcel in) {
+    protected AuditLogModel(Parcel in) {
         createdBy = in.readString();
         createdDate = (CreatedDate) in.readValue(CreatedDate.class.getClassLoader());
         objectHid = in.readString();
@@ -161,15 +161,15 @@ public class Datum implements Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Datum> CREATOR = new Parcelable.Creator<Datum>() {
+    public static final Parcelable.Creator<AuditLogModel> CREATOR = new Parcelable.Creator<AuditLogModel>() {
         @Override
-        public Datum createFromParcel(Parcel in) {
-            return new Datum(in);
+        public AuditLogModel createFromParcel(Parcel in) {
+            return new AuditLogModel(in);
         }
 
         @Override
-        public Datum[] newArray(int size) {
-            return new Datum[size];
+        public AuditLogModel[] newArray(int size) {
+            return new AuditLogModel[size];
         }
     };
 }
