@@ -6,14 +6,16 @@ import com.arrow.kronos.api.models.AccountResponse;
 import com.arrow.kronos.api.models.ActionModel;
 import com.arrow.kronos.api.models.ActionResponseModel;
 import com.arrow.kronos.api.models.ActionTypeResponseModel;
+import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.DeviceModel;
 import com.arrow.kronos.api.models.FindAllDevicesResponse;
 import com.arrow.kronos.api.models.GatewayCommand;
-import com.arrow.kronos.api.models.GatewayLogsResponse;
+import com.arrow.kronos.api.models.AuditLogsResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.models.HistoricalEventResponse;
-import com.arrow.kronos.api.models.RegisterDeviceRequest;
+import com.arrow.kronos.api.models.DeviceRegistrationModel;
 
 import java.util.List;
 
@@ -63,15 +65,15 @@ public interface IotConnectAPIService {
     Call<GatewayResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
 
     @GET("/api/v1/kronos/gateways/{hid}/logs")
-    Call<GatewayLogsResponse> getGatewayLogs(@Path("hid") String hid,
-                                             @Query("createdDateFrom") String createdDateFrom,
-                                             @Query("createdDateTo") String createdDateTo,
-                                             @Query("userHids") String[] userHids,
-                                             @Query("types") String[] types,
-                                             @Query("sortField") String sortField,
-                                             @Query("sortDirection") String sortDirection,
-                                             @Query("_page") int page,
-                                             @Query("_size") int size);
+    Call<AuditLogsResponse> getGatewayLogs(@Path("hid") String hid,
+                                           @Query("createdDateFrom") String createdDateFrom,
+                                           @Query("createdDateTo") String createdDateTo,
+                                           @Query("userHids") String[] userHids,
+                                           @Query("types") String[] types,
+                                           @Query("sortField") String sortField,
+                                           @Query("sortDirection") String sortDirection,
+                                           @Query("_page") int page,
+                                           @Query("_size") int size);
 
     @POST("/api/v1/kronos/telemetries")
     Call<ResponseBody> sendTelemetry(@Body RequestBody body);
@@ -117,6 +119,23 @@ public interface IotConnectAPIService {
                                                 @Query("_page") int page,
                                                 @Query("_size") int size);
     @POST("/api/v1/kronos/devices")
-    Call<GatewayResponse> createOrUpdateDevice(@Body RegisterDeviceRequest deviceRequest);
+    Call<GatewayResponse> createOrUpdateDevice(@Body DeviceRegistrationModel deviceRequest);
+
+    @GET("/api/v1/kronos/devices/{hid}")
+    Call<DeviceModel> findDeviceByHid(@Path("hid") String hid);
+
+    @PUT("/api/v1/kronos/devices/{hid}")
+    Call<CommonResponse> updateExistingDevice(@Path("hid") String hid, @Body DeviceRegistrationModel model);
+
+    @GET("/api/v1/kronos/devices/{hid}/logs")
+    Call<AuditLogsResponse> listDeviceAuditLogs(@Path("hid") String hid,
+                                                @Query("createdDateFrom") String createdDateFrom,
+                                                @Query("createdDateTo") String createdDateTo,
+                                                @Query("userHids") String[] userHids,
+                                                @Query("types") String[] types,
+                                                @Query("sortField") String sortField,
+                                                @Query("sortDirection") String sortDirection,
+                                                @Query("_page") int page,
+                                                @Query("_size") int size);
 
 }

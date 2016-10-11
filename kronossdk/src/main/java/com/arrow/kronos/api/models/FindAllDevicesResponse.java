@@ -12,7 +12,7 @@ public class FindAllDevicesResponse implements Parcelable {
 
     @SerializedName("data")
     @Expose
-    private List<Datum> data = new ArrayList<>();
+    private List<DeviceModel> data = new ArrayList<>();
     @SerializedName("page")
     @Expose
     private int page;
@@ -31,7 +31,7 @@ public class FindAllDevicesResponse implements Parcelable {
      * @return
      * The data
      */
-    public List<Datum> getData() {
+    public List<DeviceModel> getData() {
         return data;
     }
 
@@ -40,7 +40,7 @@ public class FindAllDevicesResponse implements Parcelable {
      * @param data
      * The data
      */
-    public void setData(List<Datum> data) {
+    public void setData(List<DeviceModel> data) {
         this.data = data;
     }
 
@@ -119,8 +119,8 @@ public class FindAllDevicesResponse implements Parcelable {
 
     protected FindAllDevicesResponse(Parcel in) {
         if (in.readByte() == 0x01) {
-            data = new ArrayList<Datum>();
-            in.readList(data, Datum.class.getClassLoader());
+            data = new ArrayList<DeviceModel>();
+            in.readList(data, DeviceModel.class.getClassLoader());
         } else {
             data = null;
         }
