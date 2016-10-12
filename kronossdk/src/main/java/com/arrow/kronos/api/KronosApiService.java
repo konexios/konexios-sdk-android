@@ -16,6 +16,7 @@ import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
+import com.arrow.kronos.api.listeners.GetDeviceTypesListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
 import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
@@ -27,7 +28,9 @@ import com.arrow.kronos.api.listeners.RegisterDeviceListener;
 import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.listeners.UpdateDeviceActionListener;
 import com.arrow.kronos.api.models.AccountRequest;
+import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.DeviceActionModel;
+import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.GatewayModel;
@@ -181,4 +184,13 @@ public interface KronosApiService {
     void createNewNodeType(NodeTypeRegistrationModel nodeType, CommonRequestListener listener);
 
     void updateExistingNodeType(String hid, NodeTypeRegistrationModel nodeType, CommonRequestListener listener);
+
+    //device-type api
+
+    void getListDeviceTypes(GetDeviceTypesListener listener);
+
+    void createNewDeviceType(DeviceTypeRegistrationModel deviceType, CommonRequestListener listener);
+
+    void updateExistingDeviceType(String hid,
+                                  DeviceTypeRegistrationModel deviceType, CommonRequestListener listener);
 }

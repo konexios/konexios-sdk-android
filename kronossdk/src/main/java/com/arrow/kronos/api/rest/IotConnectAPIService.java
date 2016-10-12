@@ -10,6 +10,8 @@ import com.arrow.kronos.api.models.ConfigResponse;
 import com.arrow.kronos.api.models.DeviceActionTypeModel;
 import com.arrow.kronos.api.models.DeviceEventModel;
 import com.arrow.kronos.api.models.DeviceModel;
+import com.arrow.kronos.api.models.DeviceTypeModel;
+import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.PagingResultModel;
 import com.arrow.kronos.api.models.GatewayModel;
@@ -162,5 +164,16 @@ public interface IotConnectAPIService {
 
     @PUT("/api/v1/kronos/nodes/types/{hid}")
     Call<CommonResponse> updateExistingNodeType(@Path("hid")String hid, @Body NodeTypeRegistrationModel model);
+
+    // device - type api
+
+    @GET("/api/v1/kronos/devices/types")
+    Call<ListResultModel<DeviceTypeModel>> getListDeviceTypes();
+
+    @POST("/api/v1/kronos/devices/types")
+    Call<CommonResponse> createNewDeviceType(@Body DeviceTypeRegistrationModel body);
+
+    @PUT("/api/v1/kronos/devices/types/{hid}")
+    Call<CommonResponse> updateExistingDeviceType(@Path("hid")String hid, @Body DeviceTypeRegistrationModel body);
 
 }
