@@ -3,14 +3,13 @@ package com.arrow.kronos.api.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.arrow.kronos.api.models.ActionParametersModel;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by osminin on 8/8/2016.
  */
 
-public final class ActionTypeModel implements Parcelable {
+public final class DeviceActionTypeModel implements Parcelable {
     @SerializedName("hid")
     private String mHid;
     @SerializedName("name")
@@ -82,7 +81,7 @@ public final class ActionTypeModel implements Parcelable {
         mParameters = parameters;
     }
 
-    protected ActionTypeModel(Parcel in) {
+    protected DeviceActionTypeModel(Parcel in) {
         mHid = in.readString();
         mName = in.readString();
         mDescription = in.readString();
@@ -114,15 +113,15 @@ public final class ActionTypeModel implements Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<ActionTypeModel> CREATOR = new Parcelable.Creator<ActionTypeModel>() {
+    public static final Parcelable.Creator<DeviceActionTypeModel> CREATOR = new Parcelable.Creator<DeviceActionTypeModel>() {
         @Override
-        public ActionTypeModel createFromParcel(Parcel in) {
-            return new ActionTypeModel(in);
+        public DeviceActionTypeModel createFromParcel(Parcel in) {
+            return new DeviceActionTypeModel(in);
         }
 
         @Override
-        public ActionTypeModel[] newArray(int size) {
-            return new ActionTypeModel[size];
+        public DeviceActionTypeModel[] newArray(int size) {
+            return new DeviceActionTypeModel[size];
         }
     };
 }

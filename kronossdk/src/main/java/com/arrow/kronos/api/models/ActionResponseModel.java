@@ -3,7 +3,6 @@ package com.arrow.kronos.api.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.arrow.kronos.api.models.ActionModel;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -15,20 +14,20 @@ import java.util.List;
 
 public final class ActionResponseModel implements Parcelable {
     @SerializedName("data")
-    List<ActionModel> mActions;
+    List<DeviceActionModel> mActions;
 
-    public List<ActionModel> getActions() {
+    public List<DeviceActionModel> getActions() {
         return mActions;
     }
 
-    public void setActions(List<ActionModel> actions) {
+    public void setActions(List<DeviceActionModel> actions) {
         mActions = actions;
     }
 
     protected ActionResponseModel(Parcel in) {
         if (in.readByte() == 0x01) {
             mActions = new ArrayList<>();
-            in.readList(mActions, ActionModel.class.getClassLoader());
+            in.readList(mActions, DeviceActionModel.class.getClassLoader());
         } else {
             mActions = null;
         }

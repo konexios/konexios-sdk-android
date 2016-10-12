@@ -3,18 +3,17 @@ package com.arrow.kronos.api.rest;
 
 import com.arrow.kronos.api.models.AccountRequest;
 import com.arrow.kronos.api.models.AccountResponse;
-import com.arrow.kronos.api.models.ActionModel;
-import com.arrow.kronos.api.models.ActionResponseModel;
-import com.arrow.kronos.api.models.ActionTypeResponseModel;
+import com.arrow.kronos.api.models.AuditLogModel;
+import com.arrow.kronos.api.models.DeviceActionModel;
 import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.DeviceActionTypeModel;
+import com.arrow.kronos.api.models.DeviceEventModel;
 import com.arrow.kronos.api.models.DeviceModel;
-import com.arrow.kronos.api.models.FindAllDevicesResponse;
 import com.arrow.kronos.api.models.GatewayCommand;
-import com.arrow.kronos.api.models.AuditLogsResponse;
+import com.arrow.kronos.api.models.PagingResultModel;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
-import com.arrow.kronos.api.models.HistoricalEventResponse;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
@@ -70,7 +69,7 @@ public interface IotConnectAPIService {
     Call<GatewayResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
 
     @GET("/api/v1/kronos/gateways/{hid}/logs")
-    Call<AuditLogsResponse> getGatewayLogs(@Path("hid") String hid,
+    Call<PagingResultModel<AuditLogModel>> getGatewayLogs(@Path("hid") String hid,
                                            @Query("createdDateFrom") String createdDateFrom,
                                            @Query("createdDateTo") String createdDateTo,
                                            @Query("userHids") String[] userHids,
@@ -97,26 +96,26 @@ public interface IotConnectAPIService {
 
     //device-action api
     @GET("/api/v1/kronos/devices/actions/types")
-    Call<ActionTypeResponseModel> getActionTypes();
+    Call<ListResultModel<DeviceActionTypeModel>> getActionTypes();
 
     @GET("/api/v1/kronos/devices/{hid}/actions")
-    Call<ActionResponseModel> getActions(@Path("hid") String hid);
+    Call<ListResultModel<DeviceActionModel>> getActions(@Path("hid") String hid);
 
     @POST("/api/v1/kronos/devices/{hid}/actions")
-    Call<ResponseBody> postAction(@Path("hid") String hid, @Body ActionModel action);
+    Call<ResponseBody> postAction(@Path("hid") String hid, @Body DeviceActionModel action);
 
     @PUT("/api/v1/kronos/devices/{hid}/actions/{index}")
     Call<ResponseBody> updateAction(@Path("hid") String hid, @Path("index") int index,
-                                    @Body ActionModel action);
+                                    @Body DeviceActionModel action);
     @DELETE("/api/v1/kronos/devices/{hid}/actions/{index}")
     Call<ResponseBody> deleteAction(@Path("hid") String hid, @Path("index") int index);
 
     //Device api
     @GET("/api/v1/kronos/devices/{hid}/events")
-    Call<HistoricalEventResponse> getHistoricalEvents(@Path("hid") String hid);
+    Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid);
 
     @GET("/api/v1/kronos/devices")
-    Call<FindAllDevicesResponse> findAllDevices(@Query("userHid") String userHid,
+    Call<PagingResultModel<DeviceModel>> findAllDevices(@Query("userHid") String userHid,
                                                 @Query("uid") String uid,
                                                 @Query("type") String type,
                                                 @Query("gatewayHid") String gatewayHid,
@@ -133,15 +132,15 @@ public interface IotConnectAPIService {
     Call<CommonResponse> updateExistingDevice(@Path("hid") String hid, @Body DeviceRegistrationModel model);
 
     @GET("/api/v1/kronos/devices/{hid}/logs")
-    Call<AuditLogsResponse> listDeviceAuditLogs(@Path("hid") String hid,
-                                                @Query("createdDateFrom") String createdDateFrom,
-                                                @Query("createdDateTo") String createdDateTo,
-                                                @Query("userHids") String[] userHids,
-                                                @Query("types") String[] types,
-                                                @Query("sortField") String sortField,
-                                                @Query("sortDirection") String sortDirection,
-                                                @Query("_page") int page,
-                                                @Query("_size") int size);
+    Call<PagingResultModel<AuditLogModel>> listDeviceAuditLogs(@Path("hid") String hid,
+                                                               @Query("createdDateFrom") String createdDateFrom,
+                                                               @Query("createdDateTo") String createdDateTo,
+                                                               @Query("userHids") String[] userHids,
+                                                               @Query("types") String[] types,
+                                                               @Query("sortField") String sortField,
+                                                               @Query("sortDirection") String sortDirection,
+                                                               @Query("_page") int page,
+                                                               @Query("_size") int size);
     //node api
 
     @GET("/api/v1/kronos/nodes")

@@ -1,7 +1,9 @@
 package com.arrow.kronos.api.listeners;
 
 
-import com.arrow.kronos.api.models.ActionTypeResponseModel;
+import com.arrow.kronos.api.models.DeviceActionTypeModel;
+
+import java.util.List;
 
 /**
  * Created by osminin on 9/22/2016.
@@ -9,6 +11,6 @@ import com.arrow.kronos.api.models.ActionTypeResponseModel;
 
 public interface DeviceActionTypesListener {
 
-    void onActionTypesReceived(ActionTypeResponseModel actionTypes);
+    void onActionTypesReceived(List<DeviceActionTypeModel> actionTypes);
     void onActionTypesFailed(String error);
 }

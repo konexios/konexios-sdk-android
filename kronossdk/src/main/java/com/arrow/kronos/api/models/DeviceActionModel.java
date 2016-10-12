@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 8/2/2016.
  */
 
-public final class ActionModel implements Parcelable {
+public final class DeviceActionModel implements Parcelable {
     @SerializedName("criteria")
     String mCriteria;
     @SerializedName("description")
@@ -81,7 +81,7 @@ public final class ActionModel implements Parcelable {
         mSystemName = systemName;
     }
 
-    protected ActionModel(Parcel in) {
+    protected DeviceActionModel(Parcel in) {
         mCriteria = in.readString();
         mDescription = in.readString();
         byte mEnabledVal = in.readByte();
@@ -92,7 +92,7 @@ public final class ActionModel implements Parcelable {
         mSystemName = in.readString();
     }
 
-    public ActionModel() {
+    public DeviceActionModel() {
     }
 
     @Override
@@ -126,15 +126,15 @@ public final class ActionModel implements Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<ActionModel> CREATOR = new Parcelable.Creator<ActionModel>() {
+    public static final Parcelable.Creator<DeviceActionModel> CREATOR = new Parcelable.Creator<DeviceActionModel>() {
         @Override
-        public ActionModel createFromParcel(Parcel in) {
-            return new ActionModel(in);
+        public DeviceActionModel createFromParcel(Parcel in) {
+            return new DeviceActionModel(in);
         }
 
         @Override
-        public ActionModel[] newArray(int size) {
-            return new ActionModel[size];
+        public DeviceActionModel[] newArray(int size) {
+            return new DeviceActionModel[size];
         }
     };
 }
