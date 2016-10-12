@@ -20,6 +20,7 @@ import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
 import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
 import com.arrow.kronos.api.listeners.GetNodesListListener;
+import com.arrow.kronos.api.listeners.ListNodeTypesListener;
 import com.arrow.kronos.api.listeners.PostDeviceActionListener;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
@@ -32,6 +33,7 @@ import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
+import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 
 import java.util.List;
 
@@ -171,4 +173,12 @@ public interface KronosApiService {
     void createNewNode(NodeRegistrationModel node, CommonRequestListener listener);
 
     void updateExistingNode(String nodeHid, NodeRegistrationModel node, CommonRequestListener listener);
+
+    //Node-type api
+
+    void getListNodeTypes(ListNodeTypesListener listener);
+
+    void createNewNodeType(NodeTypeRegistrationModel nodeType, CommonRequestListener listener);
+
+    void updateExistingNodeType(String hid, NodeTypeRegistrationModel nodeType, CommonRequestListener listener);
 }
