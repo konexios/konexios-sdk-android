@@ -15,21 +15,18 @@ import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
-import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
-import com.arrow.kronos.api.listeners.DeviceActionsListener;
-import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
 import com.arrow.kronos.api.listeners.FindDeviceListener;
 import com.arrow.kronos.api.listeners.FindDevicesListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
-import com.arrow.kronos.api.listeners.GetDeviceTypesListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
 import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
-import com.arrow.kronos.api.listeners.GetNodesListListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
+import com.arrow.kronos.api.listeners.ListResultListener;
+import com.arrow.kronos.api.listeners.PagingResultListener;
 import com.arrow.kronos.api.listeners.PostDeviceActionListener;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
@@ -327,42 +324,42 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void getDeviceActionTypes(final DeviceActionTypesListener listener) {
+    public void getDeviceActionTypes(final ListResultListener<DeviceActionTypeModel> listener) {
         mService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, Response<ListResultModel<DeviceActionTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onActionTypesReceived(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onActionTypesFailed("Error: " + response.code());
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceActionTypeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getActionTypes error");
-                listener.onActionTypesFailed("Fatal error");
+                listener.onRequestError();
             }
         });
     }
 
     @Override
-    public void getDeviceActions(String deviceHid, final DeviceActionsListener listener) {
+    public void getDeviceActions(String deviceHid, final ListResultListener<DeviceActionModel> listener) {
         mService.getActions(deviceHid).enqueue(new Callback<ListResultModel<DeviceActionModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionModel>> call, Response<ListResultModel<DeviceActionModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActions response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onDeviceActionsReceived(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onDeviceActionsFailed("Error code: " + response.code());
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceActionModel>> call, Throwable t) {
-                listener.onDeviceActionsFailed("fatal error");
+                listener.onRequestError();
             }
         });
     }
@@ -408,21 +405,21 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void getDeviceHistoricalEvents(String deviceHid, final DeviceHistoricalEventsListener listener) {
+    public void getDeviceHistoricalEvents(String deviceHid, final PagingResultListener<DeviceEventModel> listener) {
         mService.getHistoricalEvents(deviceHid).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<DeviceEventModel>> call, Response<PagingResultModel<DeviceEventModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getHistoricalEvents response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onHistoricalEventsReceived(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onHistoricalEventsFailed("Error code: " + response.code());
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<DeviceEventModel>> call, Throwable t) {
-                listener.onHistoricalEventsFailed("Fatal error");
+                listener.onRequestError();
             }
         });
     }
@@ -670,7 +667,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void getGatewayLogs(String hid, AuditLogsQuery query, final GetAuditLogsListener listener) {
+    public void getGatewayLogs(String hid, AuditLogsQuery query, final PagingResultListener<AuditLogModel> listener) {
         mService.getGatewayLogs(hid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
                 query.getUserHids(), query.getTypes(), query.getSortField(), query.getSortDirection(),
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
@@ -678,17 +675,17 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             public void onResponse(Call<PagingResultModel<AuditLogModel>> call, Response<PagingResultModel<AuditLogModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onGatewayLogsReceived(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
-                    listener.onGatewayLogsFailed();
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
-                listener.onGatewayLogsFailed();
+                listener.onRequestError();
             }
         });
     }
@@ -717,24 +714,24 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findAllDevices(String userHid, String uid, String type, String gatewayHid,
-                               String enabled, int page, int size, final FindDevicesListener listener) {
+                               String enabled, int page, int size, final PagingResultListener<DeviceModel> listener) {
         mService.findAllDevices(userHid, uid, type, gatewayHid, enabled, page, size).
                 enqueue(new Callback<PagingResultModel<DeviceModel>>() {
                     @Override
                     public void onResponse(Call<PagingResultModel<DeviceModel>> call, Response<PagingResultModel<DeviceModel>> response) {
                         FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
                         if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                            listener.onDevicesFond(response.body().getData());
+                            listener.onRequestSuccess(response.body().getData());
                         } else {
                             FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                            listener.onDevicesFindFailed();
+                            listener.onRequestError();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<PagingResultModel<DeviceModel>> call, Throwable t) {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                        listener.onDevicesFindFailed();
+                        listener.onRequestError();
                     }
                 });
     }
@@ -784,7 +781,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, final GetAuditLogsListener listener) {
+    public void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, final PagingResultListener<AuditLogModel> listener) {
         mService.listDeviceAuditLogs(deviceHid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
                 query.getUserHids(), query.getTypes(), query.getSortField(), query.getSortDirection(),
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
@@ -792,17 +789,17 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             public void onResponse(Call<PagingResultModel<AuditLogModel>> call, Response<PagingResultModel<AuditLogModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getDeviceAuditLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onGatewayLogsReceived(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
-                    listener.onGatewayLogsFailed();
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
-                listener.onGatewayLogsFailed();
+                listener.onRequestError();
             }
         });
     }
@@ -811,23 +808,23 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
 
     @Override
-    public void getNodesList(final GetNodesListListener listener) {
+    public void getNodesList(final ListResultListener<NodeModel> listener) {
         mService.getListExistingNodes().enqueue(new Callback<ListResultModel<NodeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<NodeModel>> call, Response<ListResultModel<NodeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getNodesList response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onGetListNodesSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
-                    listener.onGetListNodesFailed();
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<NodeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
-                listener.onGetListNodesFailed();
+                listener.onRequestError();
             }
         });
     }
@@ -947,25 +944,24 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     //device - type api
 
-
     @Override
-    public void getListDeviceTypes(final GetDeviceTypesListener listener) {
+    public void getListDeviceTypes(final ListResultListener<DeviceTypeModel> listener) {
         mService.getListDeviceTypes().enqueue(new Callback<ListResultModel<DeviceTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceTypeModel>> call, Response<ListResultModel<DeviceTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getListDeviceTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onDeviceTypeListReceived(response.body().getData());
+                    listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
-                    listener.onDeviceTypeListError();
+                    listener.onRequestError();
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceTypeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
-                listener.onDeviceTypeListError();
+                listener.onRequestError();
             }
         });
     }
