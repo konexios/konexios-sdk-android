@@ -11,9 +11,9 @@ public class AuditLogModel implements Parcelable {
     @SerializedName("createdBy")
     @Expose
     private String createdBy;
-    @SerializedName("createdDate")
+    @SerializedName("createdString")
     @Expose
-    private Date createdDate;
+    private String createdString;
     @SerializedName("objectHid")
     @Expose
     private String objectHid;
@@ -48,19 +48,19 @@ public class AuditLogModel implements Parcelable {
     /**
      *
      * @return
-     * The createdDate
+     * The createdString
      */
-    public Date getCreatedDate() {
-        return createdDate;
+    public String getCreatedString() {
+        return createdString;
     }
 
     /**
      *
-     * @param date
-     * The date
+     * @param String
+     * The String
      */
-    public void setCreatedDate(Date date) {
-        this.createdDate = date;
+    public void setCreatedString(String String) {
+        this.createdString = String;
     }
 
     /**
@@ -138,7 +138,7 @@ public class AuditLogModel implements Parcelable {
 
     protected AuditLogModel(Parcel in) {
         createdBy = in.readString();
-        createdDate = (Date) in.readValue(Date.class.getClassLoader());
+        createdString = (String) in.readValue(String.class.getClassLoader());
         objectHid = in.readString();
         parameters = (Parameters) in.readValue(Parameters.class.getClassLoader());
         productName = in.readString();
@@ -153,7 +153,7 @@ public class AuditLogModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(createdBy);
-        dest.writeValue(createdDate);
+        dest.writeValue(createdString);
         dest.writeString(objectHid);
         dest.writeValue(parameters);
         dest.writeString(productName);

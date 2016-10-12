@@ -14,6 +14,8 @@ import android.widget.Button;
 
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
+import com.arrow.kronos.api.listeners.GatewayUpdateListener;
+import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayType;
 import com.google.firebase.crash.FirebaseCrash;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private KronosApiService mTelemetrySendService;
 
     private AccountResponse mAccountResponse;
-    private GatewayResponse mGatewayResponse;
+    private String mDeviceHid;
 
     private String mGatewayHid;
 
@@ -63,16 +65,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         registerGatewayButton.setOnClickListener(this);
         Button findGatewayButton = (Button) findViewById(R.id.find_gateway);
         findGatewayButton.setOnClickListener(this);
+        Button updateGatewayButton = (Button) findViewById(R.id.update_gateway);
+        updateGatewayButton.setOnClickListener(this);
 
         //Once instance of KronosApiService is created it could be got by getKronosApiService() call
         mTelemetrySendService = KronosApiServiceFactory.getKronosApiService();
         //initialize service with a context and bind it with activity's lifecycle
         mTelemetrySendService.initialize(this);
 
-        mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
+        //mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
         //register new gateway and initiate persistent connection (it makes sense only in case when some of {ConnectionType.MQTT, ConnectionType.AWS,
         // ConnectionType.IBM} is chosen)
-        mTelemetrySendService.connect();
+        //mTelemetrySendService.connect();
     }
 
     @Override
@@ -96,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.find_gateway:
                 findGateway();
                 break;
+            case R.id.update_gateway:
+                updateGateway();
+                break;
         }
     }
 
@@ -111,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         payload.setType("android");
         mTelemetrySendService.registerDevice(payload, new RegisterDeviceListener() {
             @Override
-            public void onDeviceRegistered(GatewayResponse response) {
-                mGatewayResponse = response;
+            public void onDeviceRegistered(CommonResponse response) {
+                mDeviceHid = response.getHid();
                 Log.v(TAG, "onDeviceRegistered");
             }
 
@@ -127,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Bundle bundle = new Bundle();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("_|timestamp", "1474896307844");
-        jsonObject.addProperty("_|deviceHid", mGatewayResponse.getHid());
+        jsonObject.addProperty("_|deviceHid", mDeviceHid);
         jsonObject.addProperty("f|light", "84.0");
         bundle.putString(Constants.EXTRA_DATA_LABEL_TELEMETRY, jsonObject.toString());
         mTelemetrySendService.sendSingleTelemetry(bundle);
@@ -171,12 +178,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTelemetrySendService.findGateway(mGatewayHid, new FindGatewayListener() {
             @Override
             public void onGatewayFound(GatewayModel gatewayModel) {
-                Log.v(TAG, "onGatewayFound" + gatewayModel.toString());
+                Log.v(TAG, "onGatewayFound");
             }
 
             @Override
             public void onGatewayFindError() {
                 Log.v(TAG, "onGatewayFindError");
+            }
+        });
+    }
+
+    private void updateGateway() {
+        String uid = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway() UID: " + uid);
+
+        String name = String.format("%s %s", Build.MANUFACTURER, Build.MODEL);
+        String osName = String.format("Android %s", Build.VERSION.RELEASE);
+        String swName = Constants.SOFTWARE_NAME;
+        String userHid = mAccountResponse.getHid();
+
+        GatewayModel gatewayModel = new GatewayModel();
+        gatewayModel.setName(name);
+        gatewayModel.setOsName(osName);
+        gatewayModel.setSoftwareName(swName);
+        gatewayModel.setUid(uid);
+        gatewayModel.setType(GatewayType.Mobile);
+        gatewayModel.setUserHid(userHid);
+        gatewayModel.setSoftwareVersion(
+                String.format("%d.%d", Constants.MAJOR, Constants.MINOR + 1));
+        mTelemetrySendService.updateGateway(mGatewayHid, gatewayModel, new GatewayUpdateListener() {
+            @Override
+            public void onGatewayUpdated(GatewayResponse response) {
+                Log.v(TAG, "onGatewayUpdated");
+            }
+
+            @Override
+            public void onGatewayUpdateFailed() {
+                Log.d(TAG, "onGatewayUpdateFailed");
             }
         });
     }

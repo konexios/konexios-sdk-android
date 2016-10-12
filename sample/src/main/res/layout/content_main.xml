@@ -15,9 +15,17 @@
     tools:showIn="@layout/activity_main">
 
     <Button
+        android:id="@+id/register_gateway"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:text="Register Gateway"/>
+
+    <Button
         android:id="@+id/register_device"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/register_gateway"
         android:layout_margin="@dimen/fab_margin"
         android:text="Register Device"/>
 
@@ -30,19 +38,19 @@
         android:text="Send Telemetry"/>
 
     <Button
-        android:id="@+id/register_gateway"
+        android:id="@+id/find_gateway"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/send_telemetry"
         android:layout_margin="@dimen/fab_margin"
-        android:text="Register Gateway"/>
+        android:text="Find Gateway"/>
 
     <Button
-        android:id="@+id/find_gateway"
+        android:id="@+id/update_gateway"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/register_gateway"
+        android:layout_below="@+id/find_gateway"
         android:layout_margin="@dimen/fab_margin"
-        android:text="Find Gateway"/>
+        android:text="Update Gateway"/>
 
 </RelativeLayout>
