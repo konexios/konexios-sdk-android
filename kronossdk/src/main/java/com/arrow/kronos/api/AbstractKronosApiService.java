@@ -24,6 +24,7 @@ import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
+import com.arrow.kronos.api.listeners.GetDeviceTypesListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
 import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
@@ -43,6 +44,8 @@ import com.arrow.kronos.api.models.ConfigResponse;
 import com.arrow.kronos.api.models.DeviceActionTypeModel;
 import com.arrow.kronos.api.models.DeviceEventModel;
 import com.arrow.kronos.api.models.DeviceModel;
+import com.arrow.kronos.api.models.DeviceTypeModel;
+import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.PagingResultModel;
@@ -937,6 +940,76 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNodeType error");
+                listener.onRequestError();
+            }
+        });
+    }
+
+    //device - type api
+
+
+    @Override
+    public void getListDeviceTypes(final GetDeviceTypesListener listener) {
+        mService.getListDeviceTypes().enqueue(new Callback<ListResultModel<DeviceTypeModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<DeviceTypeModel>> call, Response<ListResultModel<DeviceTypeModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getListDeviceTypes response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onDeviceTypeListReceived(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
+                    listener.onDeviceTypeListError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<DeviceTypeModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
+                listener.onDeviceTypeListError();
+            }
+        });
+    }
+
+    @Override
+    public void createNewDeviceType(DeviceTypeRegistrationModel deviceType, final CommonRequestListener listener) {
+        mService.createNewDeviceType(deviceType).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewDeviceType response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
+                listener.onRequestError();
+            }
+        });
+    }
+
+    @Override
+    public void updateExistingDeviceType(String hid, DeviceTypeRegistrationModel deviceType,
+                                         final CommonRequestListener listener) {
+        mService.updateExistingDeviceType(hid, deviceType).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDeviceType response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
                 listener.onRequestError();
             }
         });
