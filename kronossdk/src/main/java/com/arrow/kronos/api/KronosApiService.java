@@ -27,7 +27,7 @@ import com.arrow.kronos.api.listeners.RegisterDeviceListener;
 import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.listeners.UpdateDeviceActionListener;
 import com.arrow.kronos.api.models.AccountRequest;
-import com.arrow.kronos.api.models.ActionModel;
+import com.arrow.kronos.api.models.DeviceActionModel;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.GatewayModel;
@@ -112,9 +112,9 @@ public interface KronosApiService {
 
     void getDeviceActions(String deviceHid, DeviceActionsListener listener);
 
-    void postDeviceAction(String deviceHid, ActionModel action, PostDeviceActionListener listener);
+    void postDeviceAction(String deviceHid, DeviceActionModel action, PostDeviceActionListener listener);
 
-    void updateDeviceAction(String deviceHid, int index, ActionModel model, UpdateDeviceActionListener listener);
+    void updateDeviceAction(String deviceHid, int index, DeviceActionModel model, UpdateDeviceActionListener listener);
 
     void deleteDeviceAction(String deviceHid, int index, DeleteDeviceActionListener listener);
 

@@ -6,11 +6,11 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class AuditLogsResponse {
+public class PagingResultModel<T> {
 
     @SerializedName("data")
     @Expose
-    private List<AuditLogModel> data = new ArrayList<>();
+    private List<T> data = new ArrayList<>();
     @SerializedName("page")
     @Expose
     private Integer page;
@@ -29,7 +29,7 @@ public class AuditLogsResponse {
      * @return
      *     The data
      */
-    public List<AuditLogModel> getData() {
+    public List<T> getData() {
         return data;
     }
 
@@ -38,7 +38,7 @@ public class AuditLogsResponse {
      * @param data
      *     The data
      */
-    public void setData(List<AuditLogModel> data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 
