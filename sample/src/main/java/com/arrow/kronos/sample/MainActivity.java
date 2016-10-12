@@ -12,12 +12,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
+import com.arrow.kronos.api.listeners.GetNodesListListener;
+import com.arrow.kronos.api.listeners.ListNodeTypesListener;
 import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayType;
+import com.arrow.kronos.api.models.ListResultModel;
+import com.arrow.kronos.api.models.NodeModel;
+import com.arrow.kronos.api.models.NodeRegistrationModel;
+import com.arrow.kronos.api.models.NodeTypeModel;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.JsonObject;
 import com.arrow.kronos.api.Constants;
@@ -27,6 +34,8 @@ import com.arrow.kronos.api.listeners.RegisterDeviceListener;
 import com.arrow.kronos.api.models.AccountResponse;
 import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
+
+import java.util.List;
 
 import static com.arrow.kronos.api.Constants.Preference.KEY_GATEWAY_ID;
 
@@ -216,6 +225,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onGatewayUpdateFailed() {
                 Log.d(TAG, "onGatewayUpdateFailed");
+            }
+        });
+    }
+
+    private void getNodeList() {
+        mTelemetrySendService.getNodesList(new GetNodesListListener() {
+            @Override
+            public void onGetListNodesSuccess(List<NodeModel> result) {
+                Log.v(TAG, "getNodesList");
+            }
+
+            @Override
+            public void onGetListNodesFailed() {
+                Log.e(TAG, "onGetListNodesFailed");
+            }
+        });
+    }
+
+    private void createNewNode() {
+        NodeRegistrationModel model = new NodeRegistrationModel();
+        model.setEnabled(true);
+        model.setDescription("new node");
+        model.setName("NewNone");
+        model.setNodeTypeHid("5febbcc3c6befd3e28024090ea7dffa0bc318801");
+        model.setParentNodeHid("74f248083d0f83e70b030239ac85db6dfb7e8d6b");
+        mTelemetrySendService.createNewNode(model, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                Log.v(TAG, "createNewNode");
+            }
+
+            @Override
+            public void onRequestError() {
+                Log.e(TAG, "createNewNode");
+            }
+        });
+    }
+
+    void getListNodeTypes() {
+        mTelemetrySendService.getListNodeTypes(new ListNodeTypesListener() {
+            @Override
+            public void onListNodeTypesSuccess(ListResultModel<NodeTypeModel> result) {
+                Log.v(TAG, "getListNodeTypes");
+            }
+
+            @Override
+            public void onListNodeTypesFiled() {
+                Log.e(TAG, "getListNodeTypes");
             }
         });
     }

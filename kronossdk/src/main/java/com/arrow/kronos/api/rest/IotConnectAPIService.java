@@ -19,6 +19,8 @@ import com.arrow.kronos.api.models.DeviceRegistrationModel;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
+import com.arrow.kronos.api.models.NodeTypeModel;
+import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 
 import java.util.List;
 
@@ -150,5 +152,16 @@ public interface IotConnectAPIService {
 
     @PUT("/api/v1/kronos/nodes/{hid}")
     Call<CommonResponse>  updateExistingNode(@Path("hid") String nodeHid, @Body NodeRegistrationModel model);
+
+    //node - type api
+
+    @GET("/api/v1/kronos/nodes/types")
+    Call<ListResultModel<NodeTypeModel>> getListNodeTypes();
+
+    @POST("/api/v1/kronos/nodes/types")
+    Call<CommonResponse> createNewNodeType(NodeTypeRegistrationModel model);
+
+    @PUT("/api/v1/kronos/nodes/types/{hid}")
+    Call<CommonResponse> updateExistingNodeType(@Path("hid")String hid, @Body NodeTypeRegistrationModel model);
 
 }
