@@ -6,9 +6,6 @@ import android.os.Bundle;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
-import com.arrow.kronos.api.listeners.DeviceActionTypesListener;
-import com.arrow.kronos.api.listeners.DeviceActionsListener;
-import com.arrow.kronos.api.listeners.DeviceHistoricalEventsListener;
 import com.arrow.kronos.api.listeners.FindDeviceListener;
 import com.arrow.kronos.api.listeners.FindDevicesListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
@@ -16,25 +13,30 @@ import com.arrow.kronos.api.listeners.GatewayCommandsListener;
 import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
-import com.arrow.kronos.api.listeners.GetDeviceTypesListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
 import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
-import com.arrow.kronos.api.listeners.GetNodesListListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
+import com.arrow.kronos.api.listeners.ListResultListener;
+import com.arrow.kronos.api.listeners.PagingResultListener;
 import com.arrow.kronos.api.listeners.PostDeviceActionListener;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.listeners.RegisterDeviceListener;
 import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.listeners.UpdateDeviceActionListener;
 import com.arrow.kronos.api.models.AccountRequest;
-import com.arrow.kronos.api.models.CommonResponse;
+import com.arrow.kronos.api.models.AuditLogModel;
 import com.arrow.kronos.api.models.DeviceActionModel;
+import com.arrow.kronos.api.models.DeviceActionTypeModel;
+import com.arrow.kronos.api.models.DeviceEventModel;
+import com.arrow.kronos.api.models.DeviceModel;
+import com.arrow.kronos.api.models.DeviceTypeModel;
 import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
+import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 
@@ -111,9 +113,9 @@ public interface KronosApiService {
 
     //Action api
 
-    void getDeviceActionTypes(DeviceActionTypesListener listener);
+    void getDeviceActionTypes(ListResultListener<DeviceActionTypeModel> listener);
 
-    void getDeviceActions(String deviceHid, DeviceActionsListener listener);
+    void getDeviceActions(String deviceHid, ListResultListener<DeviceActionModel> listener);
 
     void postDeviceAction(String deviceHid, DeviceActionModel action, PostDeviceActionListener listener);
 
@@ -131,15 +133,15 @@ public interface KronosApiService {
     void registerDevice(DeviceRegistrationModel req, RegisterDeviceListener listener);
 
     void findAllDevices(String userHid, String uid, String type, String gatewayHid, String enabled,
-                        int page, int size, FindDevicesListener listener);
+                        int page, int size, PagingResultListener<DeviceModel> listener);
 
-    void getDeviceHistoricalEvents(String deviceHid, DeviceHistoricalEventsListener listener);
+    void getDeviceHistoricalEvents(String deviceHid, PagingResultListener<DeviceEventModel> listener);
 
     void findDeviceByHid(String deviceHid, FindDeviceListener listener);
 
     void updateDevice(String deviceHid, DeviceRegistrationModel device, CommonRequestListener listener);
 
-    void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, GetAuditLogsListener listener);
+    void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 
     //Core-event api
 
@@ -167,11 +169,11 @@ public interface KronosApiService {
 
     void gatewayHeartbeat(String hid, GatewayHeartbeatListener listener);
 
-    void getGatewayLogs(String hid, AuditLogsQuery query, GetAuditLogsListener listener);
+    void getGatewayLogs(String hid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 
     //Node api
 
-    void getNodesList(GetNodesListListener listener);
+    void getNodesList(ListResultListener<NodeModel> listener);
 
     void createNewNode(NodeRegistrationModel node, CommonRequestListener listener);
 
@@ -187,7 +189,7 @@ public interface KronosApiService {
 
     //device-type api
 
-    void getListDeviceTypes(GetDeviceTypesListener listener);
+    void getListDeviceTypes(ListResultListener<DeviceTypeModel> listener);
 
     void createNewDeviceType(DeviceTypeRegistrationModel deviceType, CommonRequestListener listener);
 

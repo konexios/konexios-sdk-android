@@ -18,6 +18,7 @@ import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
 import com.arrow.kronos.api.listeners.GetNodesListListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
+import com.arrow.kronos.api.listeners.ListResultListener;
 import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayType;
@@ -230,14 +231,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void getNodeList() {
-        mTelemetrySendService.getNodesList(new GetNodesListListener() {
+        mTelemetrySendService.getNodesList(new ListResultListener<NodeModel>() {
             @Override
-            public void onGetListNodesSuccess(List<NodeModel> result) {
+            public void onRequestSuccess(List<NodeModel> list) {
                 Log.v(TAG, "getNodesList");
             }
 
             @Override
-            public void onGetListNodesFailed() {
+            public void onRequestError() {
                 Log.e(TAG, "onGetListNodesFailed");
             }
         });
