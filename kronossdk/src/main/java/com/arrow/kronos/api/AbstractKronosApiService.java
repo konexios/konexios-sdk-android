@@ -424,9 +424,9 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void registerDevice(DeviceRegistrationModel req, final RegisterDeviceListener listener) {
-        mService.createOrUpdateDevice(req).enqueue(new Callback<GatewayResponse>() {
+        mService.createOrUpdateDevice(req).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createOrUpdateDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceRegistered(response.body());
@@ -436,7 +436,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             }
 
             @Override
-            public void onFailure(Call<GatewayResponse> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "createOrUpdateDevice error");
                 listener.onDeviceRegistrationFailed();
             }

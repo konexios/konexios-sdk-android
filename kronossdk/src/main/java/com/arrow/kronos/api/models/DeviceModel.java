@@ -10,7 +10,7 @@ public class DeviceModel implements Parcelable {
 
     @SerializedName("createdDate")
     @Expose
-    private Date createdDate;
+    private String createdDate;
     @SerializedName("enabled")
     @Expose
     private boolean enabled;
@@ -50,7 +50,7 @@ public class DeviceModel implements Parcelable {
      * @return
      * The createdDate
      */
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
@@ -59,7 +59,7 @@ public class DeviceModel implements Parcelable {
      * @param date
      * The date
      */
-    public void setCreatedDate(Date date) {
+    public void setCreatedDate(String date) {
         this.createdDate = date;
     }
 
@@ -271,7 +271,7 @@ public class DeviceModel implements Parcelable {
     }
 
     protected DeviceModel(Parcel in) {
-        createdDate = (Date) in.readValue(Date.class.getClassLoader());
+        createdDate = in.readString();
         enabled = in.readByte() != 0x00;
         gatewayHid = in.readString();
         hid = in.readString();

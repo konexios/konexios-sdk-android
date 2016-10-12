@@ -1,13 +1,13 @@
 package com.arrow.kronos.api.listeners;
 
 
-import com.arrow.kronos.api.models.GatewayResponse;
+import com.arrow.kronos.api.models.CommonResponse;
 
 /**
  * Created by osminin on 9/22/2016.
  */
 
 public interface RegisterDeviceListener {
-    void onDeviceRegistered(GatewayResponse response);
+    void onDeviceRegistered(CommonResponse response);
     void onDeviceRegistrationFailed();
 }

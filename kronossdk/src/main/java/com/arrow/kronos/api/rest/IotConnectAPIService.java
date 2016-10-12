@@ -122,7 +122,7 @@ public interface IotConnectAPIService {
                                                 @Query("_page") int page,
                                                 @Query("_size") int size);
     @POST("/api/v1/kronos/devices")
-    Call<GatewayResponse> createOrUpdateDevice(@Body DeviceRegistrationModel deviceRequest);
+    Call<CommonResponse> createOrUpdateDevice(@Body DeviceRegistrationModel deviceRequest);
 
     @GET("/api/v1/kronos/devices/{hid}")
     Call<DeviceModel> findDeviceByHid(@Path("hid") String hid);
