@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        ConnectionType type = ConnectionType.MQTT;
+        ConnectionType type = ConnectionType.REST;
         mKronosApiService = KronosApiServiceFactory.createKronosApiService(type);
         mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
                 DEFAULT_API_SECRET);
