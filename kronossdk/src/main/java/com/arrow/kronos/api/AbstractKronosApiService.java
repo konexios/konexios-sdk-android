@@ -173,7 +173,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         mServiceThreadHandler = new Handler();
     }
 
-    protected final void registerGateway(final InternalGatewayRegisterListener listener) {
+    protected final void registerGateway(String applicationHid, final InternalGatewayRegisterListener listener) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         mGatewayRegisterListener = listener;
         String gatewayHid = prefs.getString(Constants.Preference.KEY_GATEWAY_ID, null);
@@ -194,6 +194,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             gatewayModel.setUid(uid);
             gatewayModel.setType(GatewayType.Mobile);
             gatewayModel.setUserHid(userHid);
+            gatewayModel.setApplicationHid(applicationHid);
             gatewayModel.setSoftwareVersion(
                     String.format("%d.%d", Constants.MAJOR, Constants.MINOR));
 

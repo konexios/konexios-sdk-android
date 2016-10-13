@@ -19,6 +19,16 @@ public final class AccountResponse implements Parcelable {
     private String mEmail;
     @SerializedName("code")
     private String mCode;
+    @SerializedName("applicationHid")
+    private String mApplicationHid;
+
+    public String getApplicationHid() {
+        return mApplicationHid;
+    }
+
+    public void setApplicationHid(String applicationHid) {
+        mApplicationHid = applicationHid;
+    }
 
     public String getCode() {
         return mCode;
@@ -66,6 +76,7 @@ public final class AccountResponse implements Parcelable {
         mName = in.readString();
         mEmail = in.readString();
         mCode = in.readString();
+        mApplicationHid = in.readString();
     }
 
     @Override
@@ -80,6 +91,7 @@ public final class AccountResponse implements Parcelable {
         dest.writeString(mName);
         dest.writeString(mEmail);
         dest.writeString(mCode);
+        dest.writeString(mApplicationHid);
     }
 
     @SuppressWarnings("unused")

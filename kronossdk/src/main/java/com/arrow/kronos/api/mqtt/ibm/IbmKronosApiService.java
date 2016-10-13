@@ -23,9 +23,9 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService impl
     private ConfigResponse.Ibm mIbm;
 
     @Override
-    public void connect() {
+    public void connect(String applicationHid) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect");
-        registerGateway(this);
+        registerGateway(applicationHid, this);
     }
 
     @Override

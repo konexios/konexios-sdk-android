@@ -20,6 +20,16 @@ public final class GatewayModel implements Parcelable {
     private String softwareName;
     @SerializedName("softwareVersion")
     private String softwareVersion;
+    @SerializedName("applicationHid")
+    private String applicationHid;
+
+    public String getApplicationHid() {
+        return applicationHid;
+    }
+
+    public void setApplicationHid(String applicationHid) {
+        this.applicationHid = applicationHid;
+    }
 
     public GatewayType getType() {
         return type;

@@ -90,9 +90,9 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     };
 
     @Override
-    public void connect() {
+    public void connect(String applicationHid) {
         FirebaseCrash.logcat(Log.VERBOSE, TAG, "connect");
-        registerGateway(this);
+        registerGateway(applicationHid, this);
     }
 
     @Override

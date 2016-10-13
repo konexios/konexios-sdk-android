@@ -34,8 +34,8 @@ public final class RestApiKronosApiService extends AbstractKronosApiService {
     };
 
     @Override
-    public void connect() {
-        registerGateway(null);
+    public void connect(String applicationHid) {
+        registerGateway(applicationHid, null);
     }
 
     @Override
