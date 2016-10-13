@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -18,7 +20,7 @@ public class DeviceRegistrationModel implements Parcelable {
     private String gatewayHid;
     @SerializedName("info")
     @Expose
-    private Info info;
+    private JsonObject info;
     @SerializedName("name")
     @Expose
     private String name;
@@ -27,7 +29,7 @@ public class DeviceRegistrationModel implements Parcelable {
     private String nodeHid;
     @SerializedName("properties")
     @Expose
-    private Properties properties;
+    private JsonObject properties;
     @SerializedName("tags")
     @Expose
     private List<String> tags = new ArrayList<String>();
@@ -82,7 +84,7 @@ public class DeviceRegistrationModel implements Parcelable {
      * @return
      * The info
      */
-    public Info getInfo() {
+    public JsonObject getInfo() {
         return info;
     }
 
@@ -91,7 +93,7 @@ public class DeviceRegistrationModel implements Parcelable {
      * @param info
      * The info
      */
-    public void setInfo(Info info) {
+    public void setInfo(JsonObject info) {
         this.info = info;
     }
 
@@ -136,7 +138,7 @@ public class DeviceRegistrationModel implements Parcelable {
      * @return
      * The properties
      */
-    public Properties getProperties() {
+    public JsonObject getProperties() {
         return properties;
     }
 
@@ -145,7 +147,7 @@ public class DeviceRegistrationModel implements Parcelable {
      * @param properties
      * The properties
      */
-    public void setProperties(Properties properties) {
+    public void setProperties(JsonObject properties) {
         this.properties = properties;
     }
 
@@ -227,10 +229,10 @@ public class DeviceRegistrationModel implements Parcelable {
     protected DeviceRegistrationModel(Parcel in) {
         enabled = in.readByte() != 0x00;
         gatewayHid = in.readString();
-        info = (Info) in.readValue(Info.class.getClassLoader());
+        info = (JsonObject) in.readValue(JsonObject.class.getClassLoader());
         name = in.readString();
         nodeHid = in.readString();
-        properties = (Properties) in.readValue(Properties.class.getClassLoader());
+        properties = (JsonObject) in.readValue(JsonObject.class.getClassLoader());
         if (in.readByte() == 0x01) {
             tags = new ArrayList<String>();
             in.readList(tags, String.class.getClassLoader());

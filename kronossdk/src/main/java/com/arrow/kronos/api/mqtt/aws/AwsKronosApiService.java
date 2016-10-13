@@ -19,9 +19,9 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     private ConfigResponse.Aws mAws;
 
     @Override
-    public void connect() {
+    public void connect(String applicationHid) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect");
-        registerGateway(this);
+        registerGateway(applicationHid, this);
     }
 
     @Override

@@ -73,7 +73,7 @@ public interface KronosApiService {
      * register new gateway and initiate persistent connection (it makes sense only in case when
      * some of {ConnectionType.MQTT, ConnectionType.AWS,
      */
-    void connect();
+    void connect(String applicationHid);
 
     /**
      * destroy persistent connection
