@@ -7,6 +7,7 @@ import com.arrow.kronos.api.AbstractKronosApiService;
 import com.arrow.kronos.api.Constants;
 import com.arrow.kronos.api.models.ConfigResponse;
 import com.arrow.kronos.api.models.GatewayEventModel;
+import com.arrow.kronos.api.models.GatewayResponse;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -22,11 +23,13 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import retrofit2.Response;
+
 /**
  * Created by osminin on 6/17/2016.
  */
 
-public abstract class AbstractMqttKronosApiService extends AbstractKronosApiService implements AbstractKronosApiService.InternalGatewayRegisterListener {
+public abstract class AbstractMqttKronosApiService extends AbstractKronosApiService {
     private static final String TAG = AbstractMqttKronosApiService.class.getName();
     protected static final String MESSAGE_TOPIC_PREFIX = "krs.tel.gts.";
     private static final String SUBSCRIBE_TOPIC_PREFIX = "krs.cmd.stg.";
@@ -90,12 +93,6 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     };
 
     @Override
-    public void connect(String applicationHid) {
-        FirebaseCrash.logcat(Log.VERBOSE, TAG, "connect");
-        registerGateway(applicationHid, this);
-    }
-
-    @Override
     public void disconnect() {
         FirebaseCrash.logcat(Log.VERBOSE, TAG, "disconnect");
         try {
@@ -134,9 +131,8 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     }
 
     @Override
-    public void onGatewayRegistered(String gatewayHid) {
-        FirebaseCrash.logcat(Log.VERBOSE, TAG, "onGatewayRegistered");
-        mGatewayHid = gatewayHid;
+    protected void onGatewayResponse(Response<GatewayResponse> response) {
+        super.onGatewayResponse(response);
         connectMqtt();
     }
 
@@ -170,11 +166,6 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     protected abstract String getPublisherTopic();
 
     protected abstract String getHost();
-
-    @Override
-    public void onGatewayRegistered(ConfigResponse aws) {
-        //nothing to do here
-    }
 
     @Override
     public void setMqttEndpoint(String host, String prefix) {

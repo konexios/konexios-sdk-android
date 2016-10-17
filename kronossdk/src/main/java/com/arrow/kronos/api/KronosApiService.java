@@ -1,20 +1,17 @@
 package com.arrow.kronos.api;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
 import com.arrow.kronos.api.listeners.FindDeviceListener;
-import com.arrow.kronos.api.listeners.FindDevicesListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayCommandsListener;
-import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
-import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
 import com.arrow.kronos.api.listeners.ListResultListener;
@@ -65,15 +62,9 @@ public interface KronosApiService {
 
     /**
      *initialize service with a context and bind it with activity's lifecycle
-     * @param context - Activity or Service, it should be valid while using kronos lib
+     * @param handler -
      */
-    void initialize(Context context);
-
-    /**
-     * register new gateway and initiate persistent connection (it makes sense only in case when
-     * some of {ConnectionType.MQTT, ConnectionType.AWS,
-     */
-    void connect(String applicationHid);
+    void initialize(Handler handler);
 
     /**
      * destroy persistent connection
@@ -167,7 +158,7 @@ public interface KronosApiService {
 
     void getGatewayConfig(String hid, GetGatewayConfigListener listener);
 
-    void gatewayHeartbeat(String hid, GatewayHeartbeatListener listener);
+    void gatewayHeartbeat(String hid, CommonRequestListener listener);
 
     void getGatewayLogs(String hid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 

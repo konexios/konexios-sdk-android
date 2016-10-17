@@ -9,6 +9,10 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
+import java.net.HttpURLConnection;
+
+import retrofit2.Response;
+
 /**
  * Created by osminin on 6/20/2016.
  */
@@ -17,27 +21,6 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     private static final String TAG = AwsKronosApiService.class.getName();
 
     private ConfigResponse.Aws mAws;
-
-    @Override
-    public void connect(String applicationHid) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "connect");
-        registerGateway(applicationHid, this);
-    }
-
-    @Override
-    public void onGatewayRegistered(String gatewayHid) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onGatewayRegistered gatewayHid: " + gatewayHid);
-        mGatewayHid = gatewayHid;
-    }
-
-    @Override
-    public void onGatewayRegistered(ConfigResponse response) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onGatewayRegistered");
-        if (response.getAws() != null) {
-            mAws = response.getAws();
-        }
-        connectMqtt();
-    }
 
     @Override
     protected MqttConnectOptions getMqttOptions() {
@@ -70,5 +53,14 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     @Override
     public boolean hasBatchMode() {
         return false;
+    }
+
+    @Override
+    protected void onConfigResponse(ConfigResponse response) {
+        super.onConfigResponse(response);
+        if (response.getAws() != null) {
+            mAws = response.getAws();
+        }
+        connectMqtt();
     }
 }

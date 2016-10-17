@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 10/11/2016.
  */
 
-public final class CommonResponse implements Parcelable {
+public class CommonResponse implements Parcelable {
 
     @SerializedName("hid")
     @Expose
