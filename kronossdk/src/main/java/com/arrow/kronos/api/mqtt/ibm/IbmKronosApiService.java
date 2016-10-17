@@ -27,11 +27,10 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
     private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
 
     private ConfigResponse.Ibm mIbm;
-    private String mExternalId;
 
     @Override
-    protected String getPublisherTopic() {
-        return String.format("telemetries/devices/%s", mGatewayHid);
+    protected String getPublisherTopic(String deviceType, String externalId) {
+        return String.format("iot-2/type/%s/id/%s/evt/telemetry/fmt/json", deviceType, externalId);
     }
 
     @Override
@@ -75,8 +74,4 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
         connectMqtt();
     }
 
-    @Override
-    protected void onDeviceRegistered(DeviceRegistrationResponse response) {
-        mExternalId = response.getExternalId();
-    }
 }

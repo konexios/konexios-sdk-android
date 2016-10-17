@@ -30,7 +30,7 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
     }
 
     @Override
-    protected String getPublisherTopic() {
+    protected String getPublisherTopic(String deviceType, String externalId) {
         return MESSAGE_TOPIC_PREFIX + mGatewayHid;
     }
 
