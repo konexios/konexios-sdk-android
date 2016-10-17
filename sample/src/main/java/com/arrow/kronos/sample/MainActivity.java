@@ -27,6 +27,7 @@ import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.JsonObject;
 import com.arrow.kronos.api.Constants;
@@ -144,13 +145,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sendTelemetry() {
-        Bundle bundle = new Bundle();
+        TelemetryModel telemetryModel = new TelemetryModel();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("_|timestamp", "1474896307844");
         jsonObject.addProperty("_|deviceHid", mDeviceHid);
         jsonObject.addProperty("f|light", "84.0");
-        bundle.putString(Constants.EXTRA_DATA_LABEL_TELEMETRY, jsonObject.toString());
-        mTelemetrySendService.sendSingleTelemetry(bundle);
+        telemetryModel.setTelemetry(jsonObject.toString());
+        telemetryModel.setDeviceType("AndroidInternal");
+        mTelemetrySendService.sendSingleTelemetry(telemetryModel);
     }
 
     private void registerGateway() {

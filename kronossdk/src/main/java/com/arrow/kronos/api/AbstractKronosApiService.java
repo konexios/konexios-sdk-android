@@ -47,6 +47,7 @@ import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
@@ -117,13 +118,11 @@ public abstract class AbstractKronosApiService implements KronosApiService {
         }
     }
 
-    protected void onDeviceRegistered(DeviceRegistrationResponse response) {}
-
-    protected String formatBatchPayload(List<Bundle> telemetry) {
+    protected String formatBatchPayload(List<TelemetryModel> telemetry) {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
-        for (Bundle bundle : telemetry) {
-            String json = bundle.getString(Constants.EXTRA_DATA_LABEL_TELEMETRY);
+        for (TelemetryModel model : telemetry) {
+            String json = model.getTelemetry();
             builder.append(json).append(",");
         }
         builder.replace(builder.length() - 1, builder.length(), "").append("]");
@@ -272,11 +271,9 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     public void registerDevice(DeviceRegistrationModel req, final RegisterDeviceListener listener) {
         mService.createOrUpdateDevice(req).enqueue(new Callback<DeviceRegistrationResponse>() {
             @Override
-            public void onResponse(Call<DeviceRegistrationResponse> call, Response<DeviceRegistrationResponse> response) {
+            public void onResponse(Call<DeviceRegistrationResponse> call, final Response<DeviceRegistrationResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createOrUpdateDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    //TODO:
-
                     listener.onDeviceRegistered(response.body());
                 } else {
                     listener.onDeviceRegistrationFailed();
@@ -432,9 +429,9 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void checkinGateway(String hid, final CheckinGatewayListener listener) {
-        mService.checkin(hid).enqueue(new Callback<Void>() {
+        mService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "checkin response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onCheckinGatewaySuccess();
@@ -445,7 +442,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
                 listener.onCheckinGatewayError();
             }

@@ -15,7 +15,6 @@ public final class Constants {
         String X_ARROW_VERSION_1 = "1";
     }
 
-    public static final String EXTRA_DATA_LABEL_TELEMETRY = "telemetry_extra_data";
     public static final String DEVICE_ID_KEY = "SynapS3_IotConnect_DeviceId";
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");

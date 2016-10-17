@@ -51,7 +51,7 @@ public interface IotConnectAPIService {
     Call<GatewayResponse> registerGateway(@Body GatewayModel gatewayModel);
 
     @PUT("/api/v1/kronos/gateways/{hid}/checkin")
-    Call<Void> checkin(@Path("hid") String hid);
+    Call<CommonResponse> checkin(@Path("hid") String hid);
 
     @GET("/api/v1/kronos/gateways/{hid}/config")
     Call<ConfigResponse> getConfig(@Path("hid") String hid);
