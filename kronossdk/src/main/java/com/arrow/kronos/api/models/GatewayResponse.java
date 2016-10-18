@@ -9,6 +9,18 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 4/15/2016.
  */
 public final class GatewayResponse implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<GatewayResponse> CREATOR = new Parcelable.Creator<GatewayResponse>() {
+        @Override
+        public GatewayResponse createFromParcel(Parcel in) {
+            return new GatewayResponse(in);
+        }
+
+        @Override
+        public GatewayResponse[] newArray(int size) {
+            return new GatewayResponse[size];
+        }
+    };
     @SerializedName("hid")
     private String mHid;
     @SerializedName("message")
@@ -23,6 +35,27 @@ public final class GatewayResponse implements Parcelable {
     private String mInfo;
     @SerializedName("properties")
     private String mProperties;
+    @SerializedName("externalId")
+    private String mExternalId;
+
+    protected GatewayResponse(Parcel in) {
+        mHid = in.readString();
+        mMessage = in.readString();
+        mType = in.readString();
+        mUserHid = in.readString();
+        mGatewayHid = in.readString();
+        mInfo = in.readString();
+        mProperties = in.readString();
+        mExternalId = in.readString();
+    }
+
+    public String getExternalId() {
+        return mExternalId;
+    }
+
+    public void setExternalId(String externalId) {
+        mExternalId = externalId;
+    }
 
     public String getType() {
         return mType;
@@ -80,16 +113,6 @@ public final class GatewayResponse implements Parcelable {
         mMessage = message;
     }
 
-    protected GatewayResponse(Parcel in) {
-        mHid = in.readString();
-        mMessage = in.readString();
-        mType = in.readString();
-        mUserHid = in.readString();
-        mGatewayHid = in.readString();
-        mInfo = in.readString();
-        mProperties = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -104,18 +127,6 @@ public final class GatewayResponse implements Parcelable {
         dest.writeString(mGatewayHid);
         dest.writeString(mInfo);
         dest.writeString(mProperties);
+        dest.writeString(mExternalId);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<GatewayResponse> CREATOR = new Parcelable.Creator<GatewayResponse>() {
-        @Override
-        public GatewayResponse createFromParcel(Parcel in) {
-            return new GatewayResponse(in);
-        }
-
-        @Override
-        public GatewayResponse[] newArray(int size) {
-            return new GatewayResponse[size];
-        }
-    };
 }

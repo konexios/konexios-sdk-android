@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
-import com.arrow.kronos.api.listeners.GetNodesListListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
 import com.arrow.kronos.api.listeners.ListResultListener;
 import com.arrow.kronos.api.models.CommonResponse;
@@ -26,6 +26,8 @@ import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
+import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.JsonObject;
 import com.arrow.kronos.api.Constants;
@@ -38,13 +40,16 @@ import com.arrow.kronos.api.models.DeviceRegistrationModel;
 
 import java.util.List;
 
-import static com.arrow.kronos.api.Constants.Preference.KEY_GATEWAY_ID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
 
     public static final String MQTT_CONNECT_URL_DEV = "tcp://pegasusqueue01-dev.cloudapp.net:46953";
     public static final String MQTT_CLIENT_PREFIX_DEV = "/themis.dev";
+    public final static String KEY_GATEWAY_ID = "gateway-id";
+    public final static String SOFTWARE_NAME = "JMyIotGateway";
+    public final static int MAJOR = 0;
+    public final static int MINOR = 8;
 
     private KronosApiService mTelemetrySendService;
 
@@ -80,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Once instance of KronosApiService is created it could be got by getKronosApiService() call
         mTelemetrySendService = KronosApiServiceFactory.getKronosApiService();
-        //initialize service with a context and bind it with activity's lifecycle
-        mTelemetrySendService.initialize(this);
+        mTelemetrySendService.initialize(new Handler());
 
         //mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
         //register new gateway and initiate persistent connection (it makes sense only in case when some of {ConnectionType.MQTT, ConnectionType.AWS,
@@ -128,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         payload.setType("android");
         mTelemetrySendService.registerDevice(payload, new RegisterDeviceListener() {
             @Override
-            public void onDeviceRegistered(CommonResponse response) {
+            public void onDeviceRegistered(DeviceRegistrationResponse response) {
                 mDeviceHid = response.getHid();
                 Log.v(TAG, "onDeviceRegistered");
             }
@@ -141,13 +145,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sendTelemetry() {
-        Bundle bundle = new Bundle();
+        TelemetryModel telemetryModel = new TelemetryModel();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("_|timestamp", "1474896307844");
         jsonObject.addProperty("_|deviceHid", mDeviceHid);
         jsonObject.addProperty("f|light", "84.0");
-        bundle.putString(Constants.EXTRA_DATA_LABEL_TELEMETRY, jsonObject.toString());
-        mTelemetrySendService.sendSingleTelemetry(bundle);
+        telemetryModel.setTelemetry(jsonObject.toString());
+        telemetryModel.setDeviceType("AndroidInternal");
+        mTelemetrySendService.sendSingleTelemetry(telemetryModel);
     }
 
     private void registerGateway() {
@@ -158,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String name = String.format("%s %s", Build.MANUFACTURER, Build.MODEL);
         String osName = String.format("Android %s", Build.VERSION.RELEASE);
-        String swName = Constants.SOFTWARE_NAME;
+        String swName = SOFTWARE_NAME;
         String userHid = mAccountResponse.getHid();
 
         GatewayModel gatewayModel = new GatewayModel();
@@ -169,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         gatewayModel.setType(GatewayType.Mobile);
         gatewayModel.setUserHid(userHid);
         gatewayModel.setSoftwareVersion(
-                String.format("%d.%d", Constants.MAJOR, Constants.MINOR));
+                String.format("%d.%d", MAJOR, MINOR));
 
         mTelemetrySendService.registerGateway(gatewayModel, new GatewayRegisterListener() {
             @Override
@@ -205,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String name = String.format("%s %s", Build.MANUFACTURER, Build.MODEL);
         String osName = String.format("Android %s", Build.VERSION.RELEASE);
-        String swName = Constants.SOFTWARE_NAME;
+        String swName = SOFTWARE_NAME;
         String userHid = mAccountResponse.getHid();
 
         GatewayModel gatewayModel = new GatewayModel();
@@ -216,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         gatewayModel.setType(GatewayType.Mobile);
         gatewayModel.setUserHid(userHid);
         gatewayModel.setSoftwareVersion(
-                String.format("%d.%d", Constants.MAJOR, Constants.MINOR + 1));
+                String.format("%d.%d", MAJOR, MINOR + 1));
         mTelemetrySendService.updateGateway(mGatewayHid, gatewayModel, new GatewayUpdateListener() {
             @Override
             public void onGatewayUpdated(GatewayResponse response) {

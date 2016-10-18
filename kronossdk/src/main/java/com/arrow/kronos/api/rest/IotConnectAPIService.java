@@ -22,6 +22,7 @@ import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
+import com.arrow.kronos.api.models.DeviceRegistrationResponse;
 
 import java.util.List;
 
@@ -50,7 +51,7 @@ public interface IotConnectAPIService {
     Call<GatewayResponse> registerGateway(@Body GatewayModel gatewayModel);
 
     @PUT("/api/v1/kronos/gateways/{hid}/checkin")
-    Call<Void> checkin(@Path("hid") String hid);
+    Call<CommonResponse> checkin(@Path("hid") String hid);
 
     @GET("/api/v1/kronos/gateways/{hid}/config")
     Call<ConfigResponse> getConfig(@Path("hid") String hid);
@@ -59,7 +60,7 @@ public interface IotConnectAPIService {
     Call<GatewayResponse> updateGateway(@Path("hid") String hid, @Body GatewayModel gatewayModel);
 
     @PUT("/api/v1/kronos/gateways/{hid}/heartbeat")
-    Call<ResponseBody> heartBeat(@Path("hid") String hid);
+    Call<CommonResponse> heartBeat(@Path("hid") String hid);
 
     @GET("/api/v1/kronos/gateways")
     Call<List<GatewayModel>> findAllGateways();
@@ -125,7 +126,7 @@ public interface IotConnectAPIService {
                                                 @Query("_page") int page,
                                                 @Query("_size") int size);
     @POST("/api/v1/kronos/devices")
-    Call<CommonResponse> createOrUpdateDevice(@Body DeviceRegistrationModel deviceRequest);
+    Call<DeviceRegistrationResponse> createOrUpdateDevice(@Body DeviceRegistrationModel deviceRequest);
 
     @GET("/api/v1/kronos/devices/{hid}")
     Call<DeviceModel> findDeviceByHid(@Path("hid") String hid);

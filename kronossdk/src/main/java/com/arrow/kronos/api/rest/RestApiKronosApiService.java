@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.arrow.kronos.api.AbstractKronosApiService;
 import com.arrow.kronos.api.Constants;
+import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.List;
@@ -34,25 +35,20 @@ public final class RestApiKronosApiService extends AbstractKronosApiService {
     };
 
     @Override
-    public void connect(String applicationHid) {
-        registerGateway(applicationHid, null);
-    }
-
-    @Override
     public void disconnect() {
 
     }
 
     @Override
-    public void sendSingleTelemetry(Bundle bundle) {
-        String json = bundle.getString(Constants.EXTRA_DATA_LABEL_TELEMETRY);
+    public void sendSingleTelemetry(TelemetryModel telemetry) {
+        String json = telemetry.getTelemetry();
         RequestBody body = RequestBody.create(Constants.JSON, json);
         Call<ResponseBody> call = getService().sendTelemetry(body);
         call.enqueue(mRestApiCallback);
     }
 
     @Override
-    public void sendBatchTelemetry(List<Bundle> telemetry) {
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
         String json = formatBatchPayload(telemetry);
         RequestBody body = RequestBody.create(Constants.JSON, json);
         Call<ResponseBody> call = getService().sendBatchTelemetry(body);

@@ -1,20 +1,17 @@
 package com.arrow.kronos.api;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
 import com.arrow.kronos.api.listeners.FindDeviceListener;
-import com.arrow.kronos.api.listeners.FindDevicesListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayCommandsListener;
-import com.arrow.kronos.api.listeners.GatewayHeartbeatListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
 import com.arrow.kronos.api.listeners.GetGatewayConfigListener;
-import com.arrow.kronos.api.listeners.GetAuditLogsListener;
 import com.arrow.kronos.api.listeners.GetGatewaysListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
 import com.arrow.kronos.api.listeners.ListResultListener;
@@ -39,6 +36,7 @@ import com.arrow.kronos.api.models.DeviceRegistrationModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
+import com.arrow.kronos.api.models.TelemetryModel;
 
 import java.util.List;
 
@@ -65,15 +63,9 @@ public interface KronosApiService {
 
     /**
      *initialize service with a context and bind it with activity's lifecycle
-     * @param context - Activity or Service, it should be valid while using kronos lib
+     * @param handler -
      */
-    void initialize(Context context);
-
-    /**
-     * register new gateway and initiate persistent connection (it makes sense only in case when
-     * some of {ConnectionType.MQTT, ConnectionType.AWS,
-     */
-    void connect(String applicationHid);
+    void initialize(Handler handler);
 
     /**
      * destroy persistent connection
@@ -82,15 +74,15 @@ public interface KronosApiService {
 
     /**
      *  sends single telemetry request
-     * @param bundle - should contain String as json with telemetry using the key EXTRA_DATA_LABEL_TELEMETRY
+     * @param telemetry -
      */
-    void sendSingleTelemetry(Bundle bundle);
+    void sendSingleTelemetry(TelemetryModel telemetry);
 
     /**
      * sends a scope of bundles with telemetry data
      * @param telemetry - list of bundles, each bundle should be like in sendSingleTelemetry
      */
-    void sendBatchTelemetry(List<Bundle> telemetry);
+    void sendBatchTelemetry(List<TelemetryModel> telemetry);
 
     /**
      * check whether if current service supports sending batch telemetry
@@ -167,7 +159,7 @@ public interface KronosApiService {
 
     void getGatewayConfig(String hid, GetGatewayConfigListener listener);
 
-    void gatewayHeartbeat(String hid, GatewayHeartbeatListener listener);
+    void gatewayHeartbeat(String hid, CommonRequestListener listener);
 
     void getGatewayLogs(String hid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 

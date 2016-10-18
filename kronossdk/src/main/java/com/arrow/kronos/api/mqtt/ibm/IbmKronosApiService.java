@@ -4,17 +4,23 @@ import android.util.Log;
 
 import com.arrow.kronos.api.AbstractKronosApiService;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.mqtt.AbstractMqttKronosApiService;
 import com.arrow.kronos.api.mqtt.common.NoSSLv3SocketFactory;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
+import java.net.HttpURLConnection;
+
+import retrofit2.Response;
+
 /**
  * Created by osminin on 9/2/2016.
  */
 
-public final class IbmKronosApiService extends AbstractMqttKronosApiService implements AbstractKronosApiService.InternalGatewayRegisterListener {
+public final class IbmKronosApiService extends AbstractMqttKronosApiService {
     private static final String TAG = IbmKronosApiService.class.getName();
 
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";
@@ -23,29 +29,8 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService impl
     private ConfigResponse.Ibm mIbm;
 
     @Override
-    public void connect(String applicationHid) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "connect");
-        registerGateway(applicationHid, this);
-    }
-
-    @Override
-    public void onGatewayRegistered(String gatewayHid) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onGatewayRegistered gatewayHid: " + gatewayHid);
-        mGatewayHid = gatewayHid;
-    }
-
-    @Override
-    public void onGatewayRegistered(ConfigResponse response) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onGatewayRegistered");
-        if (response.getIbm() != null) {
-            mIbm = response.getIbm();
-        }
-        connectMqtt();
-    }
-
-    @Override
-    protected String getPublisherTopic() {
-        return String.format("telemetries/devices/%s", mGatewayHid);
+    protected String getPublisherTopic(String deviceType, String externalId) {
+        return String.format("iot-2/type/%s/id/%s/evt/telemetry/fmt/json", deviceType, externalId);
     }
 
     @Override
@@ -79,4 +64,14 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService impl
     public boolean hasBatchMode() {
         return false;
     }
+
+    @Override
+    protected void onConfigResponse(ConfigResponse response) {
+        super.onConfigResponse(response);
+        if (response.getIbm() != null) {
+            mIbm = response.getIbm();
+        }
+        connectMqtt();
+    }
+
 }
