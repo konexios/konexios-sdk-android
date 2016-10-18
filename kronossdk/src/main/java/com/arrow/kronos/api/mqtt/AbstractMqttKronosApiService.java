@@ -7,6 +7,8 @@ import com.arrow.kronos.api.AbstractKronosApiService;
 import com.arrow.kronos.api.Constants;
 import com.arrow.kronos.api.models.ConfigResponse;
 import com.arrow.kronos.api.models.GatewayEventModel;
+import com.arrow.kronos.api.models.GatewayResponse;
+import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -22,11 +24,15 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import retrofit2.Response;
+
+import static android.R.id.message;
+
 /**
  * Created by osminin on 6/17/2016.
  */
 
-public abstract class AbstractMqttKronosApiService extends AbstractKronosApiService implements AbstractKronosApiService.InternalGatewayRegisterListener {
+public abstract class AbstractMqttKronosApiService extends AbstractKronosApiService {
     private static final String TAG = AbstractMqttKronosApiService.class.getName();
     protected static final String MESSAGE_TOPIC_PREFIX = "krs.tel.gts.";
     private static final String SUBSCRIBE_TOPIC_PREFIX = "krs.cmd.stg.";
@@ -64,7 +70,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
 
         @Override
         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "MQTT connect onSuccess");
+            FirebaseCrash.logcat(Log.ERROR, TAG, "MQTT connect failure");
             FirebaseCrash.report(exception);
             exception.printStackTrace();
         }
@@ -90,12 +96,6 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     };
 
     @Override
-    public void connect(String applicationHid) {
-        FirebaseCrash.logcat(Log.VERBOSE, TAG, "connect");
-        registerGateway(applicationHid, this);
-    }
-
-    @Override
     public void disconnect() {
         FirebaseCrash.logcat(Log.VERBOSE, TAG, "disconnect");
         try {
@@ -107,15 +107,15 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     }
 
     @Override
-    public void sendSingleTelemetry(Bundle bundle) {
-        String json = bundle.getString(Constants.EXTRA_DATA_LABEL_TELEMETRY);
+    public void sendSingleTelemetry(TelemetryModel telemetry) {
+        String json = telemetry.getTelemetry();
         MqttMessage message = new MqttMessage(json.getBytes());
-        String topic = getPublisherTopic();
+        String topic = getPublisherTopic(telemetry.getDeviceType(), telemetry.getDeviceExternalId());
         sendMqttMessage(topic, message);
     }
 
     @Override
-    public void sendBatchTelemetry(List<Bundle> telemetry) {
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
         String payload = formatBatchPayload(telemetry);
         String topic = "krs.tel.bat.gts." + mGatewayHid;
         MqttMessage message = new MqttMessage(payload.toString().getBytes());
@@ -134,9 +134,8 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     }
 
     @Override
-    public void onGatewayRegistered(String gatewayHid) {
-        FirebaseCrash.logcat(Log.VERBOSE, TAG, "onGatewayRegistered");
-        mGatewayHid = gatewayHid;
+    protected void onGatewayResponse(GatewayResponse response) {
+        super.onGatewayResponse(response);
         connectMqtt();
     }
 
@@ -167,14 +166,9 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
         return MqttClient.generateClientId();
     }
 
-    protected abstract String getPublisherTopic();
+    protected abstract String getPublisherTopic(String deviceType, String externalId);
 
     protected abstract String getHost();
-
-    @Override
-    public void onGatewayRegistered(ConfigResponse aws) {
-        //nothing to do here
-    }
 
     @Override
     public void setMqttEndpoint(String host, String prefix) {

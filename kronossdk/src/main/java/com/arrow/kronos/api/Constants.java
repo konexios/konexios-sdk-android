@@ -7,19 +7,6 @@ import okhttp3.MediaType;
  */
 
 public final class Constants {
-    public final static String SOFTWARE_NAME = "JMyIotGateway";
-    public final static int MAJOR = 0;
-    public final static int MINOR = 8;
-
-    public final static String SP_CLOUD_HERATBEAT_INTERVAL = "com.arrow.jmyiotgateway.cloud_service_heartbeat";
-
-    public final static int HEART_BEAT_INTERVAL = 60; //1 minute
-
-    public static class Preference {
-        public final static String KEY_ACCOUNT_USER_ID = "account-user-id";
-        public final static String KEY_GATEWAY_ID = "gateway-id";
-    }
-
     public interface Api {
         String X_ARROW_APIKEY = "x-arrow-apikey";
         String X_ARROW_DATE = "x-arrow-date";
@@ -28,7 +15,6 @@ public final class Constants {
         String X_ARROW_VERSION_1 = "1";
     }
 
-    public static final String EXTRA_DATA_LABEL_TELEMETRY = "telemetry_extra_data";
     public static final String DEVICE_ID_KEY = "SynapS3_IotConnect_DeviceId";
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
