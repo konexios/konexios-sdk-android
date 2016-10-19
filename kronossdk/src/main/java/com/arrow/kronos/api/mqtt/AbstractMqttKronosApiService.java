@@ -159,6 +159,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
         MqttConnectOptions connOpts = new MqttConnectOptions();
         connOpts.setConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_SECS);
         connOpts.setKeepAliveInterval(DEFAULT_KEEP_ALIVE_INTERVAL_SECS);
+        connOpts.setAutomaticReconnect(true);
         return connOpts;
     }
 
