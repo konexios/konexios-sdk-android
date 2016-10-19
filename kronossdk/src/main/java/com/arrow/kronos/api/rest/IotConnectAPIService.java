@@ -23,6 +23,7 @@ import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.TelemetryItemModel;
 
 import java.util.List;
 
@@ -82,11 +83,37 @@ public interface IotConnectAPIService {
                                            @Query("_page") int page,
                                            @Query("_size") int size);
 
+    //telemetry api
     @POST("/api/v1/kronos/telemetries")
     Call<ResponseBody> sendTelemetry(@Body RequestBody body);
 
+    @GET("/api/v1/kronos/telemetries/applications/{applicationHid}")
+    Call<PagingResultModel<TelemetryItemModel>> findTelemetryByAppHid(@Path("applicationHid") String applicationHid,
+                                                                      @Query("fromTimestamp") String fromTimestamp,
+                                                                      @Query("toTimestamp") String toTimestamp,
+                                                                      @Query("telemetryNames") String telemetryNames,
+                                                                      @Query("_page") int page,
+                                                                      @Query("_size") int size);
+
     @POST("/api/v1/kronos/telemetries/batch")
     Call<ResponseBody> sendBatchTelemetry(@Body RequestBody body);
+
+    @GET("/api/v1/kronos/telemetries/devices/{deviceHid}")
+    Call<PagingResultModel<TelemetryItemModel>> findTelemetryByDeviceHid(@Path("deviceHid") String deviceHid,
+                                                                         @Query("fromTimestamp") String fromTimestamp,
+                                                                         @Query("toTimestamp") String toTimestamp,
+                                                                         @Query("telemetryNames") String telemetryNames,
+                                                                         @Query("_page") int page,
+                                                                         @Query("_size") int size);
+
+    @GET("/api/v1/kronos/telemetries/nodes/{nodeHid}")
+    Call<PagingResultModel<TelemetryItemModel>> findTelemetryByNodeHid(@Path("nodeHid") String nodeHid,
+                                                                       @Query("fromTimestamp") String fromTimestamp,
+                                                                       @Query("toTimestamp") String toTimestamp,
+                                                                       @Query("telemetryNames") String telemetryNames,
+                                                                       @Query("_page") int page,
+                                                                       @Query("_size") int size);
+
 
     @PUT("/api/v1/core/events/{hid}/received")
     Call<ResponseBody> putReceived(@Path("hid") String hid);

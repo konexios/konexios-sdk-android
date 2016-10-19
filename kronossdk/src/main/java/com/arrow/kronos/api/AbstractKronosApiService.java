@@ -35,6 +35,7 @@ import com.arrow.kronos.api.models.DeviceEventModel;
 import com.arrow.kronos.api.models.DeviceModel;
 import com.arrow.kronos.api.models.DeviceTypeModel;
 import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
+import com.arrow.kronos.api.models.FindTelemetryRequest;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.PagingResultModel;
@@ -47,6 +48,7 @@ import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
@@ -861,6 +863,77 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
+                listener.onRequestError();
+            }
+        });
+    }
+
+    //telemetry api
+
+    @Override
+    public void findTelemetryByApplicationHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
+        mService.findTelemetryByAppHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
+                request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
+            @Override
+            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByApplicationHid response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
+                listener.onRequestError();
+            }
+        });
+    }
+
+    @Override
+    public void findTelemetryByDeviceHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
+        mService.findTelemetryByDeviceHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
+                request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
+            @Override
+            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByDeviceHid response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
+                listener.onRequestError();
+            }
+        });
+    }
+
+    @Override
+    public void findTelemetryByNodeHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
+        mService.findTelemetryByNodeHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
+                request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
+            @Override
+            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByNodeHid response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
+                    listener.onRequestError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
                 listener.onRequestError();
             }
         });
