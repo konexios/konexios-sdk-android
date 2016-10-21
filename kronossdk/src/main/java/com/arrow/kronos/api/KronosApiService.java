@@ -29,6 +29,7 @@ import com.arrow.kronos.api.models.DeviceEventModel;
 import com.arrow.kronos.api.models.DeviceModel;
 import com.arrow.kronos.api.models.DeviceTypeModel;
 import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
+import com.arrow.kronos.api.models.FindTelemetryRequest;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.GatewayModel;
@@ -36,6 +37,7 @@ import com.arrow.kronos.api.models.DeviceRegistrationModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
+import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 
 import java.util.List;
@@ -74,15 +76,24 @@ public interface KronosApiService {
 
     /**
      *  sends single telemetry request
-     * @param telemetry -
+     * @param telemetry - telemetry model object
      */
     void sendSingleTelemetry(TelemetryModel telemetry);
 
     /**
      * sends a scope of bundles with telemetry data
-     * @param telemetry - list of bundles, each bundle should be like in sendSingleTelemetry
+     * @param telemetry - list of telemetries
      */
     void sendBatchTelemetry(List<TelemetryModel> telemetry);
+
+    void findTelemetryByApplicationHid(FindTelemetryRequest request,
+                                       PagingResultListener<TelemetryItemModel> listener);
+
+    void findTelemetryByDeviceHid(FindTelemetryRequest request,
+                                       PagingResultListener<TelemetryItemModel> listener);
+
+    void findTelemetryByNodeHid(FindTelemetryRequest request,
+                                       PagingResultListener<TelemetryItemModel> listener);
 
     /**
      * check whether if current service supports sending batch telemetry
