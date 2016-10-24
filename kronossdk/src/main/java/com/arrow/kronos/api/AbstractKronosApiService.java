@@ -474,7 +474,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     }
 
     @Override
-    public void getGatewayConfig(String hid, final GetGatewayConfigListener listener) {
+    public void getGatewayConfig(final String hid, final GetGatewayConfigListener listener) {
         mService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
             @Override
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
@@ -483,6 +483,9 @@ public abstract class AbstractKronosApiService implements KronosApiService {
                     mServiceThreadHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            if (mGatewayId == null) {
+                                mGatewayId = hid;
+                            }
                             onConfigResponse(response.body());
                         }
                     });
