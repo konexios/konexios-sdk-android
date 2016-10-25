@@ -49,12 +49,4 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
         mHost = host;
         mMqttPrefix = prefix;
     }
-
-    @Override
-    protected void onConfigResponse(ConfigResponse response) {
-        super.onConfigResponse(response);
-        if (!isConnected()) {
-            connectMqtt();
-        }
-    }
 }
