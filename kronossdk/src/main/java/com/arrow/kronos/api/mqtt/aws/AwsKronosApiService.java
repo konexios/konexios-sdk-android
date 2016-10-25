@@ -41,7 +41,7 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     @Override
     protected String getPublisherTopic(String daviceType, String externalId) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getPublisherTopic");
-        return String.format("telemetries/devices/%s", mGatewayHid);
+        return String.format("telemetries/devices/%s", mGatewayId);
     }
 
     @Override
@@ -57,10 +57,9 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
 
     @Override
     protected void onConfigResponse(ConfigResponse response) {
-        super.onConfigResponse(response);
         if (response.getAws() != null) {
             mAws = response.getAws();
         }
-        connectMqtt();
+        super.onConfigResponse(response);
     }
 }
