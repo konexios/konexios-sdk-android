@@ -77,6 +77,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     protected ServerCommandsListener mServerCommandsListener;
     private String mApiKey;
     private String mApiSecret;
+    protected ConfigResponse configResponse;
 
     protected IotConnectAPIService getService() {
         return mService;
@@ -118,6 +119,8 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             ApiRequestSigner.getInstance().setSecretKey(keys.getSecretKey());
             ApiRequestSigner.getInstance().apiKey(keys.getApiKey());
         }
+        this.configResponse = response;
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + this.configResponse.getCloudPlatform());
     }
 
     protected String formatBatchPayload(List<TelemetryModel> telemetry) {
@@ -138,6 +141,8 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void registerAccount(AccountRequest accountRequest, final RegisterAccountListener listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount() email: " + accountRequest.getEmail()
+            + ", code: " + accountRequest.getCode());
         Call<AccountResponse> call = mService.registerAccount(accountRequest);
         call.enqueue(new Callback<AccountResponse>() {
             @Override
@@ -271,6 +276,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void registerDevice(DeviceRegistrationModel req, final RegisterDeviceListener listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "regiterDevice() type: " + req.getType() + ", uid: " + req.getUid());
         mService.createOrUpdateDevice(req).enqueue(new Callback<DeviceRegistrationResponse>() {
             @Override
             public void onResponse(Call<DeviceRegistrationResponse> call, final Response<DeviceRegistrationResponse> response) {
@@ -359,6 +365,8 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void registerGateway(GatewayModel gatewayModel, final GatewayRegisterListener listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
+            ", applicationHid: " + gatewayModel.getApplicationHid());
         mService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, final Response<GatewayResponse> response) {
@@ -431,6 +439,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void checkinGateway(String hid, final CheckinGatewayListener listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "checkinGateway(), hid: " + hid);
         mService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
@@ -475,6 +484,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getGatewayConfig(final String hid, final GetGatewayConfigListener listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayConfig() hid: " + hid);
         mService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
             @Override
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {

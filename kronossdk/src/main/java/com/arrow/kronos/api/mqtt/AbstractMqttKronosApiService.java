@@ -1,6 +1,7 @@
 package com.arrow.kronos.api.mqtt;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.arrow.kronos.api.AbstractKronosApiService;
@@ -123,26 +124,19 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     }
 
     private void sendMqttMessage(String topic, MqttMessage message) {
-        if (mMqttClient != null && mMqttClient.isConnected()) {
-            try {
-                FirebaseCrash.logcat(Log.VERBOSE, TAG, "publishing to topic: " + topic);
-                mMqttClient.publish(topic, message).setActionCallback(mMqttTelemetryCallback);
-            } catch (MqttException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "sendMqttMessage");
-                FirebaseCrash.report(e);
-            }
-        } else {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "mMqttClient is not connected");
+        connectMqtt();
+        try {
+            FirebaseCrash.logcat(Log.VERBOSE, TAG, "publishing to topic: " + topic);
+            mMqttClient.publish(topic, message).setActionCallback(mMqttTelemetryCallback);
+        } catch (MqttException e) {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "sendMqttMessage");
+            FirebaseCrash.report(e);
         }
     }
 
-    @Override
-    protected void onGatewayResponse(GatewayResponse response) {
-        super.onGatewayResponse(response);
-        connectMqtt();
-    }
+    protected synchronized final void connectMqtt() {
+        if (isConnected()) return;
 
-    protected final void connectMqtt() {
         MqttConnectOptions connOpts = getMqttOptions();
         try {
             String clientId = getClientId();
@@ -153,6 +147,11 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
             mMqttClient = new MqttAsyncClient(getHost(), clientId, null);
             mMqttClient.setCallback(mMqttIncomingMessageListener);
             mMqttClient.connect(connOpts, null, mMqttConnectCallback);
+            do {
+                try {
+                    SystemClock.sleep(1000);
+                } catch (Throwable throwable){}
+            } while (!isConnected());
         } catch (MqttException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connectMqtt");
             FirebaseCrash.report(e);

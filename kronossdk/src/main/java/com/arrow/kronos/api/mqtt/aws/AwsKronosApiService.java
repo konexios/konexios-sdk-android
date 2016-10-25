@@ -20,15 +20,13 @@ import retrofit2.Response;
 public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     private static final String TAG = AwsKronosApiService.class.getName();
 
-    private ConfigResponse.Aws mAws;
-
     @Override
     protected MqttConnectOptions getMqttOptions() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getMqttOptions");
         MqttConnectOptions options = super.getMqttOptions();
-        String rootCert = mAws.getCaCert();
-        String clientCert = mAws.getClientCert();
-        String privateKey = mAws.getPrivateKey();
+        String rootCert = this.configResponse.getAws().getCaCert();
+        String clientCert = this.configResponse.getAws().getClientCert();
+        String privateKey = this.configResponse.getAws().getPrivateKey();
         try {
             options.setSocketFactory(SslUtil.getSocketFactory(rootCert, clientCert, privateKey));
         } catch (Exception e) {
@@ -47,19 +45,11 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     @Override
     protected String getHost() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
-        return "ssl://".concat(mAws.getHost());
+        return "ssl://".concat(this.configResponse.getAws().getHost());
     }
 
     @Override
     public boolean hasBatchMode() {
         return false;
-    }
-
-    @Override
-    protected void onConfigResponse(ConfigResponse response) {
-        if (response.getAws() != null) {
-            mAws = response.getAws();
-        }
-        super.onConfigResponse(response);
     }
 }

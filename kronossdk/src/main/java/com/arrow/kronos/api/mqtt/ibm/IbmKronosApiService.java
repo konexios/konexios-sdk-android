@@ -24,9 +24,7 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
     private static final String TAG = IbmKronosApiService.class.getName();
 
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";
-    private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
-
-    private ConfigResponse.Ibm mIbm;
+    private static final String IOT_DEVICE_USERNAME = "use-token-auth";
 
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
@@ -39,7 +37,7 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
         MqttConnectOptions options = super.getMqttOptions();
         options.setCleanSession(true);
         options.setUserName(IOT_DEVICE_USERNAME);
-        options.setPassword(mIbm.getAuthToken().toCharArray());
+        options.setPassword(this.configResponse.getIbm().getAuthToken().toCharArray());
         try {
             options.setSocketFactory(new NoSSLv3SocketFactory());
         } catch (Exception e) {
@@ -52,25 +50,17 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
     @Override
     protected String getHost() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
-        return "ssl://" + mIbm.getOrganicationId() + IOT_ORGANIZATION_SSL;
+        return "ssl://" + this.configResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
     }
 
     @Override
     protected String getClientId() {
-        return "g:" + mIbm.getOrganicationId() + ":" + mIbm.getGatewayType() + ":" + mIbm.getGatewayId();
+        ConfigResponse.Ibm ibm = this.configResponse.getIbm();
+        return "g:" + ibm.getOrganicationId() + ":" + ibm.getGatewayType() + ":" + ibm.getGatewayId();
     }
 
     @Override
     public boolean hasBatchMode() {
         return false;
     }
-
-    @Override
-    protected void onConfigResponse(ConfigResponse response) {
-        if (response.getIbm() != null) {
-            mIbm = response.getIbm();
-        }
-        super.onConfigResponse(response);
-    }
-
 }
