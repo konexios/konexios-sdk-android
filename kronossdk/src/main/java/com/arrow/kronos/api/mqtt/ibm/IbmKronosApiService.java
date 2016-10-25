@@ -67,11 +67,10 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
 
     @Override
     protected void onConfigResponse(ConfigResponse response) {
-        super.onConfigResponse(response);
         if (response.getIbm() != null) {
             mIbm = response.getIbm();
         }
-        connectMqtt();
+        super.onConfigResponse(response);
     }
 
 }

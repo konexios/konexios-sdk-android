@@ -5,6 +5,7 @@ import android.util.Log;
 import com.arrow.kronos.api.mqtt.common.NoSSLv3SocketFactory;
 import com.google.firebase.crash.FirebaseCrash;
 
+import org.spongycastle.crypto.examples.JPAKEExample;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openssl.PEMKeyPair;
 import org.spongycastle.openssl.PEMParser;
@@ -46,6 +47,7 @@ public final class SslUtil {
 
         // load client private key
         PEMParser parser = new PEMParser(new StringReader(keyContent));
+        JPAKEExample jpakeExample;
         PEMKeyPair pemKeyPair = (PEMKeyPair) parser.readObject();
         JcaPEMKeyConverter keyConverter = new JcaPEMKeyConverter();
         KeyPair key = keyConverter.getKeyPair(pemKeyPair);

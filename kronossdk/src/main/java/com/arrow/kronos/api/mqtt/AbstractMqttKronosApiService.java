@@ -53,13 +53,12 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
         }
     };
     private MqttAsyncClient mMqttClient;
-    protected String mGatewayHid;
     private final IMqttActionListener mMqttConnectCallback = new IMqttActionListener() {
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
             FirebaseCrash.logcat(Log.DEBUG, TAG, "MQTT connect onSuccess");
             try {
-                String topic = SUBSCRIBE_TOPIC_PREFIX + mGatewayHid;
+                String topic = SUBSCRIBE_TOPIC_PREFIX + mGatewayId;
                 mMqttClient.subscribe(topic, QOS);
             } catch (MqttException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "subscribe");
@@ -117,7 +116,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     @Override
     public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
         String payload = formatBatchPayload(telemetry);
-        String topic = "krs.tel.bat.gts." + mGatewayHid;
+        String topic = "krs.tel.bat.gts." + mGatewayId;
         MqttMessage message = new MqttMessage(payload.toString().getBytes());
         sendMqttMessage(topic, message);
     }
@@ -173,5 +172,9 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
 
     @Override
     public void setMqttEndpoint(String host, String prefix) {
+    }
+
+    protected boolean isConnected() {
+        return mMqttClient != null && mMqttClient.isConnected();
     }
 }
