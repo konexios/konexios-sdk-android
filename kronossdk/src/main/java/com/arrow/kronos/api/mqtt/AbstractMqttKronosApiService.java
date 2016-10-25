@@ -59,6 +59,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
             FirebaseCrash.logcat(Log.DEBUG, TAG, "MQTT connect onSuccess");
             try {
                 String topic = SUBSCRIBE_TOPIC_PREFIX + mGatewayId;
+                FirebaseCrash.logcat(Log.VERBOSE, TAG, "subscribing to topic: " + topic);
                 mMqttClient.subscribe(topic, QOS);
             } catch (MqttException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "subscribe");
@@ -124,11 +125,14 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
     private void sendMqttMessage(String topic, MqttMessage message) {
         if (mMqttClient != null && mMqttClient.isConnected()) {
             try {
+                FirebaseCrash.logcat(Log.VERBOSE, TAG, "publishing to topic: " + topic);
                 mMqttClient.publish(topic, message).setActionCallback(mMqttTelemetryCallback);
             } catch (MqttException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "sendMqttMessage");
                 FirebaseCrash.report(e);
             }
+        } else {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "mMqttClient is not connected");
         }
     }
 
@@ -145,6 +149,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractKronosApiServ
             if (mMqttClient != null) {
                 mMqttClient.disconnect();
             }
+            FirebaseCrash.logcat(Log.VERBOSE, TAG, "connecting to host: " + getHost() + ", clientId: " + clientId);
             mMqttClient = new MqttAsyncClient(getHost(), clientId, null);
             mMqttClient.setCallback(mMqttIncomingMessageListener);
             mMqttClient.connect(connOpts, null, mMqttConnectCallback);
