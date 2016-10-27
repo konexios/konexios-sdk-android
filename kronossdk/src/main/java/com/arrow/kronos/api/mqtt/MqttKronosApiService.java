@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.arrow.kronos.api.Constants;
 import com.arrow.kronos.api.ServerEndpoint;
 import com.arrow.kronos.api.common.ApiRequestSigner;
+import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.models.ConfigResponse;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -19,10 +20,16 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
     private String mHost;
     private String mMqttPrefix;
 
+    public MqttKronosApiService(String host, String mqttPrefix, String gatewayId, ServerCommandsListener listener) {
+        super(gatewayId, listener);
+        mHost = host;
+        mMqttPrefix = mqttPrefix;
+    }
+
     protected MqttConnectOptions getMqttOptions() {
         String userName = mMqttPrefix + ":" + mGatewayId;
         String apiKey = ApiRequestSigner.getInstance().getApiKey();
-        apiKey = !TextUtils.isEmpty(apiKey) ? apiKey : getApiKey();
+        apiKey = !TextUtils.isEmpty(apiKey) ? apiKey : mConfigResponse.getKey().getApiKey();
         MqttConnectOptions connOpts = super.getMqttOptions();
         connOpts.setUserName(userName);
         connOpts.setPassword(apiKey.toCharArray());
@@ -42,11 +49,5 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
     @Override
     public boolean hasBatchMode() {
         return true;
-    }
-
-    @Override
-    public void setMqttEndpoint(String host, String prefix) {
-        mHost = host;
-        mMqttPrefix = prefix;
     }
 }

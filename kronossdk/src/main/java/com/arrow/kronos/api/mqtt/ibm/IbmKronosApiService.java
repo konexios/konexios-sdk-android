@@ -2,19 +2,12 @@ package com.arrow.kronos.api.mqtt.ibm;
 
 import android.util.Log;
 
-import com.arrow.kronos.api.AbstractKronosApiService;
 import com.arrow.kronos.api.models.ConfigResponse;
-import com.arrow.kronos.api.models.DeviceRegistrationResponse;
-import com.arrow.kronos.api.models.GatewayResponse;
 import com.arrow.kronos.api.mqtt.AbstractMqttKronosApiService;
 import com.arrow.kronos.api.mqtt.common.NoSSLv3SocketFactory;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-
-import java.net.HttpURLConnection;
-
-import retrofit2.Response;
 
 /**
  * Created by osminin on 9/2/2016.
@@ -25,6 +18,10 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
 
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";
     private static final String IOT_DEVICE_USERNAME = "use-token-auth";
+
+    public IbmKronosApiService(String gatewayId, ConfigResponse configResponse) {
+        super(gatewayId, configResponse);
+    }
 
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
@@ -37,7 +34,7 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
         MqttConnectOptions options = super.getMqttOptions();
         options.setCleanSession(true);
         options.setUserName(IOT_DEVICE_USERNAME);
-        options.setPassword(this.configResponse.getIbm().getAuthToken().toCharArray());
+        options.setPassword(this.mConfigResponse.getIbm().getAuthToken().toCharArray());
         try {
             options.setSocketFactory(new NoSSLv3SocketFactory());
         } catch (Exception e) {
@@ -50,12 +47,12 @@ public final class IbmKronosApiService extends AbstractMqttKronosApiService {
     @Override
     protected String getHost() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
-        return "ssl://" + this.configResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
+        return "ssl://" + this.mConfigResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
     }
 
     @Override
     protected String getClientId() {
-        ConfigResponse.Ibm ibm = this.configResponse.getIbm();
+        ConfigResponse.Ibm ibm = this.mConfigResponse.getIbm();
         return "g:" + ibm.getOrganicationId() + ":" + ibm.getGatewayType() + ":" + ibm.getGatewayId();
     }
 

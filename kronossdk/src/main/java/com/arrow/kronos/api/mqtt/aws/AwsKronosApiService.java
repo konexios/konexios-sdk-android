@@ -9,10 +9,6 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
-import java.net.HttpURLConnection;
-
-import retrofit2.Response;
-
 /**
  * Created by osminin on 6/20/2016.
  */
@@ -20,13 +16,17 @@ import retrofit2.Response;
 public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     private static final String TAG = AwsKronosApiService.class.getName();
 
+    public AwsKronosApiService(String gatewayId, ConfigResponse configResponse) {
+        super(gatewayId, configResponse);
+    }
+
     @Override
     protected MqttConnectOptions getMqttOptions() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getMqttOptions");
         MqttConnectOptions options = super.getMqttOptions();
-        String rootCert = this.configResponse.getAws().getCaCert();
-        String clientCert = this.configResponse.getAws().getClientCert();
-        String privateKey = this.configResponse.getAws().getPrivateKey();
+        String rootCert = this.mConfigResponse.getAws().getCaCert();
+        String clientCert = this.mConfigResponse.getAws().getClientCert();
+        String privateKey = this.mConfigResponse.getAws().getPrivateKey();
         try {
             options.setSocketFactory(SslUtil.getSocketFactory(rootCert, clientCert, privateKey));
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public final class AwsKronosApiService extends AbstractMqttKronosApiService {
     @Override
     protected String getHost() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
-        return "ssl://".concat(this.configResponse.getAws().getHost());
+        return "ssl://".concat(this.mConfigResponse.getAws().getHost());
     }
 
     @Override
