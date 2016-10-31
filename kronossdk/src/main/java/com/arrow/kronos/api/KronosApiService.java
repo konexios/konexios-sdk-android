@@ -70,6 +70,14 @@ public interface KronosApiService {
     void initialize(Handler handler);
 
     /**
+     * make persistent connection to the cloud, should be called only after gateway registration
+     * (connection require gateway hid to be performed)
+     * @param type
+     */
+
+    void connect(ConnectionType type);
+
+    /**
      * destroy persistent connection
      */
     void disconnect();

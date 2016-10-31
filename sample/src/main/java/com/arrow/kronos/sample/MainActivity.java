@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.arrow.kronos.api.ConnectionType;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
 import com.arrow.kronos.api.listeners.GatewayRegisterListener;
@@ -90,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
         //register new gateway and initiate persistent connection (it makes sense only in case when some of {ConnectionType.MQTT, ConnectionType.AWS,
         // ConnectionType.IBM} is chosen)
-        //mTelemetrySendService.connect();
     }
 
     @Override
@@ -180,6 +180,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onGatewayRegistered(GatewayResponse response) {
                 mGatewayHid = response.getHid();
+                ConnectionType type = ConnectionType.MQTT;
+                mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
+
+                mTelemetrySendService.connect(type);
             }
 
             @Override

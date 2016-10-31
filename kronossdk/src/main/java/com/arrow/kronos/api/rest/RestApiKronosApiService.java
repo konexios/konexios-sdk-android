@@ -1,9 +1,8 @@
 package com.arrow.kronos.api.rest;
 
-import android.os.Bundle;
 import android.util.Log;
 
-import com.arrow.kronos.api.AbstractKronosApiService;
+import com.arrow.kronos.api.AbstractTelemetrySenderService;
 import com.arrow.kronos.api.Constants;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
@@ -19,9 +18,8 @@ import retrofit2.Response;
  * Created by osminin on 6/17/2016.
  */
 
-public final class RestApiKronosApiService extends AbstractKronosApiService {
+public final class RestApiKronosApiService extends AbstractTelemetrySenderService {
     private static final String TAG = RestApiKronosApiService.class.getName();
-
     private final retrofit2.Callback<ResponseBody> mRestApiCallback = new retrofit2.Callback<ResponseBody>() {
         @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -30,9 +28,19 @@ public final class RestApiKronosApiService extends AbstractKronosApiService {
 
         @Override
         public void onFailure(Call<ResponseBody> call, Throwable t) {
-            FirebaseCrash.logcat(Log.ERROR,  TAG, "data sent to cloud failed: " + t.toString());
+            FirebaseCrash.logcat(Log.ERROR, TAG, "data sent to cloud failed: " + t.toString());
         }
     };
+    private IotConnectAPIService mService;
+
+    public RestApiKronosApiService(IotConnectAPIService service) {
+        mService = service;
+    }
+
+    @Override
+    public void connect() {
+
+    }
 
     @Override
     public void disconnect() {
@@ -43,7 +51,7 @@ public final class RestApiKronosApiService extends AbstractKronosApiService {
     public void sendSingleTelemetry(TelemetryModel telemetry) {
         String json = telemetry.getTelemetry();
         RequestBody body = RequestBody.create(Constants.JSON, json);
-        Call<ResponseBody> call = getService().sendTelemetry(body);
+        Call<ResponseBody> call = mService.sendTelemetry(body);
         call.enqueue(mRestApiCallback);
     }
 
@@ -51,16 +59,12 @@ public final class RestApiKronosApiService extends AbstractKronosApiService {
     public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
         String json = formatBatchPayload(telemetry);
         RequestBody body = RequestBody.create(Constants.JSON, json);
-        Call<ResponseBody> call = getService().sendBatchTelemetry(body);
+        Call<ResponseBody> call = mService.sendBatchTelemetry(body);
         call.enqueue(mRestApiCallback);
     }
 
     @Override
     public boolean hasBatchMode() {
         return true;
-    }
-
-    @Override
-    public void setMqttEndpoint(String host, String prefix) {
     }
 }
