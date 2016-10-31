@@ -1,6 +1,5 @@
 package com.arrow.kronos.api;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
@@ -50,7 +49,11 @@ import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
 import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
+import com.arrow.kronos.api.mqtt.MqttKronosApiService;
+import com.arrow.kronos.api.mqtt.aws.AwsKronosApiService;
+import com.arrow.kronos.api.mqtt.ibm.IbmKronosApiService;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
+import com.arrow.kronos.api.rest.RestApiKronosApiService;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
 
@@ -67,46 +70,74 @@ import retrofit2.Response;
  * Created by osminin on 6/17/2016.
  */
 
-public abstract class AbstractKronosApiService implements KronosApiService {
-    private static final String TAG = AbstractKronosApiService.class.getName();
+class KronosApiImpl implements KronosApiService {
+    private static final String TAG = KronosApiImpl.class.getName();
 
-    private IotConnectAPIService mService;
+    private IotConnectAPIService mRestService;
     private Gson mGson = new Gson();
     protected Handler mServiceThreadHandler;
     protected String mGatewayId;
-    protected ServerCommandsListener mServerCommandsListener;
-    private String mApiKey;
-    private String mApiSecret;
-    protected ConfigResponse configResponse;
+    private TelemetrySenderInterface mSenderService;
 
-    protected IotConnectAPIService getService() {
-        return mService;
-    }
+    private ServerCommandsListener mServerCommandsListener;
+    private String mMqttHost;
+    private String mMqttPrefix;
+    private ConfigResponse mConfigResponse;
 
     protected Gson getGson() {
         return mGson;
     }
 
-    protected String getApiKey() {
-        return mApiKey;
-    }
-
-    protected String getApiSecret() {
-        return mApiSecret;
+    @Override
+    public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
+        RetrofitHolder.setApiKey(apiKey);
+        RetrofitHolder.setApiSecret(apiSecret);
+        mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
     @Override
-    public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
-        mApiKey = apiKey;
-        mApiSecret = apiSecret;
-        RetrofitHolder.setApiKey(apiKey);
-        RetrofitHolder.setApiSecret(apiSecret);
-        mService = RetrofitHolder.getIotConnectAPIService(endpoint);
+    public void setMqttEndpoint(String host, String prefix) {
+        mMqttHost = host;
+        mMqttPrefix = prefix;
+    }
+
+    @Override
+    public void connect(ConnectionType type) {
+        switch (type) {
+            case REST:
+                mSenderService = new RestApiKronosApiService(mRestService);
+                break;
+            case MQTT:
+                mSenderService = new MqttKronosApiService(mMqttHost, mMqttPrefix, mGatewayId, mServerCommandsListener);
+                break;
+            case AWS:
+                mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
+                break;
+            case IBM:
+                mSenderService = new IbmKronosApiService(mGatewayId, mConfigResponse);
+                break;
+        }
+        mSenderService.connect();
     }
 
     @Override
     public void initialize(Handler handler) {
         mServiceThreadHandler = handler;
+    }
+
+    @Override
+    public void disconnect() {
+        mSenderService.disconnect();
+    }
+
+    @Override
+    public void sendSingleTelemetry(TelemetryModel telemetry) {
+        mSenderService.sendSingleTelemetry(telemetry);
+    }
+
+    @Override
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
+        mSenderService.sendBatchTelemetry(telemetry);
     }
 
     protected void onGatewayResponse(GatewayResponse response) {
@@ -119,19 +150,8 @@ public abstract class AbstractKronosApiService implements KronosApiService {
             ApiRequestSigner.getInstance().setSecretKey(keys.getSecretKey());
             ApiRequestSigner.getInstance().apiKey(keys.getApiKey());
         }
-        this.configResponse = response;
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + this.configResponse.getCloudPlatform());
-    }
-
-    protected String formatBatchPayload(List<TelemetryModel> telemetry) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        for (TelemetryModel model : telemetry) {
-            String json = model.getTelemetry();
-            builder.append(json).append(",");
-        }
-        builder.replace(builder.length() - 1, builder.length(), "").append("]");
-        return builder.toString();
+        mConfigResponse = response;
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() ");
     }
 
     @Override
@@ -143,18 +163,18 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     public void registerAccount(AccountRequest accountRequest, final RegisterAccountListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount() email: " + accountRequest.getEmail()
             + ", code: " + accountRequest.getCode());
-        Call<AccountResponse> call = mService.registerAccount(accountRequest);
+        Call<AccountResponse> call = mRestService.registerAccount(accountRequest);
         call.enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
-                Log.v(TAG, "onResponse: " + response.code());
+                Log.v(TAG, "registerAccount: " + response.code());
                 try {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
                         listener.onAccountRegistered(response.body());
                     } else {
                         String code = Integer.toString(response.code());
                         listener.onAccountRegisterFailed(code);
-                        Log.v(TAG, "data sent to cloud: " + code);
+                        Log.v(TAG, "registerAccount " + code);
                     }
                 } catch (Exception e) {
                     listener.onAccountRegisterFailed(e.toString());
@@ -175,7 +195,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getDeviceActionTypes(final ListResultListener<DeviceActionTypeModel> listener) {
-        mService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
+        mRestService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, Response<ListResultModel<DeviceActionTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
@@ -196,7 +216,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getDeviceActions(String deviceHid, final ListResultListener<DeviceActionModel> listener) {
-        mService.getActions(deviceHid).enqueue(new Callback<ListResultModel<DeviceActionModel>>() {
+        mRestService.getActions(deviceHid).enqueue(new Callback<ListResultModel<DeviceActionModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionModel>> call, Response<ListResultModel<DeviceActionModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActions response");
@@ -216,7 +236,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void postDeviceAction(String deviceHid, DeviceActionModel action, final PostDeviceActionListener listener) {
-        mService.postAction(deviceHid, action).enqueue(new Callback<ResponseBody>() {
+        mRestService.postAction(deviceHid, action).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
@@ -236,7 +256,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void updateDeviceAction(String deviceHid, int index, DeviceActionModel model, final UpdateDeviceActionListener listener) {
-        mService.updateAction(deviceHid, index, model).enqueue(new Callback<ResponseBody>() {
+        mRestService.updateAction(deviceHid, index, model).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
@@ -256,7 +276,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getDeviceHistoricalEvents(String deviceHid, final PagingResultListener<DeviceEventModel> listener) {
-        mService.getHistoricalEvents(deviceHid).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
+        mRestService.getHistoricalEvents(deviceHid).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<DeviceEventModel>> call, Response<PagingResultModel<DeviceEventModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getHistoricalEvents response");
@@ -277,7 +297,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     @Override
     public void registerDevice(DeviceRegistrationModel req, final RegisterDeviceListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "regiterDevice() type: " + req.getType() + ", uid: " + req.getUid());
-        mService.createOrUpdateDevice(req).enqueue(new Callback<DeviceRegistrationResponse>() {
+        mRestService.createOrUpdateDevice(req).enqueue(new Callback<DeviceRegistrationResponse>() {
             @Override
             public void onResponse(Call<DeviceRegistrationResponse> call, final Response<DeviceRegistrationResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createOrUpdateDevice response");
@@ -298,7 +318,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void registerReceivedEvent(String eventHid) {
-        mService.putReceived(eventHid).enqueue(new Callback<ResponseBody>() {
+        mRestService.putReceived(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "registerReceivedEvent response");
@@ -313,7 +333,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void eventHandlingSucceed(String eventHid) {
-        mService.putSucceeded(eventHid).enqueue(new Callback<ResponseBody>() {
+        mRestService.putSucceeded(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "eventHandlingSucceed response");
@@ -328,7 +348,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void eventHandlingFailed(String eventHid) {
-        mService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
+        mRestService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "eventHandlingSucceed response");
@@ -343,7 +363,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findAllGateways(final GetGatewaysListener listener) {
-        mService.findAllGateways().enqueue(new Callback<List<GatewayModel>>() {
+        mRestService.findAllGateways().enqueue(new Callback<List<GatewayModel>>() {
             @Override
             public void onResponse(Call<List<GatewayModel>> call, Response<List<GatewayModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findAllGateways response");
@@ -367,18 +387,27 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     public void registerGateway(GatewayModel gatewayModel, final GatewayRegisterListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
             ", applicationHid: " + gatewayModel.getApplicationHid());
-        mService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
+        mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, final Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    mServiceThreadHandler.post(new Runnable() {
+                    final Handler uiHandler = new Handler();
+                    final Runnable handleInUiThread = new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onGatewayRegistered(response.body());
+                        }
+                    };
+                    Runnable handleInServiceThread = new Runnable() {
                         @Override
                         public void run() {
                             onGatewayResponse(response.body());
+                            uiHandler.post(handleInUiThread);
                         }
-                    });
-                    listener.onGatewayRegistered(response.body());
+                    };
+                    mServiceThreadHandler.post(handleInServiceThread);
+
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
                     listener.onGatewayRegisterFailed();
@@ -395,7 +424,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findGateway(String hid, final FindGatewayListener listener) {
-        mService.findGateway(hid).enqueue(new Callback<GatewayModel>() {
+        mRestService.findGateway(hid).enqueue(new Callback<GatewayModel>() {
             @Override
             public void onResponse(Call<GatewayModel> call, Response<GatewayModel> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findGateway response");
@@ -417,7 +446,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void updateGateway(String hid, GatewayModel gatewayModel, final GatewayUpdateListener listener) {
-        mService.updateGateway(hid, gatewayModel).enqueue(new Callback<GatewayResponse>() {
+        mRestService.updateGateway(hid, gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateGateway response");
@@ -440,7 +469,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     @Override
     public void checkinGateway(String hid, final CheckinGatewayListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "checkinGateway(), hid: " + hid);
-        mService.checkin(hid).enqueue(new Callback<CommonResponse>() {
+        mRestService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "checkin response");
@@ -462,7 +491,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void sendCommandGateway(String hid, GatewayCommand command, final GatewayCommandsListener listener) {
-        mService.sendGatewayCommand(hid, command).enqueue(new Callback<GatewayResponse>() {
+        mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "sendGatewayCommand response");
@@ -485,7 +514,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     @Override
     public void getGatewayConfig(final String hid, final GetGatewayConfigListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayConfig() hid: " + hid);
-        mService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
+        mRestService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
             @Override
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
@@ -516,7 +545,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void gatewayHeartbeat(String hid, final CommonRequestListener listener) {
-        mService.heartBeat(hid).enqueue(new Callback<CommonResponse>() {
+        mRestService.heartBeat(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "heartBeat response");
@@ -538,7 +567,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getGatewayLogs(String hid, AuditLogsQuery query, final PagingResultListener<AuditLogModel> listener) {
-        mService.getGatewayLogs(hid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
+        mRestService.getGatewayLogs(hid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
                 query.getUserHids(), query.getTypes(), query.getSortField(), query.getSortDirection(),
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
             @Override
@@ -562,7 +591,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void deleteDeviceAction(String deviceHid, int index, final DeleteDeviceActionListener listener) {
-        mService.deleteAction(deviceHid, index).enqueue(new Callback<ResponseBody>() {
+        mRestService.deleteAction(deviceHid, index).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
@@ -585,7 +614,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     @Override
     public void findAllDevices(String userHid, String uid, String type, String gatewayHid,
                                String enabled, int page, int size, final PagingResultListener<DeviceModel> listener) {
-        mService.findAllDevices(userHid, uid, type, gatewayHid, enabled, page, size).
+        mRestService.findAllDevices(userHid, uid, type, gatewayHid, enabled, page, size).
                 enqueue(new Callback<PagingResultModel<DeviceModel>>() {
                     @Override
                     public void onResponse(Call<PagingResultModel<DeviceModel>> call, Response<PagingResultModel<DeviceModel>> response) {
@@ -608,7 +637,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findDeviceByHid(String deviceHid, final FindDeviceListener listener) {
-        mService.findDeviceByHid(deviceHid).enqueue(new Callback<DeviceModel>() {
+        mRestService.findDeviceByHid(deviceHid).enqueue(new Callback<DeviceModel>() {
             @Override
             public void onResponse(Call<DeviceModel> call, Response<DeviceModel> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findDeviceByHid response");
@@ -630,7 +659,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void updateDevice(String deviceHid, DeviceRegistrationModel device, final CommonRequestListener listener) {
-        mService.updateExistingDevice(deviceHid, device).enqueue(new Callback<CommonResponse>() {
+        mRestService.updateExistingDevice(deviceHid, device).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDevice response");
@@ -652,7 +681,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, final PagingResultListener<AuditLogModel> listener) {
-        mService.listDeviceAuditLogs(deviceHid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
+        mRestService.listDeviceAuditLogs(deviceHid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
                 query.getUserHids(), query.getTypes(), query.getSortField(), query.getSortDirection(),
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
             @Override
@@ -679,7 +708,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getNodesList(final ListResultListener<NodeModel> listener) {
-        mService.getListExistingNodes().enqueue(new Callback<ListResultModel<NodeModel>>() {
+        mRestService.getListExistingNodes().enqueue(new Callback<ListResultModel<NodeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<NodeModel>> call, Response<ListResultModel<NodeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getNodesList response");
@@ -701,7 +730,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void createNewNode(NodeRegistrationModel node, final CommonRequestListener listener) {
-        mService.createNewNode(node).enqueue(new Callback<CommonResponse>() {
+        mRestService.createNewNode(node).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNode response");
@@ -723,7 +752,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void updateExistingNode(String nodeHid, NodeRegistrationModel node, final CommonRequestListener listener) {
-        mService.updateExistingNode(nodeHid, node).enqueue(new Callback<CommonResponse>() {
+        mRestService.updateExistingNode(nodeHid, node).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNode response");
@@ -748,7 +777,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getListNodeTypes(final ListNodeTypesListener listener) {
-        mService.getListNodeTypes().enqueue(new Callback<ListResultModel<NodeTypeModel>>() {
+        mRestService.getListNodeTypes().enqueue(new Callback<ListResultModel<NodeTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<NodeTypeModel>> call, Response<ListResultModel<NodeTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getListNodeTypes response");
@@ -770,7 +799,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void createNewNodeType(NodeTypeRegistrationModel nodeType, final CommonRequestListener listener) {
-        mService.createNewNodeType(nodeType).enqueue(new Callback<CommonResponse>() {
+        mRestService.createNewNodeType(nodeType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNodeType response");
@@ -792,7 +821,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void updateExistingNodeType(String hid, NodeTypeRegistrationModel nodeType, final CommonRequestListener listener) {
-        mService.updateExistingNodeType(hid, nodeType).enqueue(new Callback<CommonResponse>() {
+        mRestService.updateExistingNodeType(hid, nodeType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNodeType response");
@@ -816,7 +845,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void getListDeviceTypes(final ListResultListener<DeviceTypeModel> listener) {
-        mService.getListDeviceTypes().enqueue(new Callback<ListResultModel<DeviceTypeModel>>() {
+        mRestService.getListDeviceTypes().enqueue(new Callback<ListResultModel<DeviceTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceTypeModel>> call, Response<ListResultModel<DeviceTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getListDeviceTypes response");
@@ -838,7 +867,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void createNewDeviceType(DeviceTypeRegistrationModel deviceType, final CommonRequestListener listener) {
-        mService.createNewDeviceType(deviceType).enqueue(new Callback<CommonResponse>() {
+        mRestService.createNewDeviceType(deviceType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewDeviceType response");
@@ -861,7 +890,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
     @Override
     public void updateExistingDeviceType(String hid, DeviceTypeRegistrationModel deviceType,
                                          final CommonRequestListener listener) {
-        mService.updateExistingDeviceType(hid, deviceType).enqueue(new Callback<CommonResponse>() {
+        mRestService.updateExistingDeviceType(hid, deviceType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDeviceType response");
@@ -885,7 +914,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findTelemetryByApplicationHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
-        mService.findTelemetryByAppHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
+        mRestService.findTelemetryByAppHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
@@ -908,7 +937,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findTelemetryByDeviceHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
-        mService.findTelemetryByDeviceHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
+        mRestService.findTelemetryByDeviceHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
@@ -931,7 +960,7 @@ public abstract class AbstractKronosApiService implements KronosApiService {
 
     @Override
     public void findTelemetryByNodeHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
-        mService.findTelemetryByNodeHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
+        mRestService.findTelemetryByNodeHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
@@ -950,5 +979,10 @@ public abstract class AbstractKronosApiService implements KronosApiService {
                 listener.onRequestError();
             }
         });
+    }
+
+    @Override
+    public boolean hasBatchMode() {
+        return mSenderService.hasBatchMode();
     }
 }
