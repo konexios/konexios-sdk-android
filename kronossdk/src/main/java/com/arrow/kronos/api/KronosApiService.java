@@ -72,10 +72,9 @@ public interface KronosApiService {
     /**
      * make persistent connection to the cloud, should be called only after gateway registration
      * (connection require gateway hid to be performed)
-     * @param type
      */
 
-    void connect(ConnectionType type);
+    void connect();
 
     /**
      * destroy persistent connection

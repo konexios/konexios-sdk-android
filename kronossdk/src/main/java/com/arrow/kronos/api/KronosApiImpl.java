@@ -102,22 +102,25 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
-    public void connect(ConnectionType type) {
-        switch (type) {
-            case REST:
-                mSenderService = new RestApiKronosApiService(mRestService);
-                break;
-            case MQTT:
-                mSenderService = new MqttKronosApiService(mMqttHost, mMqttPrefix, mGatewayId, mServerCommandsListener);
-                break;
-            case AWS:
-                mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
-                break;
-            case IBM:
-                mSenderService = new IbmKronosApiService(mGatewayId, mConfigResponse);
-                break;
+    public void connect() {
+        if (mConfigResponse == null) {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
+            throw new RuntimeException("config() method must be called first!");
+        }
+        String cloud = mConfigResponse.getCloudPlatform();
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
+        if (cloud.equalsIgnoreCase("ArrowConnect")) {
+            mSenderService = new MqttKronosApiService(mMqttHost, mMqttPrefix, mGatewayId, mServerCommandsListener);
+        } else if (cloud.equalsIgnoreCase("IBM")) {
+            mSenderService = new IbmKronosApiService(mGatewayId, mConfigResponse);
+        } else if (cloud.equalsIgnoreCase("AWS")) {
+            mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
+        } else {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
+            throw new RuntimeException("invalid cloud platform: " + cloud);
         }
         mSenderService.connect();
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() done!");
     }
 
     @Override
@@ -151,7 +154,7 @@ class KronosApiImpl implements KronosApiService {
             ApiRequestSigner.getInstance().apiKey(keys.getApiKey());
         }
         mConfigResponse = response;
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() ");
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + mConfigResponse.getCloudPlatform());
     }
 
     @Override
@@ -519,15 +522,7 @@ class KronosApiImpl implements KronosApiService {
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    mServiceThreadHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mGatewayId == null) {
-                                mGatewayId = hid;
-                            }
-                            onConfigResponse(response.body());
-                        }
-                    });
+                    onConfigResponse(response.body());
                     listener.onGatewayConfigReceived(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
