@@ -180,10 +180,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onGatewayRegistered(GatewayResponse response) {
                 mGatewayHid = response.getHid();
-                ConnectionType type = ConnectionType.MQTT;
-                mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
-
-                mTelemetrySendService.connect(type);
             }
 
             @Override
