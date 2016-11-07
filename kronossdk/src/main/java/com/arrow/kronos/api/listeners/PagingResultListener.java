@@ -1,5 +1,7 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
+
 import java.util.List;
 
 /**
@@ -8,5 +10,5 @@ import java.util.List;
 
 public interface PagingResultListener<T> {
     void onRequestSuccess(List<T> list);
-    void onRequestError();
+    void onRequestError(ApiError error);
 }
