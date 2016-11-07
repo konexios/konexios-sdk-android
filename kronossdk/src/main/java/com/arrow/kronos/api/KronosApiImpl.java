@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.arrow.kronos.api.common.ApiRequestSigner;
+import com.arrow.kronos.api.common.ErrorUtils;
 import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
@@ -25,35 +26,35 @@ import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.listeners.UpdateDeviceActionListener;
 import com.arrow.kronos.api.models.AccountRequest;
 import com.arrow.kronos.api.models.AccountResponse;
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.AuditLogModel;
-import com.arrow.kronos.api.models.DeviceActionModel;
+import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.ConfigResponse;
+import com.arrow.kronos.api.models.DeviceActionModel;
 import com.arrow.kronos.api.models.DeviceActionTypeModel;
 import com.arrow.kronos.api.models.DeviceEventModel;
 import com.arrow.kronos.api.models.DeviceModel;
+import com.arrow.kronos.api.models.DeviceRegistrationModel;
+import com.arrow.kronos.api.models.DeviceRegistrationResponse;
 import com.arrow.kronos.api.models.DeviceTypeModel;
 import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
 import com.arrow.kronos.api.models.FindTelemetryRequest;
 import com.arrow.kronos.api.models.GatewayCommand;
-import com.arrow.kronos.api.models.AuditLogsQuery;
-import com.arrow.kronos.api.models.PagingResultModel;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
-import com.arrow.kronos.api.models.DeviceRegistrationModel;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
-import com.arrow.kronos.api.models.DeviceRegistrationResponse;
+import com.arrow.kronos.api.models.PagingResultModel;
 import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.mqtt.MqttKronosApiService;
 import com.arrow.kronos.api.mqtt.aws.AwsKronosApiService;
 import com.arrow.kronos.api.mqtt.ibm.IbmKronosApiService;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
-import com.arrow.kronos.api.rest.RestApiKronosApiService;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
 
@@ -73,10 +74,10 @@ import retrofit2.Response;
 class KronosApiImpl implements KronosApiService {
     private static final String TAG = KronosApiImpl.class.getName();
 
-    private IotConnectAPIService mRestService;
-    private Gson mGson = new Gson();
     protected Handler mServiceThreadHandler;
     protected String mGatewayId;
+    private IotConnectAPIService mRestService;
+    private Gson mGson = new Gson();
     private TelemetrySenderInterface mSenderService;
 
     private ServerCommandsListener mServerCommandsListener;
@@ -165,7 +166,7 @@ class KronosApiImpl implements KronosApiService {
     @Override
     public void registerAccount(AccountRequest accountRequest, final RegisterAccountListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount() email: " + accountRequest.getEmail()
-            + ", code: " + accountRequest.getCode());
+                + ", code: " + accountRequest.getCode());
         Call<AccountResponse> call = mRestService.registerAccount(accountRequest);
         call.enqueue(new Callback<AccountResponse>() {
             @Override
@@ -175,12 +176,11 @@ class KronosApiImpl implements KronosApiService {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
                         listener.onAccountRegistered(response.body());
                     } else {
-                        String code = Integer.toString(response.code());
-                        listener.onAccountRegisterFailed(code);
-                        Log.v(TAG, "registerAccount " + code);
+                        ApiError error = ErrorUtils.parseError(response);
+                        listener.onAccountRegisterFailed(error);
                     }
                 } catch (Exception e) {
-                    listener.onAccountRegisterFailed(e.toString());
+                    listener.onAccountRegisterFailed(ErrorUtils.parseError(e));
                     e.printStackTrace();
                     FirebaseCrash.report(e);
                 }
@@ -189,7 +189,7 @@ class KronosApiImpl implements KronosApiService {
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable t) {
                 Log.v(TAG, "onFailure: " + t.toString());
-                listener.onAccountRegisterFailed(t.toString());
+                listener.onAccountRegisterFailed(ErrorUtils.parseError(t));
                 FirebaseCrash.logcat(Log.ERROR, TAG, "postDelayed() failed");
                 FirebaseCrash.report(t);
             }
@@ -205,14 +205,14 @@ class KronosApiImpl implements KronosApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceActionTypeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getActionTypes error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -226,13 +226,13 @@ class KronosApiImpl implements KronosApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceActionModel>> call, Throwable t) {
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -246,13 +246,13 @@ class KronosApiImpl implements KronosApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.postActionSucceed();
                 } else {
-                    listener.postActionFailed();
+                    listener.postActionFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                listener.postActionFailed();
+                listener.postActionFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -266,13 +266,13 @@ class KronosApiImpl implements KronosApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceActionUpdated();
                 } else {
-                    listener.onDeviceActionUpdateFailed();
+                    listener.onDeviceActionUpdateFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                listener.onDeviceActionUpdateFailed();
+                listener.onDeviceActionUpdateFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -286,13 +286,13 @@ class KronosApiImpl implements KronosApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<DeviceEventModel>> call, Throwable t) {
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -307,14 +307,14 @@ class KronosApiImpl implements KronosApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceRegistered(response.body());
                 } else {
-                    listener.onDeviceRegistrationFailed();
+                    listener.onDeviceRegistrationFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<DeviceRegistrationResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "createOrUpdateDevice error");
-                listener.onDeviceRegistrationFailed();
+                listener.onDeviceRegistrationFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -374,14 +374,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onGatewaysReceived(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
-                    listener.onGatewaysFailed();
+                    listener.onGatewaysFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<List<GatewayModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
-                listener.onGatewaysFailed();
+                listener.onGatewaysFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -389,7 +389,7 @@ class KronosApiImpl implements KronosApiService {
     @Override
     public void registerGateway(GatewayModel gatewayModel, final GatewayRegisterListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
-            ", applicationHid: " + gatewayModel.getApplicationHid());
+                ", applicationHid: " + gatewayModel.getApplicationHid());
         mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, final Response<GatewayResponse> response) {
@@ -413,14 +413,14 @@ class KronosApiImpl implements KronosApiService {
 
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
-                    listener.onGatewayRegisterFailed();
+                    listener.onGatewayRegisterFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
-                listener.onGatewayRegisterFailed();
+                listener.onGatewayRegisterFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -435,14 +435,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onGatewayFound(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
-                    listener.onGatewayFindError();
+                    listener.onGatewayFindError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayModel> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
-                listener.onGatewayFindError();
+                listener.onGatewayFindError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -457,14 +457,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onGatewayUpdated(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
-                    listener.onGatewayUpdateFailed();
+                    listener.onGatewayUpdateFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
-                listener.onGatewayUpdateFailed();
+                listener.onGatewayUpdateFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -480,14 +480,15 @@ class KronosApiImpl implements KronosApiService {
                     listener.onCheckinGatewaySuccess();
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
-                    listener.onCheckinGatewayError();
+                    ApiError error = ErrorUtils.parseError(response);
+                    listener.onCheckinGatewayError(error);
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
-                listener.onCheckinGatewayError();
+                listener.onCheckinGatewayError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -502,14 +503,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onGatewayCommandSent(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
-                    listener.onGatewayCommandFailed();
+                    listener.onGatewayCommandFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
-                listener.onGatewayCommandFailed();
+                listener.onGatewayCommandFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -529,14 +530,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onGatewayConfigReceived(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
-                    listener.onGatewayConfigFailed();
+                    listener.onGatewayConfigFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ConfigResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
-                listener.onGatewayConfigFailed();
+                listener.onGatewayConfigFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -551,14 +552,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -575,14 +576,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -597,14 +598,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onDeviceActionDeleted();
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                    listener.onDeviceActionDeleteFailed();
+                    listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                listener.onDeviceActionDeleteFailed();
+                listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -621,14 +622,14 @@ class KronosApiImpl implements KronosApiService {
                             listener.onRequestSuccess(response.body().getData());
                         } else {
                             FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                            listener.onRequestError();
+                            listener.onRequestError(ErrorUtils.parseError(response));
                         }
                     }
 
                     @Override
                     public void onFailure(Call<PagingResultModel<DeviceModel>> call, Throwable t) {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                        listener.onRequestError();
+                        listener.onRequestError(ErrorUtils.parseError(t));
                     }
                 });
     }
@@ -643,14 +644,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onDeviceFindSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findDeviceByHid error");
-                    listener.onDeviceFindFailed();
+                    listener.onDeviceFindFailed(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<DeviceModel> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findDeviceByHid error");
-                listener.onDeviceFindFailed();
+                listener.onDeviceFindFailed(ErrorUtils.parseError(t));
             }
         });
     }
@@ -665,14 +666,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDevice error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDevice error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -689,14 +690,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -714,14 +715,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<NodeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -736,14 +737,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -758,14 +759,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -783,14 +784,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onListNodeTypesSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getListNodeTypes error");
-                    listener.onListNodeTypesFiled();
+                    listener.onListNodeTypesFiled(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<NodeTypeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getListNodeTypes error");
-                listener.onListNodeTypesFiled();
+                listener.onListNodeTypesFiled(ErrorUtils.parseError(t));
             }
         });
     }
@@ -805,14 +806,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNodeType error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNodeType error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -827,14 +828,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNodeType error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNodeType error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -851,14 +852,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceTypeModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -873,14 +874,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -896,14 +897,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -921,14 +922,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -944,14 +945,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -967,14 +968,14 @@ class KronosApiImpl implements KronosApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
-                    listener.onRequestError();
+                    listener.onRequestError(ErrorUtils.parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
-                listener.onRequestError();
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -983,4 +984,5 @@ class KronosApiImpl implements KronosApiService {
     public boolean hasBatchMode() {
         return mSenderService.hasBatchMode();
     }
+
 }

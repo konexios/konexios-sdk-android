@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.GatewayModel;
 
 /**
@@ -8,5 +9,5 @@ import com.arrow.kronos.api.models.GatewayModel;
 
 public interface FindGatewayListener {
     void onGatewayFound(GatewayModel gatewayModel);
-    void onGatewayFindError();
+    void onGatewayFindError(ApiError error);
 }
