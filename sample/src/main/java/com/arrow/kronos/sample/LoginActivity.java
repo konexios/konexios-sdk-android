@@ -26,6 +26,7 @@ import com.arrow.kronos.api.ServerEndpoint;
 import com.arrow.kronos.api.listeners.RegisterAccountListener;
 import com.arrow.kronos.api.models.AccountRequest;
 import com.arrow.kronos.api.models.AccountResponse;
+import com.arrow.kronos.api.models.ApiError;
 
 
 /**
@@ -143,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onAccountRegisterFailed(String s) {
+                public void onAccountRegisterFailed(ApiError e) {
                     Log.v(TAG, "onAccountRegisterFailed");
                     mPasswordView.setError(getString(R.string.error_fatal));
                     mPasswordView.requestFocus();
