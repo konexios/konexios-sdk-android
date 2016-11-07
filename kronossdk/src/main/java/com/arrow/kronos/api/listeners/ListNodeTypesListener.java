@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeTypeModel;
 
@@ -9,5 +10,5 @@ import com.arrow.kronos.api.models.NodeTypeModel;
 
 public interface ListNodeTypesListener {
     void onListNodeTypesSuccess(ListResultModel<NodeTypeModel> result);
-    void onListNodeTypesFiled();
+    void onListNodeTypesFiled(ApiError error);
 }

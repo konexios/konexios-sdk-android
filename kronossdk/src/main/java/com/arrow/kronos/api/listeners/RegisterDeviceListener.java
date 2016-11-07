@@ -1,6 +1,7 @@
 package com.arrow.kronos.api.listeners;
 
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
 
 /**
@@ -9,5 +10,5 @@ import com.arrow.kronos.api.models.DeviceRegistrationResponse;
 
 public interface RegisterDeviceListener {
     void onDeviceRegistered(DeviceRegistrationResponse response);
-    void onDeviceRegistrationFailed();
+    void onDeviceRegistrationFailed(ApiError error);
 }

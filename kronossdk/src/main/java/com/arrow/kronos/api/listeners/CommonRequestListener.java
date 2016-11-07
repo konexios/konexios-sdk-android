@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.CommonResponse;
 
 /**
@@ -8,5 +9,5 @@ import com.arrow.kronos.api.models.CommonResponse;
 
 public interface CommonRequestListener {
     void onRequestSuccess(CommonResponse response);
-    void onRequestError();
+    void onRequestError(ApiError error);
 }

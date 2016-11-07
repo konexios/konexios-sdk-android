@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
 
@@ -11,5 +12,5 @@ import java.util.List;
 
 public interface GetGatewaysListener {
     void onGatewaysReceived(List<GatewayModel> response);
-    void onGatewaysFailed();
+    void onGatewaysFailed(ApiError error);
 }

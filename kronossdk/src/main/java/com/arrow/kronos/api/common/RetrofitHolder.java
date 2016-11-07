@@ -90,6 +90,10 @@ public abstract class RetrofitHolder {
         return retrofit.create(IotConnectAPIService.class);
     }
 
+    public static Retrofit getRetrofit() {
+        return retrofit;
+    }
+
     private static String bodyToString(final RequestBody request){
         try {
             final RequestBody copy = request;
