@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.DeviceModel;
 
 /**
@@ -8,5 +9,5 @@ import com.arrow.kronos.api.models.DeviceModel;
 
 public interface FindDeviceListener {
     void onDeviceFindSuccess(DeviceModel device);
-    void onDeviceFindFailed();
+    void onDeviceFindFailed(ApiError error);
 }
