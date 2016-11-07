@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.ConfigResponse;
 
 /**
@@ -8,5 +9,5 @@ import com.arrow.kronos.api.models.ConfigResponse;
 
 public interface GetGatewayConfigListener {
     void onGatewayConfigReceived(ConfigResponse response);
-    void onGatewayConfigFailed();
+    void onGatewayConfigFailed(ApiError error);
 }

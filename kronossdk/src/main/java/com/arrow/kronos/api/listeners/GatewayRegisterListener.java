@@ -1,5 +1,6 @@
 package com.arrow.kronos.api.listeners;
 
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.GatewayResponse;
 
 /**
@@ -8,5 +9,5 @@ import com.arrow.kronos.api.models.GatewayResponse;
 
 public interface GatewayRegisterListener {
     void onGatewayRegistered(GatewayResponse response);
-    void onGatewayRegisterFailed();
+    void onGatewayRegisterFailed(ApiError error);
 }

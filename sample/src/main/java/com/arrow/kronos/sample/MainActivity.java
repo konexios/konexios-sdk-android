@@ -20,6 +20,7 @@ import com.arrow.kronos.api.listeners.GatewayRegisterListener;
 import com.arrow.kronos.api.listeners.GatewayUpdateListener;
 import com.arrow.kronos.api.listeners.ListNodeTypesListener;
 import com.arrow.kronos.api.listeners.ListResultListener;
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.CommonResponse;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayType;
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onDeviceRegistrationFailed() {
+            public void onDeviceRegistrationFailed(ApiError error) {
                 Log.v(TAG, "onDeviceRegistrationFailed");
             }
         });
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onGatewayRegisterFailed() {
+            public void onGatewayRegisterFailed(ApiError error) {
                 Log.v(TAG, "onGatewayRegisterFailed");
             }
         });
@@ -197,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onGatewayFindError() {
+            public void onGatewayFindError(ApiError error) {
                 Log.v(TAG, "onGatewayFindError");
             }
         });
@@ -229,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onGatewayUpdateFailed() {
+            public void onGatewayUpdateFailed(ApiError error) {
                 Log.d(TAG, "onGatewayUpdateFailed");
             }
         });
@@ -243,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onRequestError() {
+            public void onRequestError(ApiError error) {
                 Log.e(TAG, "onGetListNodesFailed");
             }
         });
@@ -263,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onRequestError() {
+            public void onRequestError(ApiError error) {
                 Log.e(TAG, "createNewNode");
             }
         });
@@ -277,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onListNodeTypesFiled() {
+            public void onListNodeTypesFiled(ApiError error) {
                 Log.e(TAG, "getListNodeTypes");
             }
         });
