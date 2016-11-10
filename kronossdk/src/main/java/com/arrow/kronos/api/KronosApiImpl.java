@@ -108,6 +108,9 @@ class KronosApiImpl implements KronosApiService {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
             throw new RuntimeException("config() method must be called first!");
         }
+        if (mSenderService != null) {
+            mSenderService.disconnect();
+        }
         String cloud = mConfigResponse.getCloudPlatform();
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
         if (cloud.equalsIgnoreCase("IotConnect")) {
