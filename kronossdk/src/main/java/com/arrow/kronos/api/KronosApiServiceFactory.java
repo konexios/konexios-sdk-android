@@ -10,9 +10,7 @@ public final class KronosApiServiceFactory {
     private static KronosApiService service;
 
     public static KronosApiService createKronosApiService() {
-        if (service == null) {
-            service = new KronosApiImpl();
-        }
+        service = new KronosApiImpl();
         return service;
     }
 
