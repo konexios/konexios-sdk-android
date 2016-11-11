@@ -110,7 +110,8 @@ class KronosApiImpl implements KronosApiService {
         }
         String cloud = mConfigResponse.getCloudPlatform();
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
-        if (cloud.equalsIgnoreCase("ArrowConnect")) {
+        if (cloud.equalsIgnoreCase("ArrowConnect") ||
+                cloud.equalsIgnoreCase("IotConnect")) {
             mSenderService = new MqttKronosApiService(mMqttHost, mMqttPrefix, mGatewayId, mServerCommandsListener);
         } else if (cloud.equalsIgnoreCase("IBM")) {
             mSenderService = new IbmKronosApiService(mGatewayId, mConfigResponse);
