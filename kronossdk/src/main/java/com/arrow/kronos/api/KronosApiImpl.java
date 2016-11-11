@@ -93,6 +93,8 @@ class KronosApiImpl implements KronosApiService {
     public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
         RetrofitHolder.setApiKey(apiKey);
         RetrofitHolder.setApiSecret(apiSecret);
+        ApiRequestSigner.getInstance().setSecretKey(null);
+        ApiRequestSigner.getInstance().apiKey(null);
         mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
