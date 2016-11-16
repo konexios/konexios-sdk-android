@@ -20,4 +20,6 @@ public interface TelemetrySenderInterface {
     void sendBatchTelemetry(List<TelemetryModel> telemetry);
 
     boolean hasBatchMode();
+
+    boolean isConnected();
 }
