@@ -110,8 +110,9 @@ class KronosApiImpl implements KronosApiService {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
             throw new RuntimeException("config() method must be called first!");
         }
-        if (mSenderService != null) {
+        if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
+            FirebaseCrash.logcat(Log.DEBUG, TAG, "connect(), old service is disconnected");
         }
         String cloud = mConfigResponse.getCloudPlatform();
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
@@ -990,4 +991,8 @@ class KronosApiImpl implements KronosApiService {
         return mSenderService.hasBatchMode();
     }
 
+    @Override
+    public boolean isConnected() {
+        return mSenderService != null && mSenderService.isConnected();
+    }
 }

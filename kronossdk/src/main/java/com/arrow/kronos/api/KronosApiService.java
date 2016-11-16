@@ -81,6 +81,12 @@ public interface KronosApiService {
      */
     void disconnect();
 
+    /**check if persistent connection is
+     *
+     * @return
+     */
+    boolean isConnected();
+
     /**
      *  sends single telemetry request
      * @param telemetry - telemetry model object
