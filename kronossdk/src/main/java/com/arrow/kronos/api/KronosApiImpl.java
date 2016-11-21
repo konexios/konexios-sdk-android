@@ -110,8 +110,9 @@ class KronosApiImpl implements KronosApiService {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
             throw new RuntimeException("config() method must be called first!");
         }
-        if (mSenderService != null) {
+        if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
+            FirebaseCrash.logcat(Log.DEBUG, TAG, "connect(), old service is disconnected");
         }
         String cloud = mConfigResponse.getCloudPlatform();
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
@@ -543,6 +544,29 @@ class KronosApiImpl implements KronosApiService {
             public void onFailure(Call<ConfigResponse> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
                 listener.onGatewayConfigFailed(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void getDevicesList(String gatewayHid, final ListResultListener<DeviceModel> listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList() hid: " + gatewayHid);
+        mRestService.getDevicesByGatewayHid(gatewayHid).enqueue(new Callback<ListResultModel<DeviceModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<DeviceModel>> call, Response<ListResultModel<DeviceModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
+                    listener.onRequestError(ErrorUtils.parseError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<DeviceModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
@@ -990,4 +1014,8 @@ class KronosApiImpl implements KronosApiService {
         return mSenderService.hasBatchMode();
     }
 
+    @Override
+    public boolean isConnected() {
+        return mSenderService != null && mSenderService.isConnected();
+    }
 }

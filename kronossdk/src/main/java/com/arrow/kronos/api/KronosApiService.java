@@ -81,6 +81,12 @@ public interface KronosApiService {
      */
     void disconnect();
 
+    /**check if persistent connection is
+     *
+     * @return
+     */
+    boolean isConnected();
+
     /**
      *  sends single telemetry request
      * @param telemetry - telemetry model object
@@ -174,6 +180,8 @@ public interface KronosApiService {
     void checkinGateway(String hid, CheckinGatewayListener listener);
 
     void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
+
+    void getDevicesList(String gatewayHid, ListResultListener<DeviceModel> listener);
 
     void getGatewayConfig(String hid, GetGatewayConfigListener listener);
 
