@@ -549,6 +549,29 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
+    public void getDevicesList(String gatewayHid, final ListResultListener<DeviceModel> listener) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList() hid: " + gatewayHid);
+        mRestService.getDevicesByGatewayHid(gatewayHid).enqueue(new Callback<ListResultModel<DeviceModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<DeviceModel>> call, Response<ListResultModel<DeviceModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
+                    listener.onRequestError(ErrorUtils.parseError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<DeviceModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
     public void gatewayHeartbeat(String hid, final CommonRequestListener listener) {
         mRestService.heartBeat(hid).enqueue(new Callback<CommonResponse>() {
             @Override

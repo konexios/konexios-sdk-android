@@ -181,6 +181,8 @@ public interface KronosApiService {
 
     void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
 
+    void getDevicesList(String gatewayHid, ListResultListener<DeviceModel> listener);
+
     void getGatewayConfig(String hid, GetGatewayConfigListener listener);
 
     void gatewayHeartbeat(String hid, CommonRequestListener listener);
