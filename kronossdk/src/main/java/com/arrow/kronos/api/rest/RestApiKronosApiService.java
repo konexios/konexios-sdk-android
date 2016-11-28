@@ -67,4 +67,9 @@ public final class RestApiKronosApiService extends AbstractTelemetrySenderServic
     public boolean hasBatchMode() {
         return true;
     }
+
+    @Override
+    public boolean isConnected() {
+        return true;
+    }
 }

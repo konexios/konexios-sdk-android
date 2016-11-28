@@ -180,7 +180,8 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
 
     protected abstract String getHost();
 
-    protected boolean isConnected() {
+    @Override
+    public boolean isConnected() {
         return mMqttClient != null && mMqttClient.isConnected();
     }
 }

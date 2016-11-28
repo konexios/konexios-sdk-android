@@ -60,6 +60,9 @@ public interface IotConnectAPIService {
     @PUT("/api/v1/kronos/gateways/{hid}")
     Call<GatewayResponse> updateGateway(@Path("hid") String hid, @Body GatewayModel gatewayModel);
 
+    @GET("/api/v1/kronos/gateways/{hid}/devices")
+    Call<ListResultModel<DeviceModel>> getDevicesByGatewayHid(@Path("hid") String hid);
+
     @PUT("/api/v1/kronos/gateways/{hid}/heartbeat")
     Call<CommonResponse> heartBeat(@Path("hid") String hid);
 
