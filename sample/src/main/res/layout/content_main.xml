@@ -12,45 +12,126 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.kronossdk.sample.MainActivity"
+    android:background="@drawable/sensor_puck_background"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/register_gateway"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/android_internal_details_header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="Register Gateway"/>
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:background="@drawable/header_rectangle"
+        android:gravity="center_horizontal"
+        android:text="@string/internal_sensors_title"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/details_title_text_size"
+        android:textStyle="bold"/>
 
-    <Button
-        android:id="@+id/register_device"
+    <View
+        android:id="@+id/android_internal_details_separator"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/register_gateway"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="Register Device"/>
+        android:layout_height="2dp"
+        android:layout_alignLeft="@+id/android_internal_details_header"
+        android:layout_alignRight="@+id/android_internal_details_header"
+        android:layout_below="@+id/android_internal_details_header"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:background="@android:color/white"/>
 
-    <Button
-        android:id="@+id/send_telemetry"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/register_device"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="Send Telemetry"/>
+        android:layout_below="@+id/android_internal_details_separator"
+        android:layout_above="@+id/android_internal_details_separator_1">
 
-    <Button
-        android:id="@+id/find_gateway"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/send_telemetry"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="Find Gateway"/>
+        <LinearLayout
+            android:id="@+id/android_internal_telemetry_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
 
-    <Button
-        android:id="@+id/update_gateway"
+    </ScrollView>
+
+    <View
+        android:id="@+id/android_internal_details_separator_1"
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:layout_alignLeft="@+id/android_internal_details_header"
+        android:layout_alignRight="@+id/android_internal_details_header"
+        android:layout_above="@+id/android_internal_details_timer_layout"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:background="@android:color/white"/>
+
+    <RelativeLayout
+        android:id="@+id/android_internal_details_timer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/android_internal_details_device_id_label"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:background="@drawable/timer_rectangle">
+
+        <TextView
+            android:id="@+id/android_internal_details_online"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/android_internal_details_timer"
+            android:layout_alignRight="@+id/android_internal_details_timer"
+            android:layout_marginTop="@dimen/details_online_horizontal_margin"
+            android:gravity="center"
+            android:text="@string/device_details_online"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/details_online_text_size"/>
+
+        <TextView
+            android:id="@+id/android_internal_details_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/android_internal_details_online"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/details_online_horizontal_margin"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/details_timer_text_size"/>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/device_details_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:enabled="false"
+            android:background="@null"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/android_internal_details_device_id_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/find_gateway"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="Update Gateway"/>
+        android:layout_above="@+id/android_internal_details_separator_2"
+        android:layout_alignLeft="@+id/android_internal_details_separator"
+        android:layout_marginLeft="@dimen/details_online_horizontal_margin"
+        android:text="@string/device_details_device_id"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/android_internal_details_device_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/android_internal_details_separator_2"
+        android:layout_toRightOf="@+id/android_internal_details_device_id_label"
+        android:textColor="@android:color/white"/>
+
+    <View
+        android:id="@+id/android_internal_details_separator_2"
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:layout_alignLeft="@+id/android_internal_details_header"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/android_internal_details_header"
+        android:layout_marginBottom="@dimen/details_secondary_top_margin"
+        android:layout_marginTop="@dimen/details_secondary_top_margin"
+        android:background="@android:color/white"/>
 
 </RelativeLayout>

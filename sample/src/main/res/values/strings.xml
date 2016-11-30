@@ -15,4 +15,26 @@
         completions."
     </string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="internal_sensors_title">Android</string>
+    <string name="device_details_online">online</string>
+    <string name="device_details_accelerometer">Accelerometer</string>
+    <string name="device_details_gyroscope">Gyroscope</string>
+    <string name="device_details_magnetometer">Magnetometer</string>
+    <string name="device_details_temperature">Temperature</string>
+    <string name="device_details_heart_rate">Heart Rate</string>
+    <string name="device_details_pressure">Pressure</string>
+    <string name="device_details_total_steps">Total Steps</string>
+    <string name="device_details_device_id">Device ID: </string>
+    <string name="device_details_x">x</string>
+    <string name="device_details_y">y</string>
+    <string name="device_details_z">z</string>
+    <string name="device_details_magnet">Magnet</string>
+    <string name="device_details_airflow">Airflow</string>
+    <string name="device_details_orientation">Orientation</string>
+    <string name="telemetry_param_humidity">Humidity</string>
+    <string name="telemetry_param_light">Light</string>
+
+    <string name="device_details_degree_sign">\u00B0</string>
+    <string name="device_details_meters_per_square_second">ms\u00B2</string>
+    <string name="device_details_steps">steps</string>
 </resources>
