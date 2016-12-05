@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mDevice.disable();
         if (mTelemetrySendService != null && mTelemetrySendService.isConnected()) {
             mTelemetrySendService.disconnect();
         }
