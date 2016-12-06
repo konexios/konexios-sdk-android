@@ -5,6 +5,8 @@ import android.util.Log;
 import com.arrow.kronos.api.Constants;
 import com.google.firebase.crash.FirebaseCrash;
 
+import org.spongycastle.asn1.x509.Holder;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -19,12 +21,8 @@ import static android.content.ContentValues.TAG;
 /**
  * Created by osminin on 4/8/2016.
  */
-public class ApiRequestSigner {
+class ApiRequestSigner {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-    private static class Holder {
-        private static final ApiRequestSigner instance = new ApiRequestSigner();
-    }
 
     private String secretKey;
     private String method;
@@ -34,55 +32,51 @@ public class ApiRequestSigner {
     private String payload;
     private List<String> parameters;
 
-    public static ApiRequestSigner getInstance() {
-        return Holder.instance;
-    }
-
-    private ApiRequestSigner() {
+    ApiRequestSigner() {
         this.parameters = new ArrayList<>();
         this.payload = "";
     }
 
-    public ApiRequestSigner payload(String payload) {
+    ApiRequestSigner payload(String payload) {
         if (payload != null)
             this.payload = payload;
         return this;
     }
 
-    public ApiRequestSigner method(String method) {
+    ApiRequestSigner method(String method) {
         this.method = method.toUpperCase();
         return this;
     }
 
-    public ApiRequestSigner canonicalUri(String uri) {
+    ApiRequestSigner canonicalUri(String uri) {
         this.uri = uri;
         return this;
     }
 
-    public ApiRequestSigner apiKey(String apiKey) {
+    ApiRequestSigner apiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
     }
 
-    public String getApiKey() {
+    String getApiKey() {
         return apiKey;
     }
 
-    public String getSecretKey() {
+    String getSecretKey() {
         return secretKey;
     }
 
-    public ApiRequestSigner setSecretKey(String secretKey) {
+    ApiRequestSigner setSecretKey(String secretKey) {
         this.secretKey = secretKey;
         return this;
     }
 
-    public ApiRequestSigner timestamp(String timestamp) {
+    ApiRequestSigner timestamp(String timestamp) {
         this.timestamp = timestamp;
         return this;
     }
 
-    public String signV1() {
+    String signV1() {
         StringBuffer canonicalRequest = new StringBuffer(buildCanonicalRequest());
         canonicalRequest.append(hash(payload));
 
@@ -99,7 +93,7 @@ public class ApiRequestSigner {
         return result;
     }
 
-    public String encode(String key, String data) {
+    String encode(String key, String data) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");

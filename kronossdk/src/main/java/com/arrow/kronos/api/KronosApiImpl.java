@@ -3,7 +3,6 @@ package com.arrow.kronos.api;
 import android.os.Handler;
 import android.util.Log;
 
-import com.arrow.kronos.api.common.ApiRequestSigner;
 import com.arrow.kronos.api.common.ErrorUtils;
 import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
@@ -91,8 +90,8 @@ class KronosApiImpl implements KronosApiService {
 
     @Override
     public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
-        RetrofitHolder.setApiKey(apiKey);
-        RetrofitHolder.setApiSecret(apiSecret);
+        RetrofitHolder.setDefaultApiKey(apiKey);
+        RetrofitHolder.setDefaultApiSecret(apiSecret);
         mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
@@ -156,8 +155,8 @@ class KronosApiImpl implements KronosApiService {
     protected void onConfigResponse(ConfigResponse response) {
         ConfigResponse.Key keys = response.getKey();
         if (keys != null) {
-            ApiRequestSigner.getInstance().setSecretKey(keys.getSecretKey());
-            ApiRequestSigner.getInstance().apiKey(keys.getApiKey());
+            RetrofitHolder.setSecretKey(keys.getSecretKey());
+            RetrofitHolder.setApiKey(keys.getApiKey());
         }
         mConfigResponse = response;
         FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + mConfigResponse.getCloudPlatform());

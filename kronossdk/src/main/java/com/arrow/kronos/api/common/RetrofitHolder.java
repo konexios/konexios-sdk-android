@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.arrow.kronos.api.Constants;
-import com.arrow.kronos.api.ServerEndpoint;
 import com.arrow.kronos.api.mqtt.common.NoSSLv3SocketFactory;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
@@ -24,14 +23,15 @@ import okio.Buffer;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by osminin on 3/15/2016.
  */
 public abstract class RetrofitHolder {
-    private static ApiRequestSigner requestSigner = ApiRequestSigner.getInstance();
-
+    private static final String TAG = RetrofitHolder.class.getSimpleName();
+    private static ApiRequestSigner requestSigner = new ApiRequestSigner();
+    private static Retrofit retrofit;
+    private static String sApiKey;
+    private static String sApiSecret;
     private static OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .addInterceptor(new Interceptor() {
                 @Override
@@ -67,16 +67,24 @@ public abstract class RetrofitHolder {
             .sslSocketFactory(new NoSSLv3SocketFactory())
             .build();
 
-    private static Retrofit retrofit;
-    private static String sApiKey;
-    private static String sApiSecret;
-
-    public static void setApiKey(String apiKey) {
+    public static void setDefaultApiKey(String apiKey) {
         RetrofitHolder.sApiKey = apiKey;
     }
 
-    public static void setApiSecret(String apiSecret) {
+    public static void setDefaultApiSecret(String apiSecret) {
         RetrofitHolder.sApiSecret = apiSecret;
+    }
+
+    public static void setSecretKey(String secretKey) {
+        requestSigner.setSecretKey(secretKey);
+    }
+
+    public static void setApiKey(String apiKey) {
+        requestSigner.apiKey(apiKey);
+    }
+
+    public static String getApiKey() {
+        return requestSigner.getApiKey();
     }
 
     public static IotConnectAPIService getIotConnectAPIService(String endpoint) {
@@ -94,17 +102,16 @@ public abstract class RetrofitHolder {
         return retrofit;
     }
 
-    private static String bodyToString(final RequestBody request){
+    private static String bodyToString(final RequestBody request) {
         try {
             final RequestBody copy = request;
             final Buffer buffer = new Buffer();
-            if(copy != null)
+            if (copy != null)
                 copy.writeTo(buffer);
             else
                 return "";
             return buffer.readUtf8();
-        }
-        catch (final IOException e) {
+        } catch (final IOException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "bodyToString");
             FirebaseCrash.report(e);
             return "did not work";
