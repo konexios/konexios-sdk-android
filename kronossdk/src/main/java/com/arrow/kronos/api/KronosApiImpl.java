@@ -92,6 +92,8 @@ class KronosApiImpl implements KronosApiService {
     public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
         RetrofitHolder.setDefaultApiKey(apiKey);
         RetrofitHolder.setDefaultApiSecret(apiSecret);
+        RetrofitHolder.setSecretKey(null);
+        RetrofitHolder.setApiKey(null);
         mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
@@ -527,6 +529,11 @@ class KronosApiImpl implements KronosApiService {
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    if (mGatewayId == null) {
+                        //this means that gateway id has been stored on a client side and we have
+                        //to set it here
+                        mGatewayId = hid;
+                    }
                     onConfigResponse(response.body());
                     listener.onGatewayConfigReceived(response.body());
                 } else {
