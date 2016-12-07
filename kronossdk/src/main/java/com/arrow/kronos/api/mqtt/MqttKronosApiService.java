@@ -3,11 +3,8 @@ package com.arrow.kronos.api.mqtt;
 
 import android.text.TextUtils;
 
-import com.arrow.kronos.api.Constants;
-import com.arrow.kronos.api.ServerEndpoint;
-import com.arrow.kronos.api.common.ApiRequestSigner;
+import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.ServerCommandsListener;
-import com.arrow.kronos.api.models.ConfigResponse;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -28,7 +25,7 @@ public final class MqttKronosApiService extends AbstractMqttKronosApiService {
 
     protected MqttConnectOptions getMqttOptions() {
         String userName = mMqttPrefix + ":" + mGatewayId;
-        String apiKey = ApiRequestSigner.getInstance().getApiKey();
+        String apiKey = RetrofitHolder.getApiKey();
         apiKey = !TextUtils.isEmpty(apiKey) ? apiKey : mConfigResponse.getKey().getApiKey();
         MqttConnectOptions connOpts = super.getMqttOptions();
         connOpts.setUserName(userName);
