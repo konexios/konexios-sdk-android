@@ -3,7 +3,6 @@ package com.arrow.kronos.api;
 import android.os.Handler;
 import android.util.Log;
 
-import com.arrow.kronos.api.common.ApiRequestSigner;
 import com.arrow.kronos.api.common.ErrorUtils;
 import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
@@ -91,8 +90,10 @@ class KronosApiImpl implements KronosApiService {
 
     @Override
     public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
-        RetrofitHolder.setApiKey(apiKey);
-        RetrofitHolder.setApiSecret(apiSecret);
+        RetrofitHolder.setDefaultApiKey(apiKey);
+        RetrofitHolder.setDefaultApiSecret(apiSecret);
+        RetrofitHolder.setSecretKey(null);
+        RetrofitHolder.setApiKey(null);
         mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
@@ -156,8 +157,8 @@ class KronosApiImpl implements KronosApiService {
     protected void onConfigResponse(ConfigResponse response) {
         ConfigResponse.Key keys = response.getKey();
         if (keys != null) {
-            ApiRequestSigner.getInstance().setSecretKey(keys.getSecretKey());
-            ApiRequestSigner.getInstance().apiKey(keys.getApiKey());
+            RetrofitHolder.setSecretKey(keys.getSecretKey());
+            RetrofitHolder.setApiKey(keys.getApiKey());
         }
         mConfigResponse = response;
         FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + mConfigResponse.getCloudPlatform());
@@ -528,6 +529,11 @@ class KronosApiImpl implements KronosApiService {
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    if (mGatewayId == null) {
+                        //this means that gateway id has been stored on a client side and we have
+                        //to set it here
+                        mGatewayId = hid;
+                    }
                     onConfigResponse(response.body());
                     listener.onGatewayConfigReceived(response.body());
                 } else {
