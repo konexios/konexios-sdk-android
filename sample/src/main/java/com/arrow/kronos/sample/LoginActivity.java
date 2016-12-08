@@ -39,8 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
     // DEV
     public static final String BASE_IOT_CONNECT_URL_DEV = "http://pegasuskronos01-dev.cloudapp.net:28880";
-    public static final String DEFAULT_API_KEY = "***REMOVED***";
-    public static final String DEFAULT_API_SECRET = "***REMOVED***";
+    public static final String DEFAULT_API_KEY = "api key goes here";
+    public static final String DEFAULT_API_SECRET = "api secret goes here";
 
     private static final String ACCOUNT_LOGIN_SP_KEY = "com.arrow.kronos.sample.login_key";
     private static final String ACCOUNT_PASSWORD_SP_KEY = "com.arrow.kronos.sample.password_key";
