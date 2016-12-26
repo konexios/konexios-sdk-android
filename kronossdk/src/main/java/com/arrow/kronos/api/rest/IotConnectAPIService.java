@@ -13,6 +13,7 @@ import com.arrow.kronos.api.models.DeviceModel;
 import com.arrow.kronos.api.models.DeviceTypeModel;
 import com.arrow.kronos.api.models.DeviceTypeRegistrationModel;
 import com.arrow.kronos.api.models.GatewayCommand;
+import com.arrow.kronos.api.models.HistoricalTelemetryModel;
 import com.arrow.kronos.api.models.PagingResultModel;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
@@ -24,6 +25,7 @@ import com.arrow.kronos.api.models.NodeTypeModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
 import com.arrow.kronos.api.models.DeviceRegistrationResponse;
 import com.arrow.kronos.api.models.TelemetryItemModel;
+import com.arrow.kronos.api.models.TelemetryStatsModel;
 
 import java.util.List;
 
@@ -117,6 +119,11 @@ public interface IotConnectAPIService {
                                                                        @Query("_page") int page,
                                                                        @Query("_size") int size);
 
+    @GET("/api/kronos/device/{deviceHid}/lastTelemetry")
+    Call<ListResultModel<HistoricalTelemetryModel>> getLastTelemetry(@Path("deviceHid") String deviceHid);
+
+    @GET("/api/kronos/device/{deviceHid}/stats")
+    Call<TelemetryStatsModel> getTelemetryStats(@Path("deviceHid") String deviceHid);
 
     @PUT("/api/v1/core/events/{hid}/received")
     Call<ResponseBody> putReceived(@Path("hid") String hid);
