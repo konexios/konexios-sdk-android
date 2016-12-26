@@ -42,6 +42,7 @@ import com.arrow.kronos.api.models.FindTelemetryRequest;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
+import com.arrow.kronos.api.models.HistoricalTelemetryModel;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
@@ -92,6 +93,8 @@ class KronosApiImpl implements KronosApiService {
     public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
         RetrofitHolder.setDefaultApiKey(apiKey);
         RetrofitHolder.setDefaultApiSecret(apiSecret);
+        RetrofitHolder.setSecretKey(null);
+        RetrofitHolder.setApiKey(null);
         mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
@@ -527,6 +530,11 @@ class KronosApiImpl implements KronosApiService {
             public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    if (mGatewayId == null) {
+                        //this means that gateway id has been stored on a client side and we have
+                        //to set it here
+                        mGatewayId = hid;
+                    }
                     onConfigResponse(response.body());
                     listener.onGatewayConfigReceived(response.body());
                 } else {
@@ -999,6 +1007,28 @@ class KronosApiImpl implements KronosApiService {
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void getLastTelemetry(String deviceHid, final ListResultListener<HistoricalTelemetryModel> listener) {
+        mRestService.getLastTelemetry(deviceHid).enqueue(new Callback<ListResultModel<HistoricalTelemetryModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<HistoricalTelemetryModel>> call, Response<ListResultModel<HistoricalTelemetryModel>> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getLastTelemetry response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body().getData());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
+                    listener.onRequestError(ErrorUtils.parseError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<HistoricalTelemetryModel>> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
