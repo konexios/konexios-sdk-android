@@ -54,7 +54,7 @@ public abstract class RetrofitHolder {
                     Request request = chain.request().newBuilder()
                             .addHeader("Accept", "application/json")
                             .addHeader("Content-Type", "application/json")
-                            .addHeader(Constants.Api.X_ARROW_APIKEY, requestSigner.getApiKey())
+                            .addHeader(Constants.Api.X_ARROW_APIKEY, apiKey)
                             .addHeader(Constants.Api.X_ARROW_DATE, nowAsISO)
                             .addHeader(Constants.Api.X_ARROW_SIGNATURE, signature)
                             .addHeader(Constants.Api.X_ARROW_VERSION, Constants.Api.X_ARROW_VERSION_1)
