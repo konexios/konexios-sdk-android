@@ -34,6 +34,7 @@ import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.AuditLogsQuery;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.DeviceRegistrationModel;
+import com.arrow.kronos.api.models.HistoricalTelemetryModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
 import com.arrow.kronos.api.models.NodeTypeRegistrationModel;
@@ -107,6 +108,8 @@ public interface KronosApiService {
 
     void findTelemetryByNodeHid(FindTelemetryRequest request,
                                        PagingResultListener<TelemetryItemModel> listener);
+
+    void getLastTelemetry(String deviceHid, ListResultListener<HistoricalTelemetryModel> listener);
 
     /**
      * check whether if current service supports sending batch telemetry
