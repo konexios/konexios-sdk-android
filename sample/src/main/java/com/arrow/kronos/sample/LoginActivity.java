@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Build;
@@ -37,8 +39,11 @@ public class LoginActivity extends AppCompatActivity {
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
     // DEV
     public static final String BASE_IOT_CONNECT_URL_DEV = "http://pegasuskronos01-dev.cloudapp.net:28880";
-    public static final String DEFAULT_API_KEY = "5a3264fb990a18e0e180efbbfadd5d95db3baed93defcb1d5a35966c6b98fef5";
-    public static final String DEFAULT_API_SECRET = "E9Y8y8A88R/x5JV2nfB7H/1A3eET85PSeURpk4QKp4c=";
+    public static final String DEFAULT_API_KEY = "api key goes here";
+    public static final String DEFAULT_API_SECRET = "api secret goes here";
+
+    private static final String ACCOUNT_LOGIN_SP_KEY = "com.arrow.kronos.sample.login_key";
+    private static final String ACCOUNT_PASSWORD_SP_KEY = "com.arrow.kronos.sample.password_key";
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -81,6 +86,8 @@ public class LoginActivity extends AppCompatActivity {
         mKronosApiService = KronosApiServiceFactory.createKronosApiService();
         mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
                 DEFAULT_API_SECRET);
+
+        initViews();
     }
 
     /**
@@ -94,8 +101,8 @@ public class LoginActivity extends AppCompatActivity {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String email = mEmailView.getText().toString();
+        final String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -136,6 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onAccountRegistered(AccountResponse accountResponse) {
                     Log.v(TAG, "onAccountRegistered");
+                    saveCredentials(email, password);
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra(ACCOUNT_RESPONSE_EXTRA, accountResponse);
                     startActivity(intent);
@@ -197,6 +205,25 @@ public class LoginActivity extends AppCompatActivity {
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    private void saveCredentials(String login, String password) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(ACCOUNT_LOGIN_SP_KEY, login);
+        editor.putString(ACCOUNT_PASSWORD_SP_KEY, password);
+        editor.commit();
+    }
+
+    private void initViews() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String login = sp.getString(ACCOUNT_LOGIN_SP_KEY, "");
+        String password = sp.getString(ACCOUNT_PASSWORD_SP_KEY, "");
+        if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
+            mEmailView.setText(login);
+            mPasswordView.setText(password);
+            attemptLogin();
         }
     }
 }
