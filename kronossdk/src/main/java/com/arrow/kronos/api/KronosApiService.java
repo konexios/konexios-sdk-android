@@ -109,7 +109,7 @@ public interface KronosApiService {
     void findTelemetryByNodeHid(FindTelemetryRequest request,
                                        PagingResultListener<TelemetryItemModel> listener);
 
-    void getLastTelemetry(String deviceHid, ListResultListener<HistoricalTelemetryModel> listener);
+    void getLastTelemetry(String deviceHid, ListResultListener<TelemetryItemModel> listener);
 
     /**
      * check whether if current service supports sending batch telemetry
