@@ -119,8 +119,8 @@ public interface IotConnectAPIService {
                                                                        @Query("_page") int page,
                                                                        @Query("_size") int size);
 
-    @GET("/api/kronos/device/{deviceHid}/lastTelemetry")
-    Call<ListResultModel<HistoricalTelemetryModel>> getLastTelemetry(@Path("deviceHid") String deviceHid);
+    @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/latest")
+    Call<ListResultModel<TelemetryItemModel>> getLastTelemetry(@Path("deviceHid") String deviceHid);
 
     @GET("/api/kronos/device/{deviceHid}/stats")
     Call<TelemetryStatsModel> getTelemetryStats(@Path("deviceHid") String deviceHid);
