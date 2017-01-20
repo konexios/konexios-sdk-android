@@ -55,7 +55,7 @@ import static android.hardware.Sensor.TYPE_STEP_COUNTER;
 
 
 public class MainActivity extends AppCompatActivity implements InternalSensorsView, TelemetrySender {
-    public static final String MQTT_CONNECT_URL_DEV = "tcp://pegasusqueue01-dev.cloudapp.net:46953";
+    public static final String MQTT_CONNECT_URL_DEV = "tcp://pgsdev01.arrowconnect.io:1883";
     public static final String MQTT_CLIENT_PREFIX_DEV = "/themis.dev";
     public final static String KEY_GATEWAY_ID = "gateway-id";
     public final static String SOFTWARE_NAME = "JMyIotGateway";
