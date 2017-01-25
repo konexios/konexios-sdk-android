@@ -42,6 +42,11 @@ dependencies {
     compile 'com.madgag.spongycastle:prov:1.54.0.0'
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
 
+    //Azure
+    compile ('com.microsoft.azure.sdk.iot:iot-device-client:1.0.17') {
+        exclude group: 'com.microsoft.azure.sdk.iot.deps', module: 'websocket-transport-layer'
+    }
+
     testCompile 'junit:junit:4.12'
 }
 
