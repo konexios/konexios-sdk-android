@@ -7,6 +7,7 @@ android {
         applicationId "com.kronossdk.sample"
         minSdkVersion 19
         targetSdkVersion 19
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
 
@@ -36,6 +37,8 @@ dependencies {
     // RxJava
     compile 'io.reactivex:rxjava:1.1.1'
     compile 'io.reactivex:rxandroid:1.1.0'
+
+    compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
     compile project(':kronossdk')
 }
