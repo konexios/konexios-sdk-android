@@ -53,7 +53,7 @@ import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.mqtt.MqttKronosApiService;
 import com.arrow.kronos.api.mqtt.aws.AwsKronosApiService;
-import com.arrow.kronos.api.mqtt.azure.AzureKronosApiServie;
+import com.arrow.kronos.api.mqtt.azure.AzureKronosApiService;
 import com.arrow.kronos.api.mqtt.ibm.IbmKronosApiService;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
@@ -125,7 +125,8 @@ class KronosApiImpl implements KronosApiService {
         } else if (cloud.equalsIgnoreCase("AWS")) {
             mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
         } else if (cloud.equalsIgnoreCase("AZURE")) {
-            mSenderService = new AzureKronosApiServie("", "");
+            mSenderService = new AzureKronosApiService(mConfigResponse.getAzure().getAccessKey(),
+                    mConfigResponse.getAzure().getHost(), mGatewayId);
         } else {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
             throw new RuntimeException("invalid cloud platform: " + cloud);
@@ -181,7 +182,7 @@ class KronosApiImpl implements KronosApiService {
         call.enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
-                Log.v(TAG, "registerAccount: " + response.code());
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount: " + response.code());
                 try {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
                         listener.onAccountRegistered(response.body());
@@ -198,9 +199,8 @@ class KronosApiImpl implements KronosApiService {
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable t) {
-                Log.v(TAG, "onFailure: " + t.toString());
                 listener.onAccountRegisterFailed(ErrorUtils.parseError(t));
-                FirebaseCrash.logcat(Log.ERROR, TAG, "postDelayed() failed");
+                FirebaseCrash.logcat(Log.ERROR, TAG, "registerAccount() failed");
                 FirebaseCrash.report(t);
             }
         });

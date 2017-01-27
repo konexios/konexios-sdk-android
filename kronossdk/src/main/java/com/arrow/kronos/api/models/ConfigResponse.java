@@ -17,6 +17,8 @@ public final class ConfigResponse implements Parcelable {
     private Aws mAws;
     @SerializedName("ibm")
     private Ibm mIbm;
+    @SerializedName("azure")
+    private Azure mAzure;
 
     public Ibm getIbm() {
         return mIbm;
@@ -48,6 +50,14 @@ public final class ConfigResponse implements Parcelable {
 
     public void setAws(Aws aws) {
         mAws = aws;
+    }
+
+    public Azure getAzure() {
+        return mAzure;
+    }
+
+    public void setAzure(Azure azure) {
+        mAzure = azure;
     }
 
     public static class Key implements Parcelable {
