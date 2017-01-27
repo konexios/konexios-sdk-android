@@ -15,6 +15,7 @@ import com.microsoft.azure.sdk.iot.device.Message;
 import java.io.IOException;
 import java.util.List;
 
+import static com.microsoft.azure.sdk.iot.device.DeviceClient.DEVICE_ID_ATTRIBUTE;
 import static com.microsoft.azure.sdk.iot.device.DeviceClient.HOSTNAME_ATTRIBUTE;
 import static com.microsoft.azure.sdk.iot.device.DeviceClient.SHARED_ACCESS_KEY_ATTRIBUTE;
 
@@ -22,14 +23,15 @@ import static com.microsoft.azure.sdk.iot.device.DeviceClient.SHARED_ACCESS_KEY_
  * Created by osminin on 25.01.2017.
  */
 
-public final class AzureKronosApiServie implements TelemetrySenderInterface {
-    private static final String TAG = AzureKronosApiServie.class.getName();
+public final class AzureKronosApiService implements TelemetrySenderInterface {
+    private static final String TAG = AzureKronosApiService.class.getName();
 
     private DeviceClient mClient;
     private final String mConnectionString;
 
-    public AzureKronosApiServie(String accessKey, String host) {
+    public AzureKronosApiService(String accessKey, String host, String gatewayId) {
         mConnectionString = HOSTNAME_ATTRIBUTE + host + ";"
+                + DEVICE_ID_ATTRIBUTE + gatewayId + ";"
                 + SHARED_ACCESS_KEY_ATTRIBUTE + accessKey;
     }
 
