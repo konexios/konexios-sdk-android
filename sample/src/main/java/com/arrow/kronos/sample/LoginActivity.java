@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private final static String TAG = LoginActivity.class.getSimpleName();
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
     // DEV
-    public static final String BASE_IOT_CONNECT_URL_DEV = "http://pegasuskronos01-dev.cloudapp.net:28880";
+    public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:12001";
     public static final String DEFAULT_API_KEY = "api key goes here";
     public static final String DEFAULT_API_SECRET = "api secret goes here";
 
@@ -84,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
 
         mKronosApiService = KronosApiServiceFactory.createKronosApiService();
+        //TODO: replace DEFAULT_API_KEY and DEFAULT_API_SECRET with valid keys
         mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
                 DEFAULT_API_SECRET);
 
