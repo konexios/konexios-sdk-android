@@ -100,6 +100,9 @@ public final class DeviceAndroid extends DeviceAbstract implements SensorEventLi
 
     @Override
     public void enable() {
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
+            return;
+        }
         List<Sensor> sensors = AndroidSensorUtils.getSensorsList(mSensorManager);
         for (Sensor sensor : sensors) {
             mSensors.add(sensor);
