@@ -90,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
 
         mKronosApiService = KronosApiServiceFactory.createKronosApiService();
+        //TODO: replace DEFAULT_API_KEY and DEFAULT_API_SECRET with valid keys
         mKronosApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
                 DEFAULT_API_SECRET);
 
