@@ -30,6 +30,8 @@ import com.arrow.kronos.api.models.AccountRequest;
 import com.arrow.kronos.api.models.AccountResponse;
 import com.arrow.kronos.api.models.ApiError;
 
+import static com.google.android.gms.analytics.internal.zzy.e;
+
 
 /**
  * A login screen that offers login via email/password.
@@ -39,16 +41,18 @@ public class LoginActivity extends AppCompatActivity {
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
     // DEV
     public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:12001";
-    //TODO: remove back api keys
-    public static final String DEFAULT_API_KEY = "5a3264fb990a18e0e180efbbfadd5d95db3baed93defcb1d5a35966c6b98fef5";
-    public static final String DEFAULT_API_SECRET = "E9Y8y8A88R/x5JV2nfB7H/1A3eET85PSeURpk4QKp4c=";
+    //TODO: replace with real keys
+    public static final String DEFAULT_API_KEY = "api key goes here";
+    public static final String DEFAULT_API_SECRET = "api secret goes here";
 
     private static final String ACCOUNT_LOGIN_SP_KEY = "com.arrow.kronos.sample.login_key";
     private static final String ACCOUNT_PASSWORD_SP_KEY = "com.arrow.kronos.sample.password_key";
+    private static final String CODE_PASSWORD_SP_KEY = "com.arrow.kronos.sample.code_key";
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mCode;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -62,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
+        mCode = (EditText) findViewById(R.id.code);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -104,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
         // Store values at the time of the login attempt.
         final String email = mEmailView.getText().toString();
         final String password = mPasswordView.getText().toString();
+        final String code = mCode.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -138,14 +144,15 @@ public class LoginActivity extends AppCompatActivity {
             model.setName("Some Name");
             model.setEmail(email.toLowerCase());
             model.setPassword(password);
-            //TODO: remove back code
-            model.setCode("EMS573");
+            if (!TextUtils.isEmpty(code)) {
+                model.setCode(code);
+            }
 
             mKronosApiService.registerAccount(model, new RegisterAccountListener() {
                 @Override
                 public void onAccountRegistered(AccountResponse accountResponse) {
                     Log.v(TAG, "onAccountRegistered");
-                    saveCredentials(email, password);
+                    saveCredentials(email, password, code);
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra(ACCOUNT_RESPONSE_EXTRA, accountResponse);
                     startActivity(intent);
@@ -210,11 +217,12 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void saveCredentials(String login, String password) {
+    private void saveCredentials(String login, String password, String code) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(ACCOUNT_LOGIN_SP_KEY, login);
         editor.putString(ACCOUNT_PASSWORD_SP_KEY, password);
+        editor.putString(CODE_PASSWORD_SP_KEY, code);
         editor.commit();
     }
 
@@ -222,9 +230,11 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String login = sp.getString(ACCOUNT_LOGIN_SP_KEY, "");
         String password = sp.getString(ACCOUNT_PASSWORD_SP_KEY, "");
+        String code = sp.getString(CODE_PASSWORD_SP_KEY, "");
         if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
             mEmailView.setText(login);
             mPasswordView.setText(password);
+            mCode.setText(code);
             attemptLogin();
         }
     }
