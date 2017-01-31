@@ -77,6 +77,7 @@ class KronosApiImpl implements KronosApiService {
 
     protected Handler mServiceThreadHandler;
     protected String mGatewayId;
+    private String mGatewayUid;
     private IotConnectAPIService mRestService;
     private Gson mGson = new Gson();
     private TelemetrySenderInterface mSenderService;
@@ -126,7 +127,7 @@ class KronosApiImpl implements KronosApiService {
             mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
         } else if (cloud.equalsIgnoreCase("AZURE")) {
             mSenderService = new AzureKronosApiService(mConfigResponse.getAzure().getAccessKey(),
-                    mConfigResponse.getAzure().getHost(), mGatewayId);
+                    mConfigResponse.getAzure().getHost(), mGatewayUid);
         } else {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
             throw new RuntimeException("invalid cloud platform: " + cloud);
@@ -397,7 +398,7 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
-    public void registerGateway(GatewayModel gatewayModel, final GatewayRegisterListener listener) {
+    public void registerGateway(final GatewayModel gatewayModel, final GatewayRegisterListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
                 ", applicationHid: " + gatewayModel.getApplicationHid());
         mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
@@ -416,6 +417,7 @@ class KronosApiImpl implements KronosApiService {
                         @Override
                         public void run() {
                             onGatewayResponse(response.body());
+                            mGatewayUid = gatewayModel.getUid();
                             uiHandler.post(handleInUiThread);
                         }
                     };

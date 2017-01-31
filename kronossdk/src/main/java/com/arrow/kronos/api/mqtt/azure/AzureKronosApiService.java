@@ -2,6 +2,7 @@ package com.arrow.kronos.api.mqtt.azure;
 
 import android.util.Log;
 
+import com.arrow.kronos.api.AbstractTelemetrySenderService;
 import com.arrow.kronos.api.TelemetrySenderInterface;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
@@ -23,11 +24,12 @@ import static com.microsoft.azure.sdk.iot.device.DeviceClient.SHARED_ACCESS_KEY_
  * Created by osminin on 25.01.2017.
  */
 
-public final class AzureKronosApiService implements TelemetrySenderInterface {
+public final class AzureKronosApiService extends AbstractTelemetrySenderService {
     private static final String TAG = AzureKronosApiService.class.getName();
 
     private DeviceClient mClient;
     private final String mConnectionString;
+    private EventCallback mEventCallback;
 
     public AzureKronosApiService(String accessKey, String host, String gatewayId) {
         mConnectionString = HOSTNAME_ATTRIBUTE + host + ";"
@@ -44,6 +46,7 @@ public final class AzureKronosApiService implements TelemetrySenderInterface {
                 mClient.open();
                 MessageCallbackMqtt callback = new MessageCallbackMqtt();
                 mClient.setMessageCallback(callback, null);
+                mEventCallback = new EventCallback();
             } catch (Exception e) {
                 FirebaseCrash.report(e);
                 FirebaseCrash.logcat(Log.ERROR, TAG, e.toString());
@@ -68,13 +71,14 @@ public final class AzureKronosApiService implements TelemetrySenderInterface {
     public void sendSingleTelemetry(TelemetryModel telemetry) {
         String json = telemetry.getTelemetry();
         Message msg = new Message(json);
-        EventCallback evtCallback = new EventCallback();
-        mClient.sendEventAsync(msg, evtCallback, msg);
+        mClient.sendEventAsync(msg, mEventCallback, msg);
     }
 
     @Override
     public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
-
+        String payload = formatBatchPayload(telemetry);
+        Message msg = new Message(payload);
+        mClient.sendEventAsync(msg, mEventCallback, msg);
     }
 
     @Override
