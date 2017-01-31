@@ -947,7 +947,6 @@ class KronosApiImpl implements KronosApiService {
     }
 
     //telemetry api
-
     @Override
     public void findTelemetryByApplicationHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
         mRestService.findTelemetryByAppHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
@@ -1018,10 +1017,10 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
-    public void getLastTelemetry(String deviceHid, final ListResultListener<HistoricalTelemetryModel> listener) {
-        mRestService.getLastTelemetry(deviceHid).enqueue(new Callback<ListResultModel<HistoricalTelemetryModel>>() {
+    public void getLastTelemetry(String deviceHid, final ListResultListener<TelemetryItemModel> listener) {
+        mRestService.getLastTelemetry(deviceHid).enqueue(new Callback<ListResultModel<TelemetryItemModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<HistoricalTelemetryModel>> call, Response<ListResultModel<HistoricalTelemetryModel>> response) {
+            public void onResponse(Call<ListResultModel<TelemetryItemModel>> call, Response<ListResultModel<TelemetryItemModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getLastTelemetry response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -1032,7 +1031,7 @@ class KronosApiImpl implements KronosApiService {
             }
 
             @Override
-            public void onFailure(Call<ListResultModel<HistoricalTelemetryModel>> call, Throwable t) {
+            public void onFailure(Call<ListResultModel<TelemetryItemModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
