@@ -42,8 +42,8 @@ public class LoginActivity extends AppCompatActivity {
     // DEV
     public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:12001";
     //TODO: replace with real keys
-    public static final String DEFAULT_API_KEY = "api key goes here";
-    public static final String DEFAULT_API_SECRET = "api secret goes here";
+    public static final String DEFAULT_API_KEY = "5a3264fb990a18e0e180efbbfadd5d95db3baed93defcb1d5a35966c6b98fef5";
+    public static final String DEFAULT_API_SECRET = "E9Y8y8A88R/x5JV2nfB7H/1A3eET85PSeURpk4QKp4c=";
 
     private static final String ACCOUNT_LOGIN_SP_KEY = "com.arrow.kronos.sample.login_key";
     private static final String ACCOUNT_PASSWORD_SP_KEY = "com.arrow.kronos.sample.password_key";

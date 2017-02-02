@@ -53,6 +53,7 @@ import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.mqtt.MqttKronosApiService;
 import com.arrow.kronos.api.mqtt.aws.AwsKronosApiService;
+import com.arrow.kronos.api.mqtt.azure.AzureHybridKronosApiService;
 import com.arrow.kronos.api.mqtt.azure.AzureKronosApiService;
 import com.arrow.kronos.api.mqtt.ibm.IbmKronosApiService;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
@@ -126,8 +127,9 @@ class KronosApiImpl implements KronosApiService {
         } else if (cloud.equalsIgnoreCase("AWS")) {
             mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
         } else if (cloud.equalsIgnoreCase("AZURE")) {
-            mSenderService = new AzureKronosApiService(mConfigResponse.getAzure().getAccessKey(),
-                    mConfigResponse.getAzure().getHost(), mGatewayUid);
+            mSenderService = new AzureHybridKronosApiService(mGatewayUid,
+                    mConfigResponse.getAzure().getAccessKey(),
+                    mConfigResponse.getAzure().getHost());
         } else {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
             throw new RuntimeException("invalid cloud platform: " + cloud);
