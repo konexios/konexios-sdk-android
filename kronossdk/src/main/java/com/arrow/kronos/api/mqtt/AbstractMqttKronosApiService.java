@@ -34,6 +34,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
     private static final String SUBSCRIBE_TOPIC_PREFIX = "krs.cmd.stg.";
     private final static int DEFAULT_CONNECTION_TIMEOUT_SECS = 60;
     private final static int DEFAULT_KEEP_ALIVE_INTERVAL_SECS = 60;
+    private static final int MAX_INFLIGHT_COUNT = 10;
     private static final int QOS = 0;
     private final IMqttActionListener mMqttTelemetryCallback = new IMqttActionListener() {
         @Override
@@ -76,7 +77,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
         public void onSuccess(IMqttToken asyncActionToken) {
             FirebaseCrash.logcat(Log.DEBUG, TAG, "MQTT connect onSuccess");
             try {
-                String topic = SUBSCRIBE_TOPIC_PREFIX + mGatewayId;
+                String topic = getSubscribeTopic();
                 FirebaseCrash.logcat(Log.VERBOSE, TAG, "subscribing to topic: " + topic);
                 mMqttClient.subscribe(topic, QOS);
             } catch (MqttException e) {
@@ -102,6 +103,10 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
     public AbstractMqttKronosApiService(String gatewayId, ConfigResponse configResponse) {
         mGatewayId = gatewayId;
         mConfigResponse = configResponse;
+    }
+
+    public AbstractMqttKronosApiService(String gatewayId) {
+        mGatewayId = gatewayId;
     }
 
     @Override
@@ -137,7 +142,8 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
     }
 
     private void sendMqttMessage(String topic, MqttMessage message) {
-        if (mMqttClient != null && mMqttClient.isConnected()) {
+        if (mMqttClient != null && mMqttClient.isConnected()
+                && mMqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_COUNT) {
             try {
                 mMqttClient.publish(topic, message).setActionCallback(mMqttTelemetryCallback);
             } catch (MqttException e) {
@@ -174,6 +180,10 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
 
     protected String getClientId() {
         return MqttClient.generateClientId();
+    }
+
+    protected String getSubscribeTopic() {
+        return SUBSCRIBE_TOPIC_PREFIX + mGatewayId;
     }
 
     protected abstract String getPublisherTopic(String deviceType, String externalId);
