@@ -42,7 +42,6 @@ import com.arrow.kronos.api.models.FindTelemetryRequest;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
-import com.arrow.kronos.api.models.HistoricalTelemetryModel;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
@@ -53,7 +52,6 @@ import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.mqtt.MqttKronosApiService;
 import com.arrow.kronos.api.mqtt.aws.AwsKronosApiService;
-import com.arrow.kronos.api.mqtt.azure.AzureHybridKronosApiService;
 import com.arrow.kronos.api.mqtt.azure.AzureKronosApiService;
 import com.arrow.kronos.api.mqtt.ibm.IbmKronosApiService;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
@@ -127,7 +125,7 @@ class KronosApiImpl implements KronosApiService {
         } else if (cloud.equalsIgnoreCase("AWS")) {
             mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
         } else if (cloud.equalsIgnoreCase("AZURE")) {
-            mSenderService = new AzureHybridKronosApiService(mGatewayUid,
+            mSenderService = new AzureKronosApiService(mGatewayUid,
                     mConfigResponse.getAzure().getAccessKey(),
                     mConfigResponse.getAzure().getHost());
         } else {

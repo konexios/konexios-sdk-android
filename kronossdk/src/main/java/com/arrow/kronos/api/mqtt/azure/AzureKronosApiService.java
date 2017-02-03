@@ -2,109 +2,86 @@ package com.arrow.kronos.api.mqtt.azure;
 
 import android.util.Log;
 
-import com.arrow.kronos.api.AbstractTelemetrySenderService;
-import com.arrow.kronos.api.TelemetrySenderInterface;
-import com.arrow.kronos.api.models.TelemetryModel;
+import com.arrow.kronos.api.mqtt.AbstractMqttKronosApiService;
 import com.google.firebase.crash.FirebaseCrash;
-import com.microsoft.azure.sdk.iot.device.DeviceClient;
-import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
-import com.microsoft.azure.sdk.iot.device.IotHubMessageResult;
-import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
-import com.microsoft.azure.sdk.iot.device.Message;
+import com.microsoft.azure.sdk.iot.device.DeviceClientConfig;
+import com.microsoft.azure.sdk.iot.device.auth.IotHubSasToken;
+import com.microsoft.azure.sdk.iot.device.transport.TransportUtils;
 
-import java.io.IOException;
-import java.util.List;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
-import static com.microsoft.azure.sdk.iot.device.DeviceClient.DEVICE_ID_ATTRIBUTE;
-import static com.microsoft.azure.sdk.iot.device.DeviceClient.HOSTNAME_ATTRIBUTE;
-import static com.microsoft.azure.sdk.iot.device.DeviceClient.SHARED_ACCESS_KEY_ATTRIBUTE;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 /**
- * Created by osminin on 25.01.2017.
+ * Created by osminin on 2/2/2017.
  */
 
-public final class AzureKronosApiService extends AbstractTelemetrySenderService {
+public final class AzureKronosApiService extends AbstractMqttKronosApiService {
     private static final String TAG = AzureKronosApiService.class.getName();
 
-    private DeviceClient mClient;
-    private final String mConnectionString;
-    private EventCallback mEventCallback;
+    private static String sslPrefix = "ssl://";
+    private static String sslPortSuffix = ":8883";
 
-    public AzureKronosApiService(String accessKey, String host, String gatewayId) {
-        mConnectionString = HOSTNAME_ATTRIBUTE + host + ";"
-                + DEVICE_ID_ATTRIBUTE + gatewayId + ";"
-                + SHARED_ACCESS_KEY_ATTRIBUTE + accessKey;
+    private final String mAccessKey;
+    private final String mHost;
+
+    public AzureKronosApiService(String gatewayUid, String accessKey, String host) {
+        super(gatewayUid);
+        mAccessKey = accessKey;
+        mHost = host;
     }
 
     @Override
-    public void connect() {
-        if (mClient == null) {
-            IotHubClientProtocol protocol = IotHubClientProtocol.MQTT;
-            try {
-                mClient = new DeviceClient(mConnectionString, protocol);
-                mClient.open();
-                MessageCallbackMqtt callback = new MessageCallbackMqtt();
-                mClient.setMessageCallback(callback, null);
-                mEventCallback = new EventCallback();
-            } catch (Exception e) {
-                FirebaseCrash.report(e);
-                FirebaseCrash.logcat(Log.ERROR, TAG, e.toString());
-            }
-        }
+    protected String getPublisherTopic(String deviceType, String externalId) {
+        return "devices/" + mGatewayId + "/messages/events/";
     }
 
     @Override
-    public void disconnect() {
-        if (mClient != null) {
-            try {
-                mClient.close();
-            } catch (IOException e) {
-                FirebaseCrash.report(e);
-                FirebaseCrash.logcat(Log.ERROR, TAG, e.toString());
-            }
-            mClient = null;
-        }
-    }
-
-    @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry) {
-        String json = telemetry.getTelemetry();
-        Message msg = new Message(json);
-        mClient.sendEventAsync(msg, mEventCallback, msg);
-    }
-
-    @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
-        String payload = formatBatchPayload(telemetry);
-        Message msg = new Message(payload);
-        mClient.sendEventAsync(msg, mEventCallback, msg);
+    protected String getHost() {
+        return sslPrefix + mHost + sslPortSuffix;
     }
 
     @Override
     public boolean hasBatchMode() {
-        return false;
+        return true;
     }
 
     @Override
-    public boolean isConnected() {
-        return mClient != null;
+    protected MqttConnectOptions getMqttOptions() {
+        MqttConnectOptions options = super.getMqttOptions();
+        try {
+            DeviceClientConfig config = new DeviceClientConfig(mHost, mGatewayId, mAccessKey, null);
+            IotHubSasToken sasToken = new IotHubSasToken(config, System.currentTimeMillis() / 1000l +
+                    config.getTokenValidSecs() + 1l);
+            options.setCleanSession(false);
+            String clientIdentifier = "DeviceClientType="
+                    + URLEncoder.encode(TransportUtils.javaDeviceClientIdentifier
+                    + TransportUtils.clientVersion, "UTF-8");
+            String iotHubUserName = config.getIotHubHostname() + "/" + config.getDeviceId() + "/" + clientIdentifier;
+            options.setUserName(iotHubUserName);
+            options.setPassword(sasToken.toString().toCharArray());
+        } catch (URISyntaxException e) {
+            reportError(e);
+        } catch (UnsupportedEncodingException e) {
+            reportError(e);
+        }
+        return options;
     }
 
-    private static class MessageCallbackMqtt implements com.microsoft.azure.sdk.iot.device.MessageCallback
-    {
-        public IotHubMessageResult execute(Message msg, Object context)
-        {
-            FirebaseCrash.logcat(Log.VERBOSE, TAG, "data sent to cloud: " + msg.getMessageId());
-            return IotHubMessageResult.COMPLETE;
-        }
+    @Override
+    protected String getClientId() {
+        return mGatewayId;
     }
 
-    private static class EventCallback implements IotHubEventCallback {
-        public void execute(IotHubStatusCode status, Object context){
-            Message msg = (Message) context;
-            FirebaseCrash.logcat(Log.VERBOSE, TAG, "IoT Hub responded to message: "
-                    + msg.getMessageId() + " with status " + status.name());
-        }
+    @Override
+    protected String getSubscribeTopic() {
+        return "devices/" + mGatewayId + "/messages/devicebound/#";
+    }
+
+    private void reportError(Exception e) {
+        FirebaseCrash.logcat(Log.ERROR, TAG, e.getClass().getName() + " " + e.getMessage());
+        FirebaseCrash.report(e);
     }
 }
