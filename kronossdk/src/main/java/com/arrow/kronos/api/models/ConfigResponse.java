@@ -17,6 +17,8 @@ public final class ConfigResponse implements Parcelable {
     private Aws mAws;
     @SerializedName("ibm")
     private Ibm mIbm;
+    @SerializedName("azure")
+    private Azure mAzure;
 
     public Ibm getIbm() {
         return mIbm;
@@ -48,6 +50,14 @@ public final class ConfigResponse implements Parcelable {
 
     public void setAws(Aws aws) {
         mAws = aws;
+    }
+
+    public Azure getAzure() {
+        return mAzure;
+    }
+
+    public void setAzure(Azure azure) {
+        mAzure = azure;
     }
 
     public static class Key implements Parcelable {
@@ -310,4 +320,56 @@ public final class ConfigResponse implements Parcelable {
             return new ConfigResponse[size];
         }
     };
+
+    public static class Azure implements Parcelable {
+        @SerializedName("accessKey")
+        private String accessKey;
+        @SerializedName("host")
+        private String host;
+
+        public String getAccessKey() {
+            return accessKey;
+        }
+
+        public void setAccessKey(String accessKey) {
+            this.accessKey = accessKey;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        protected Azure(Parcel in) {
+            accessKey = in.readString();
+            host = in.readString();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(accessKey);
+            dest.writeString(host);
+        }
+
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<Azure> CREATOR = new Parcelable.Creator<Azure>() {
+            @Override
+            public Azure createFromParcel(Parcel in) {
+                return new Azure(in);
+            }
+
+            @Override
+            public Azure[] newArray(int size) {
+                return new Azure[size];
+            }
+        };
+    }
 }

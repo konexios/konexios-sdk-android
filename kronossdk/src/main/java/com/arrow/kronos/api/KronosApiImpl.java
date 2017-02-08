@@ -42,7 +42,6 @@ import com.arrow.kronos.api.models.FindTelemetryRequest;
 import com.arrow.kronos.api.models.GatewayCommand;
 import com.arrow.kronos.api.models.GatewayModel;
 import com.arrow.kronos.api.models.GatewayResponse;
-import com.arrow.kronos.api.models.HistoricalTelemetryModel;
 import com.arrow.kronos.api.models.ListResultModel;
 import com.arrow.kronos.api.models.NodeModel;
 import com.arrow.kronos.api.models.NodeRegistrationModel;
@@ -53,6 +52,7 @@ import com.arrow.kronos.api.models.TelemetryItemModel;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.arrow.kronos.api.mqtt.MqttKronosApiService;
 import com.arrow.kronos.api.mqtt.aws.AwsKronosApiService;
+import com.arrow.kronos.api.mqtt.azure.AzureKronosApiService;
 import com.arrow.kronos.api.mqtt.ibm.IbmKronosApiService;
 import com.arrow.kronos.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
@@ -76,6 +76,7 @@ class KronosApiImpl implements KronosApiService {
 
     protected Handler mServiceThreadHandler;
     protected String mGatewayId;
+    private String mGatewayUid;
     private IotConnectAPIService mRestService;
     private Gson mGson = new Gson();
     private TelemetrySenderInterface mSenderService;
@@ -123,6 +124,10 @@ class KronosApiImpl implements KronosApiService {
             mSenderService = new IbmKronosApiService(mGatewayId, mConfigResponse);
         } else if (cloud.equalsIgnoreCase("AWS")) {
             mSenderService = new AwsKronosApiService(mGatewayId, mConfigResponse);
+        } else if (cloud.equalsIgnoreCase("AZURE")) {
+            mSenderService = new AzureKronosApiService(mGatewayUid,
+                    mConfigResponse.getAzure().getAccessKey(),
+                    mConfigResponse.getAzure().getHost());
         } else {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
             throw new RuntimeException("invalid cloud platform: " + cloud);
@@ -178,7 +183,7 @@ class KronosApiImpl implements KronosApiService {
         call.enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
-                Log.v(TAG, "registerAccount: " + response.code());
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount: " + response.code());
                 try {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
                         listener.onAccountRegistered(response.body());
@@ -195,9 +200,8 @@ class KronosApiImpl implements KronosApiService {
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable t) {
-                Log.v(TAG, "onFailure: " + t.toString());
                 listener.onAccountRegisterFailed(ErrorUtils.parseError(t));
-                FirebaseCrash.logcat(Log.ERROR, TAG, "postDelayed() failed");
+                FirebaseCrash.logcat(Log.ERROR, TAG, "registerAccount() failed");
                 FirebaseCrash.report(t);
             }
         });
@@ -394,7 +398,7 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
-    public void registerGateway(GatewayModel gatewayModel, final GatewayRegisterListener listener) {
+    public void registerGateway(final GatewayModel gatewayModel, final GatewayRegisterListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
                 ", applicationHid: " + gatewayModel.getApplicationHid());
         mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
@@ -413,6 +417,7 @@ class KronosApiImpl implements KronosApiService {
                         @Override
                         public void run() {
                             onGatewayResponse(response.body());
+                            mGatewayUid = gatewayModel.getUid();
                             uiHandler.post(handleInUiThread);
                         }
                     };
