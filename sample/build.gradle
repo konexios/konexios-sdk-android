@@ -22,6 +22,16 @@ android {
     }
     productFlavors {
     }
+    packagingOptions {
+        exclude "META-INF/MSFTSIG.SF"
+        exclude "META-INF/MSFTSIG.RSA"
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'thirdpartynotice.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -38,6 +48,8 @@ dependencies {
     // RxJava
     compile 'io.reactivex:rxjava:1.1.1'
     compile 'io.reactivex:rxandroid:1.1.0'
+
+    compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
     compile project(':kronossdk')
 }

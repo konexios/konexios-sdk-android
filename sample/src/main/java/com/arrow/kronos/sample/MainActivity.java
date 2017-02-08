@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
         gatewayModel.setUid(uid);
         gatewayModel.setType(GatewayType.Mobile);
         gatewayModel.setUserHid(userHid);
+        gatewayModel.setApplicationHid(mAccountResponse.getApplicationHid());
         gatewayModel.setSoftwareVersion(
                 String.format("%d.%d", MAJOR, MINOR));
 

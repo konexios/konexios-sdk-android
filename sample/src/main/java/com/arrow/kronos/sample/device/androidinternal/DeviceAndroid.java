@@ -59,6 +59,7 @@ public final class DeviceAndroid extends DeviceAbstract implements SensorEventLi
     private Observable<Long> mPollingTimer = Observable
             .interval(1000, TimeUnit.MILLISECONDS)
             .subscribeOn(AndroidSchedulers.mainThread())
+            .onBackpressureBuffer(1000)
             .observeOn(Schedulers.computation());
 
     public DeviceAndroid(Context context) {
@@ -99,6 +100,9 @@ public final class DeviceAndroid extends DeviceAbstract implements SensorEventLi
 
     @Override
     public void enable() {
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
+            return;
+        }
         List<Sensor> sensors = AndroidSensorUtils.getSensorsList(mSensorManager);
         for (Sensor sensor : sensors) {
             mSensors.add(sensor);
