@@ -5,7 +5,7 @@ package com.arrow.acn.api;
  * Created by osminin on 9/21/2016.
  */
 
-public final class KronosApiServiceFactory {
+public final class AcnApiServiceFactory {
 
     private static AcnApiService service;
 

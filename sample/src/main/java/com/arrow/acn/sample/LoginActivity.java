@@ -22,7 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.arrow.acn.api.AcnApiService;
-import com.arrow.acn.api.KronosApiServiceFactory;
+import com.arrow.acn.api.AcnApiServiceFactory;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        mAcnApiService = KronosApiServiceFactory.createAcnApiService();
+        mAcnApiService = AcnApiServiceFactory.createAcnApiService();
         //TODO: replace DEFAULT_API_KEY and DEFAULT_API_SECRET with valid keys
         mAcnApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
                 DEFAULT_API_SECRET);

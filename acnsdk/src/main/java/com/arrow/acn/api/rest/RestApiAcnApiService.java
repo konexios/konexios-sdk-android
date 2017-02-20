@@ -18,8 +18,8 @@ import retrofit2.Response;
  * Created by osminin on 6/17/2016.
  */
 
-public final class RestApiKronosApiService extends AbstractTelemetrySenderService {
-    private static final String TAG = RestApiKronosApiService.class.getName();
+public final class RestApiAcnApiService extends AbstractTelemetrySenderService {
+    private static final String TAG = RestApiAcnApiService.class.getName();
     private final retrofit2.Callback<ResponseBody> mRestApiCallback = new retrofit2.Callback<ResponseBody>() {
         @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -33,7 +33,7 @@ public final class RestApiKronosApiService extends AbstractTelemetrySenderServic
     };
     private IotConnectAPIService mService;
 
-    public RestApiKronosApiService(IotConnectAPIService service) {
+    public RestApiAcnApiService(IotConnectAPIService service) {
         mService = service;
     }
 
