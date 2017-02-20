@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.arrow.acn.api.AcnApiService;
-import com.arrow.acn.api.KronosApiServiceFactory;
+import com.arrow.acn.api.AcnApiServiceFactory;
 import com.arrow.acn.api.listeners.GatewayRegisterListener;
 import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
         }
 
         //Once instance of AcnApiService is created it could be got by getAcnApiService() call
-        mTelemetrySendService = KronosApiServiceFactory.getAcnApiService();
+        mTelemetrySendService = AcnApiServiceFactory.getAcnApiService();
         mTelemetrySendService.initialize(new Handler());
 
         registerGateway();
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
     }
 
     private void registerGateway() {
-        mTelemetrySendService = KronosApiServiceFactory.getAcnApiService();
+        mTelemetrySendService = AcnApiServiceFactory.getAcnApiService();
         String uid = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID);
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway() UID: " + uid);
