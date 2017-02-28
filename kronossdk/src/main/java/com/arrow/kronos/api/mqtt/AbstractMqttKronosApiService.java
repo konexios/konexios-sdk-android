@@ -4,7 +4,10 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.arrow.kronos.api.AbstractTelemetrySenderService;
+import com.arrow.kronos.api.common.ErrorUtils;
+import com.arrow.kronos.api.listeners.ConnectionListener;
 import com.arrow.kronos.api.listeners.ServerCommandsListener;
+import com.arrow.kronos.api.models.ApiError;
 import com.arrow.kronos.api.models.ConfigResponse;
 import com.arrow.kronos.api.models.GatewayEventModel;
 import com.arrow.kronos.api.models.TelemetryModel;
@@ -52,6 +55,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
     private ServerCommandsListener mServerCommandsListener;
     protected ConfigResponse mConfigResponse;
     private Gson mGson = new Gson();
+    private ConnectionListener mExternalConnListener;
     private final MqttCallback mMqttIncomingMessageListener = new MqttCallback() {
         @Override
         public void connectionLost(Throwable cause) {
@@ -76,6 +80,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
             FirebaseCrash.logcat(Log.DEBUG, TAG, "MQTT connect onSuccess");
+            mExternalConnListener.onConnectionSuccess();
             try {
                 String topic = getSubscribeTopic();
                 FirebaseCrash.logcat(Log.VERBOSE, TAG, "subscribing to topic: " + topic);
@@ -90,6 +95,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
         @Override
         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "MQTT connect failure");
+            mExternalConnListener.onConnectionError(ErrorUtils.parseError(exception));
             FirebaseCrash.report(exception);
             exception.printStackTrace();
         }
@@ -110,7 +116,8 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
     }
 
     @Override
-    public void connect() {
+    public void connect(ConnectionListener listener) {
+        mExternalConnListener = listener;
         connectMqtt();
     }
 
@@ -166,6 +173,7 @@ public abstract class AbstractMqttKronosApiService extends AbstractTelemetrySend
             mMqttClient.connect(connOpts, null, mMqttConnectCallback);
         } catch (MqttException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connectMqtt");
+            mExternalConnListener.onConnectionError(ErrorUtils.parseError(e));
             FirebaseCrash.report(e);
         }
     }

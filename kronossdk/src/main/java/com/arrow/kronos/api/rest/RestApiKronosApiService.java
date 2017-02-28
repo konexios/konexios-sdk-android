@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.arrow.kronos.api.AbstractTelemetrySenderService;
 import com.arrow.kronos.api.Constants;
+import com.arrow.kronos.api.listeners.ConnectionListener;
 import com.arrow.kronos.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -38,8 +39,8 @@ public final class RestApiKronosApiService extends AbstractTelemetrySenderServic
     }
 
     @Override
-    public void connect() {
-
+    public void connect(ConnectionListener listener) {
+        listener.onConnectionSuccess();
     }
 
     @Override
