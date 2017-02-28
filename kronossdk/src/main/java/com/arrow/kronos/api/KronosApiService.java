@@ -5,6 +5,7 @@ import android.os.Handler;
 
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
+import com.arrow.kronos.api.listeners.ConnectionListener;
 import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
 import com.arrow.kronos.api.listeners.FindDeviceListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
@@ -75,7 +76,7 @@ public interface KronosApiService {
      * (connection require gateway hid to be performed)
      */
 
-    void connect();
+    void connect(ConnectionListener listener);
 
     /**
      * destroy persistent connection

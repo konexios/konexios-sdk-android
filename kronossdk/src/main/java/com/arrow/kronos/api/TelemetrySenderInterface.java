@@ -1,5 +1,6 @@
 package com.arrow.kronos.api;
 
+import com.arrow.kronos.api.listeners.ConnectionListener;
 import com.arrow.kronos.api.listeners.ServerCommandsListener;
 import com.arrow.kronos.api.models.ConfigResponse;
 import com.arrow.kronos.api.models.TelemetryModel;
@@ -11,7 +12,7 @@ import java.util.List;
  */
 
 public interface TelemetrySenderInterface {
-    void connect();
+    void connect(ConnectionListener listener);
 
     void disconnect();
 

@@ -7,6 +7,7 @@ import com.arrow.kronos.api.common.ErrorUtils;
 import com.arrow.kronos.api.common.RetrofitHolder;
 import com.arrow.kronos.api.listeners.CheckinGatewayListener;
 import com.arrow.kronos.api.listeners.CommonRequestListener;
+import com.arrow.kronos.api.listeners.ConnectionListener;
 import com.arrow.kronos.api.listeners.DeleteDeviceActionListener;
 import com.arrow.kronos.api.listeners.FindDeviceListener;
 import com.arrow.kronos.api.listeners.FindGatewayListener;
@@ -66,6 +67,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.arrow.kronos.api.common.ErrorUtils.COMMON_ERROR_CODE;
+
 
 /**
  * Created by osminin on 6/17/2016.
@@ -106,10 +109,12 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
-    public void connect() {
-        if (mConfigResponse == null) {
+    public void connect(ConnectionListener listener) {
+        if (mConfigResponse == null || mGatewayUid == null) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
-            throw new RuntimeException("config() method must be called first!");
+            ApiError error = new ApiError(COMMON_ERROR_CODE, "config() method must be called first!");
+            listener.onConnectionError(error);
+            return;
         }
         if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
@@ -130,9 +135,11 @@ class KronosApiImpl implements KronosApiService {
                     mConfigResponse.getAzure().getHost());
         } else {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
-            throw new RuntimeException("invalid cloud platform: " + cloud);
+            ApiError error = new ApiError(COMMON_ERROR_CODE, "invalid cloud platform: " + cloud);
+            listener.onConnectionError(error);
+            return;
         }
-        mSenderService.connect();
+        mSenderService.connect(listener);
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() done!");
     }
 
