@@ -110,11 +110,16 @@ class KronosApiImpl implements KronosApiService {
 
     @Override
     public void connect(ConnectionListener listener) {
-        if (mConfigResponse == null || mGatewayUid == null) {
+        if (mConfigResponse == null) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
             ApiError error = new ApiError(COMMON_ERROR_CODE, "config() method must be called first!");
             listener.onConnectionError(error);
             return;
+        } else if (mGatewayUid == null) {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
+            ApiError error = new ApiError(COMMON_ERROR_CODE, "registerGateway or checkinGateway" +
+                    "method must be called first!");
+            listener.onConnectionError(error);
         }
         if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
@@ -489,8 +494,9 @@ class KronosApiImpl implements KronosApiService {
     }
 
     @Override
-    public void checkinGateway(String hid, final CheckinGatewayListener listener) {
+    public void checkinGateway(String hid, String gatewayUid, final CheckinGatewayListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "checkinGateway(), hid: " + hid);
+        mGatewayUid = gatewayUid;
         mRestService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
