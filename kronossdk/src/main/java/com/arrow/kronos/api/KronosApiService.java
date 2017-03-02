@@ -181,7 +181,7 @@ public interface KronosApiService {
 
     void updateGateway(String hid, GatewayModel gatewayModel, GatewayUpdateListener listener);
 
-    void checkinGateway(String hid, CheckinGatewayListener listener);
+    void checkinGateway(String hid, String gatewayUid, CheckinGatewayListener listener);
 
     void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
 
