@@ -1,5 +1,6 @@
 package com.arrow.acn.api;
 
+import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.models.TelemetryModel;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  */
 
 public interface TelemetrySenderInterface {
-    void connect();
+    void connect(ConnectionListener listener);
 
     void disconnect();
 

@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.arrow.acn.api.AcnApiService;
 import com.arrow.acn.api.AcnApiServiceFactory;
+import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.GatewayRegisterListener;
 import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
@@ -54,7 +55,8 @@ import static android.hardware.Sensor.TYPE_RELATIVE_HUMIDITY;
 import static android.hardware.Sensor.TYPE_STEP_COUNTER;
 
 
-public class MainActivity extends AppCompatActivity implements InternalSensorsView, TelemetrySender {
+public class MainActivity extends AppCompatActivity implements InternalSensorsView,
+        TelemetrySender, ConnectionListener {
     public static final String MQTT_CONNECT_URL_DEV = "tcp://pgsdev01.arrowconnect.io:1883";
     public static final String MQTT_CLIENT_PREFIX_DEV = "/themis.dev";
     public final static String KEY_GATEWAY_ID = "gateway-id";
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
             @Override
             public void onGatewayConfigReceived(ConfigResponse response) {
                 mTelemetrySendService.setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV);
-                mTelemetrySendService.connect();
+                mTelemetrySendService.connect(MainActivity.this);
                 //allow user to start collecting telemetry from internal sensors
                 mDeviceSwitch.setEnabled(true);
             }
@@ -341,5 +343,15 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
                 textView.setText(String.format("%s %s", defaultVal, unit));
             }
         }
+    }
+
+    @Override
+    public void onConnectionSuccess() {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConnectionSuccess");
+    }
+
+    @Override
+    public void onConnectionError(ApiError error) {
+        FirebaseCrash.logcat(Log.ERROR, TAG, error.getMessage());
     }
 }
