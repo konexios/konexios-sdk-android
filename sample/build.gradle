@@ -32,6 +32,10 @@ android {
         exclude 'thirdpartynotice.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+    dexOptions {
+        // Prevent OutOfMemory with MultiDex during the build phase
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {
@@ -51,5 +55,5 @@ dependencies {
 
     compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
-    compile project(':kronossdk')
+    compile project(':acnsdk')
 }
