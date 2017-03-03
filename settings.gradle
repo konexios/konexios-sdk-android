@@ -1,1 +1,1 @@
-include ':kronossdk', ':sample'
+include ':acnsdk', ':sample'
