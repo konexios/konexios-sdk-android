@@ -2,11 +2,11 @@ package com.arrow.acn.api;
 
 import android.os.Handler;
 import android.util.Log;
-
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
+import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.DeleteDeviceActionListener;
 import com.arrow.acn.api.listeners.FindDeviceListener;
 import com.arrow.acn.api.listeners.FindGatewayListener;
@@ -66,6 +66,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.arrow.acn.api.common.ErrorUtils.COMMON_ERROR_CODE;
 
 /**
  * Created by osminin on 6/17/2016.
@@ -106,10 +107,17 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void connect() {
+    public void connect(ConnectionListener listener) {
         if (mConfigResponse == null) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
-            throw new RuntimeException("config() method must be called first!");
+            ApiError error = new ApiError(COMMON_ERROR_CODE, "config() method must be called first!");
+            listener.onConnectionError(error);
+            return;
+        } else if (mGatewayUid == null) {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
+            ApiError error = new ApiError(COMMON_ERROR_CODE, "registerGateway or checkinGateway" +
+                    "method must be called first!");
+            listener.onConnectionError(error);
         }
         if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
@@ -130,9 +138,11 @@ class AcnApiImpl implements AcnApiService {
                     mConfigResponse.getAzure().getHost());
         } else {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
-            throw new RuntimeException("invalid cloud platform: " + cloud);
+            ApiError error = new ApiError(COMMON_ERROR_CODE, "invalid cloud platform: " + cloud);
+            listener.onConnectionError(error);
+            return;
         }
-        mSenderService.connect();
+        mSenderService.connect(listener);
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() done!");
     }
 
@@ -482,8 +492,9 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void checkinGateway(String hid, final CheckinGatewayListener listener) {
+    public void checkinGateway(String hid, String gatewayUid, final CheckinGatewayListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "checkinGateway(), hid: " + hid);
+        mGatewayUid = gatewayUid;
         mRestService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.arrow.acn.api.AbstractTelemetrySenderService;
 import com.arrow.acn.api.Constants;
+import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.models.TelemetryModel;
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -38,8 +39,8 @@ public final class RestApiAcnApiService extends AbstractTelemetrySenderService {
     }
 
     @Override
-    public void connect() {
-
+    public void connect(ConnectionListener listener) {
+        listener.onConnectionSuccess();
     }
 
     @Override

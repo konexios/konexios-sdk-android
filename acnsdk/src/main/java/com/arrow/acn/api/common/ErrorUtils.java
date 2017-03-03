@@ -1,5 +1,7 @@
 package com.arrow.acn.api.common;
 
+import android.text.TextUtils;
+
 import com.arrow.acn.api.models.ApiError;
 
 import java.io.IOException;
@@ -27,6 +29,9 @@ public final class ErrorUtils {
 
         try {
             error = converter.convert(response.errorBody());
+            if (TextUtils.isEmpty(error.getMessage())) {
+                error.setMessage(response.message());
+            }
         } catch (IOException e) {
             return new ApiError(COMMON_ERROR_CODE, COMMON_ERROR_MESSAGE);
         }
