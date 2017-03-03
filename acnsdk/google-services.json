@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "621198320726",
+    "firebase_url": "https://kronos-gateway-for-android.firebaseio.com",
+    "project_id": "kronos-gateway-for-android",
+    "storage_bucket": "kronos-gateway-for-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621198320726:android:7e680d8b1bd1d43c",
+        "android_client_info": {
+          "package_name": "com.arrow.jmyiotgateway"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "621198320726-e5lbamaja50414rbbpk2gemnjoad0kfl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZaFYJDRIkDBgRa8XGZBvL8tbwSfJX9wM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621198320726:android:f0ee975464b0df91",
+        "android_client_info": {
+          "package_name": "com.arrow.acn.api"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "621198320726-e5lbamaja50414rbbpk2gemnjoad0kfl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZaFYJDRIkDBgRa8XGZBvL8tbwSfJX9wM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
