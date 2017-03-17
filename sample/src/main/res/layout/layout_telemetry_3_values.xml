@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:id="@+id/telemetry_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/details_primary_label_text_size"/>
+
+    <TextView
+        android:id="@+id/telemetry_val_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/telemetry_label"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_alignParentRight="true"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/telemetry_val_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/telemetry_val_1"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/telemetry_val_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_below="@+id/telemetry_val_2"
+        android:textColor="@android:color/white"/>
+
+</RelativeLayout>
