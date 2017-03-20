@@ -22,6 +22,8 @@ public final class GatewayModel implements Parcelable {
     private String softwareVersion;
     @SerializedName("applicationHid")
     private String applicationHid;
+    @SerializedName("sdkVersion")
+    private String sdkVersion;
 
     public String getApplicationHid() {
         return applicationHid;
@@ -87,6 +89,14 @@ public final class GatewayModel implements Parcelable {
         this.userHid = userHid;
     }
 
+    public String getSdkVersion() {
+        return sdkVersion;
+    }
+
+    public void setSdkVersion(String sdkVersion) {
+        this.sdkVersion = sdkVersion;
+    }
+
     protected GatewayModel(Parcel in) {
         uid = in.readString();
         name = in.readString();
@@ -95,6 +105,7 @@ public final class GatewayModel implements Parcelable {
         osName = in.readString();
         softwareName = in.readString();
         softwareVersion = in.readString();
+        sdkVersion = in.readString();
     }
 
     public GatewayModel() {
@@ -114,6 +125,7 @@ public final class GatewayModel implements Parcelable {
         dest.writeString(osName);
         dest.writeString(softwareName);
         dest.writeString(softwareVersion);
+        dest.writeString(sdkVersion);
     }
 
     @SuppressWarnings("unused")
