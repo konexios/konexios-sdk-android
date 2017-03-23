@@ -10,5 +10,6 @@ import com.arrow.acn.api.models.NodeTypeModel;
 
 public interface ListNodeTypesListener {
     void onListNodeTypesSuccess(ListResultModel<NodeTypeModel> result);
+
     void onListNodeTypesFiled(ApiError error);
 }

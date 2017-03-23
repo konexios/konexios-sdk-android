@@ -11,6 +11,17 @@ import com.google.gson.annotations.SerializedName;
  */
 
 final public class DeviceTypeTelemetryModel implements Parcelable {
+    public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
+        @Override
+        public DeviceTypeTelemetryModel createFromParcel(Parcel in) {
+            return new DeviceTypeTelemetryModel(in);
+        }
+
+        @Override
+        public DeviceTypeTelemetryModel[] newArray(int size) {
+            return new DeviceTypeTelemetryModel[size];
+        }
+    };
     @SerializedName("controllable")
     @Expose
     private boolean controllable;
@@ -23,6 +34,13 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     @SerializedName("type")
     @Expose
     private String type;
+
+    protected DeviceTypeTelemetryModel(Parcel in) {
+        controllable = in.readByte() != 0x00;
+        description = in.readString();
+        name = in.readString();
+        type = in.readString();
+    }
 
     /**
      * @return The controllable
@@ -80,14 +98,6 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
         this.type = type;
     }
 
-
-    protected DeviceTypeTelemetryModel(Parcel in) {
-        controllable = in.readByte() != 0x00;
-        description = in.readString();
-        name = in.readString();
-        type = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -100,17 +110,4 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
         dest.writeString(name);
         dest.writeString(type);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
-        @Override
-        public DeviceTypeTelemetryModel createFromParcel(Parcel in) {
-            return new DeviceTypeTelemetryModel(in);
-        }
-
-        @Override
-        public DeviceTypeTelemetryModel[] newArray(int size) {
-            return new DeviceTypeTelemetryModel[size];
-        }
-    };
 }
