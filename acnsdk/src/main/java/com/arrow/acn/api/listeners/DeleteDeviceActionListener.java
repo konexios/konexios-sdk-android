@@ -18,5 +18,6 @@ import com.arrow.acn.api.models.ApiError;
 
 public interface DeleteDeviceActionListener {
     void onDeviceActionDeleted();
+
     void onDeviceActionDeleteFailed(ApiError error);
 }
