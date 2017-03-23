@@ -76,5 +76,4 @@ public class DeviceTypeRegistrationModel {
     public void setTelemetries(List<DeviceTypeTelemetryModel> telemetries) {
         this.telemetries = telemetries;
     }
-
 }

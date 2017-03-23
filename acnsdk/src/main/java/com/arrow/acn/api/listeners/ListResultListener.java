@@ -10,5 +10,6 @@ import java.util.List;
 
 public interface ListResultListener<T> {
     void onRequestSuccess(List<T> list);
+
     void onRequestError(ApiError error);
 }
