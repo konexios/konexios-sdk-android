@@ -20,6 +20,18 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class DeviceEventModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public final Parcelable.Creator<DeviceEventModel> CREATOR = new Parcelable.Creator<DeviceEventModel>() {
+        @Override
+        public DeviceEventModel createFromParcel(Parcel in) {
+            return new DeviceEventModel(in);
+        }
+
+        @Override
+        public DeviceEventModel[] newArray(int size) {
+            return new DeviceEventModel[size];
+        }
+    };
     @SerializedName("deviceActionTypeName")
     private String mDeviceActionTypeName;
     @SerializedName("criteria")
@@ -28,6 +40,13 @@ public class DeviceEventModel implements Parcelable {
     private String mCreatedDate;
     @SerializedName("status")
     private String mStatus;
+
+    protected DeviceEventModel(Parcel in) {
+        mDeviceActionTypeName = in.readString();
+        mCriteria = in.readString();
+        mCreatedDate = in.readString();
+        mStatus = in.readString();
+    }
 
     public String getDeviceActionTypeName() {
         return mDeviceActionTypeName;
@@ -61,13 +80,6 @@ public class DeviceEventModel implements Parcelable {
         mStatus = status;
     }
 
-    protected DeviceEventModel(Parcel in) {
-        mDeviceActionTypeName = in.readString();
-        mCriteria = in.readString();
-        mCreatedDate = in.readString();
-        mStatus = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -85,17 +97,4 @@ public class DeviceEventModel implements Parcelable {
         }
         dest.writeString(mStatus);
     }
-
-    @SuppressWarnings("unused")
-    public final Parcelable.Creator<DeviceEventModel> CREATOR = new Parcelable.Creator<DeviceEventModel>() {
-        @Override
-        public DeviceEventModel createFromParcel(Parcel in) {
-            return new DeviceEventModel(in);
-        }
-
-        @Override
-        public DeviceEventModel[] newArray(int size) {
-            return new DeviceEventModel[size];
-        }
-    };
 }
