@@ -2,6 +2,8 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.arrow.acn.api.Constants;
 import com.google.gson.annotations.SerializedName;
@@ -13,12 +15,15 @@ public final class SendTelemetryRequestBody implements Parcelable {
     @SerializedName(Constants.DEVICE_ID_KEY)
     String mDeviceIdKey;
 
+    @Nullable
     @SerializedName("long_timestamp")
     Long mTimestamp;
 
+    @Nullable
     @SerializedName("double_longitude")
     Double mLongitude;
 
+    @Nullable
     @SerializedName("double_latitude")
     Double mLatitude;
 
@@ -32,7 +37,7 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mLatitude = latitude;
     }
 
-    public SendTelemetryRequestBody(SendTelemetryRequestBody body) {
+    public SendTelemetryRequestBody(@NonNull SendTelemetryRequestBody body) {
         mDeviceIdKey = body.getDeviceIdKey();
         mTimestamp = body.getTimestamp();
         mLongitude = body.getLongitude();
@@ -47,6 +52,7 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mDeviceIdKey = deviceIdKey;
     }
 
+    @Nullable
     public Long getTimestamp() {
         return mTimestamp;
     }
@@ -55,6 +61,7 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mTimestamp = timestamp;
     }
 
+    @Nullable
     public Double getLongitude() {
         return mLongitude;
     }
@@ -63,6 +70,7 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mLongitude = longitude;
     }
 
+    @Nullable
     public Double getLatitude() {
         return mLatitude;
     }
@@ -71,7 +79,7 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mLatitude = latitude;
     }
 
-    protected SendTelemetryRequestBody(Parcel in) {
+    protected SendTelemetryRequestBody(@NonNull Parcel in) {
         mDeviceIdKey = in.readString();
         mTimestamp = in.readByte() == 0x00 ? null : in.readLong();
         mLongitude = in.readByte() == 0x00 ? null : in.readDouble();
@@ -84,7 +92,7 @@ public final class SendTelemetryRequestBody implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mDeviceIdKey);
         if (mTimestamp == null) {
             dest.writeByte((byte) (0x00));
@@ -108,11 +116,13 @@ public final class SendTelemetryRequestBody implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<SendTelemetryRequestBody> CREATOR = new Parcelable.Creator<SendTelemetryRequestBody>() {
+        @NonNull
         @Override
-        public SendTelemetryRequestBody createFromParcel(Parcel in) {
+        public SendTelemetryRequestBody createFromParcel(@NonNull Parcel in) {
             return new SendTelemetryRequestBody(in);
         }
 
+        @NonNull
         @Override
         public SendTelemetryRequestBody[] newArray(int size) {
             return new SendTelemetryRequestBody[size];

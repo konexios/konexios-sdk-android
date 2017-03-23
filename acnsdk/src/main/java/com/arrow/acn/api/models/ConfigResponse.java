@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -82,7 +83,7 @@ public final class ConfigResponse implements Parcelable {
             mSecretKey = secretKey;
         }
 
-        protected Key(Parcel in) {
+        protected Key(@NonNull Parcel in) {
             mApiKey = in.readString();
             mSecretKey = in.readString();
         }
@@ -93,18 +94,20 @@ public final class ConfigResponse implements Parcelable {
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
             dest.writeString(mApiKey);
             dest.writeString(mSecretKey);
         }
 
         @SuppressWarnings("unused")
         public static final Parcelable.Creator<Key> CREATOR = new Parcelable.Creator<Key>() {
+            @NonNull
             @Override
-            public Key createFromParcel(Parcel in) {
+            public Key createFromParcel(@NonNull Parcel in) {
                 return new Key(in);
             }
 
+            @NonNull
             @Override
             public Key[] newArray(int size) {
                 return new Key[size];
@@ -164,7 +167,7 @@ public final class ConfigResponse implements Parcelable {
             mPrivateKey = privateKey;
         }
 
-        protected Aws(Parcel in) {
+        protected Aws(@NonNull Parcel in) {
             mHost = in.readString();
             mPort = in.readString();
             mCaCert = in.readString();
@@ -178,7 +181,7 @@ public final class ConfigResponse implements Parcelable {
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
             dest.writeString(mHost);
             dest.writeString(mPort);
             dest.writeString(mCaCert);
@@ -188,11 +191,13 @@ public final class ConfigResponse implements Parcelable {
 
         @SuppressWarnings("unused")
         public static final Parcelable.Creator<Aws> CREATOR = new Parcelable.Creator<Aws>() {
+            @NonNull
             @Override
-            public Aws createFromParcel(Parcel in) {
+            public Aws createFromParcel(@NonNull Parcel in) {
                 return new Aws(in);
             }
 
+            @NonNull
             @Override
             public Aws[] newArray(int size) {
                 return new Aws[size];
@@ -252,7 +257,7 @@ public final class ConfigResponse implements Parcelable {
             mAuthToken = authToken;
         }
 
-        protected Ibm(Parcel in) {
+        protected Ibm(@NonNull Parcel in) {
             mOrganicationId = in.readString();
             mGatewayType = in.readString();
             mGatewayId = in.readString();
@@ -266,7 +271,7 @@ public final class ConfigResponse implements Parcelable {
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
             dest.writeString(mOrganicationId);
             dest.writeString(mGatewayType);
             dest.writeString(mGatewayId);
@@ -276,11 +281,13 @@ public final class ConfigResponse implements Parcelable {
 
         @SuppressWarnings("unused")
         public static final Parcelable.Creator<Ibm> CREATOR = new Parcelable.Creator<Ibm>() {
+            @NonNull
             @Override
-            public Ibm createFromParcel(Parcel in) {
+            public Ibm createFromParcel(@NonNull Parcel in) {
                 return new Ibm(in);
             }
 
+            @NonNull
             @Override
             public Ibm[] newArray(int size) {
                 return new Ibm[size];
@@ -288,7 +295,7 @@ public final class ConfigResponse implements Parcelable {
         };
     }
 
-    protected ConfigResponse(Parcel in) {
+    protected ConfigResponse(@NonNull Parcel in) {
         mCloudPlatform = in.readString();
         mKey = (Key) in.readValue(Key.class.getClassLoader());
         mAws = (Aws) in.readValue(Aws.class.getClassLoader());
@@ -301,7 +308,7 @@ public final class ConfigResponse implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mCloudPlatform);
         dest.writeValue(mKey);
         dest.writeValue(mAws);
@@ -310,11 +317,13 @@ public final class ConfigResponse implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<ConfigResponse> CREATOR = new Parcelable.Creator<ConfigResponse>() {
+        @NonNull
         @Override
-        public ConfigResponse createFromParcel(Parcel in) {
+        public ConfigResponse createFromParcel(@NonNull Parcel in) {
             return new ConfigResponse(in);
         }
 
+        @NonNull
         @Override
         public ConfigResponse[] newArray(int size) {
             return new ConfigResponse[size];
@@ -343,7 +352,7 @@ public final class ConfigResponse implements Parcelable {
             this.host = host;
         }
 
-        protected Azure(Parcel in) {
+        protected Azure(@NonNull Parcel in) {
             accessKey = in.readString();
             host = in.readString();
         }
@@ -354,18 +363,20 @@ public final class ConfigResponse implements Parcelable {
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
             dest.writeString(accessKey);
             dest.writeString(host);
         }
 
         @SuppressWarnings("unused")
         public static final Parcelable.Creator<Azure> CREATOR = new Parcelable.Creator<Azure>() {
+            @NonNull
             @Override
-            public Azure createFromParcel(Parcel in) {
+            public Azure createFromParcel(@NonNull Parcel in) {
                 return new Azure(in);
             }
 
+            @NonNull
             @Override
             public Azure[] newArray(int size) {
                 return new Azure[size];

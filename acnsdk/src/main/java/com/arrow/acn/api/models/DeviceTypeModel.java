@@ -2,6 +2,8 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -13,11 +15,13 @@ public class DeviceTypeModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceTypeModel> CREATOR = new Parcelable.Creator<DeviceTypeModel>() {
+        @NonNull
         @Override
-        public DeviceTypeModel createFromParcel(Parcel in) {
+        public DeviceTypeModel createFromParcel(@NonNull Parcel in) {
             return new DeviceTypeModel(in);
         }
 
+        @NonNull
         @Override
         public DeviceTypeModel[] newArray(int size) {
             return new DeviceTypeModel[size];
@@ -53,11 +57,12 @@ public class DeviceTypeModel implements Parcelable {
     @SerializedName("pri")
     @Expose
     private String pri;
+    @Nullable
     @SerializedName("telemetries")
     @Expose
     private List<DeviceTypeTelemetryModel> telemetries = new ArrayList<DeviceTypeTelemetryModel>();
 
-    protected DeviceTypeModel(Parcel in) {
+    protected DeviceTypeModel(@NonNull Parcel in) {
         createdBy = in.readString();
         createdDate = in.readString();
         description = in.readString();
@@ -219,6 +224,7 @@ public class DeviceTypeModel implements Parcelable {
     /**
      * @return The telemetries
      */
+    @Nullable
     public List<DeviceTypeTelemetryModel> getTelemetries() {
         return telemetries;
     }
@@ -236,7 +242,7 @@ public class DeviceTypeModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(createdBy);
         dest.writeString(createdDate);
         dest.writeString(description);

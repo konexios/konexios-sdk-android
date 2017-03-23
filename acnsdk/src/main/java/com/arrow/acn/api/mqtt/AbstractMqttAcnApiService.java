@@ -1,5 +1,7 @@
 package com.arrow.acn.api.mqtt;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.arrow.acn.api.AbstractTelemetrySenderService;
@@ -39,12 +41,12 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     private static final int QOS = 0;
     private final IMqttActionListener mMqttTelemetryCallback = new IMqttActionListener() {
         @Override
-        public void onSuccess(IMqttToken asyncActionToken) {
+        public void onSuccess(@NonNull IMqttToken asyncActionToken) {
             FirebaseCrash.logcat(Log.VERBOSE, TAG, "data sent to cloud: " + asyncActionToken.getResponse().toString());
         }
 
         @Override
-        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+        public void onFailure(@NonNull IMqttToken asyncActionToken, Throwable exception) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "data sent to cloud: " + asyncActionToken.getException());
             FirebaseCrash.report(exception);
         }
@@ -52,6 +54,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     protected String mGatewayId;
     private ServerCommandsListener mServerCommandsListener;
     protected ConfigResponse mConfigResponse;
+    @NonNull
     private Gson mGson = new Gson();
     private ConnectionListener mExternalConnListener;
     private final MqttCallback mMqttIncomingMessageListener = new MqttCallback() {
@@ -61,7 +64,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
         }
 
         @Override
-        public void messageArrived(String topic, MqttMessage message) throws Exception {
+        public void messageArrived(String topic, @NonNull MqttMessage message) throws Exception {
             FirebaseCrash.logcat(Log.VERBOSE, TAG, "IMqttMessageListener messageArrived");
             String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
             GatewayEventModel model = mGson.fromJson(payload, GatewayEventModel.class);
@@ -73,6 +76,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
             FirebaseCrash.logcat(Log.VERBOSE, TAG, "deliveryComplete");
         }
     };
+    @Nullable
     private MqttAsyncClient mMqttClient;
     private final IMqttActionListener mMqttConnectCallback = new IMqttActionListener() {
         @Override
@@ -91,7 +95,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
         }
 
         @Override
-        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+        public void onFailure(IMqttToken asyncActionToken, @NonNull Throwable exception) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "MQTT connect failure");
             mExternalConnListener.onConnectionError(ErrorUtils.parseError(exception));
             FirebaseCrash.report(exception);
@@ -131,7 +135,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     }
 
     @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry) {
+    public void sendSingleTelemetry(@NonNull TelemetryModel telemetry) {
         String json = telemetry.getTelemetry();
         MqttMessage message = new MqttMessage(json.getBytes());
         String topic = getPublisherTopic(telemetry.getDeviceType(), telemetry.getDeviceExternalId());
@@ -188,6 +192,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
         return MqttClient.generateClientId();
     }
 
+    @NonNull
     protected String getSubscribeTopic() {
         return SUBSCRIBE_TOPIC_PREFIX + mGatewayId;
     }

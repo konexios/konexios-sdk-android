@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -87,7 +88,7 @@ public final class GatewayModel implements Parcelable {
         this.userHid = userHid;
     }
 
-    protected GatewayModel(Parcel in) {
+    protected GatewayModel(@NonNull Parcel in) {
         uid = in.readString();
         name = in.readString();
         type = (GatewayType) in.readValue(GatewayType.class.getClassLoader());
@@ -106,7 +107,7 @@ public final class GatewayModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(uid);
         dest.writeString(name);
         dest.writeValue(type);
@@ -118,11 +119,13 @@ public final class GatewayModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<GatewayModel> CREATOR = new Parcelable.Creator<GatewayModel>() {
+        @NonNull
         @Override
-        public GatewayModel createFromParcel(Parcel in) {
+        public GatewayModel createFromParcel(@NonNull Parcel in) {
             return new GatewayModel(in);
         }
 
+        @NonNull
         @Override
         public GatewayModel[] newArray(int size) {
             return new GatewayModel[size];

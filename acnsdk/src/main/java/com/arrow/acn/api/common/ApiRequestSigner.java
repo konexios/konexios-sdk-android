@@ -1,5 +1,7 @@
 package com.arrow.acn.api.common;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.arrow.acn.api.Constants;
@@ -27,6 +29,7 @@ class ApiRequestSigner {
     private String uri;
     private String apiKey;
     private String timestamp;
+    @Nullable
     private String payload;
     private List<String> parameters;
 
@@ -35,22 +38,26 @@ class ApiRequestSigner {
         this.payload = "";
     }
 
-    ApiRequestSigner payload(String payload) {
+    @NonNull
+    ApiRequestSigner payload(@Nullable String payload) {
         if (payload != null)
             this.payload = payload;
         return this;
     }
 
-    ApiRequestSigner method(String method) {
+    @NonNull
+    ApiRequestSigner method(@NonNull String method) {
         this.method = method.toUpperCase();
         return this;
     }
 
+    @NonNull
     ApiRequestSigner canonicalUri(String uri) {
         this.uri = uri;
         return this;
     }
 
+    @NonNull
     ApiRequestSigner apiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
@@ -64,16 +71,19 @@ class ApiRequestSigner {
         return secretKey;
     }
 
+    @NonNull
     ApiRequestSigner setSecretKey(String secretKey) {
         this.secretKey = secretKey;
         return this;
     }
 
+    @NonNull
     ApiRequestSigner timestamp(String timestamp) {
         this.timestamp = timestamp;
         return this;
     }
 
+    @NonNull
     String signV1() {
         StringBuffer canonicalRequest = new StringBuffer(buildCanonicalRequest());
         canonicalRequest.append(hash(payload));
@@ -91,7 +101,8 @@ class ApiRequestSigner {
         return result;
     }
 
-    String encode(String key, String data) {
+    @NonNull
+    String encode(@NonNull String key, @NonNull String data) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -107,7 +118,7 @@ class ApiRequestSigner {
         return "";
     }
 
-    private static String bytesToHex(byte[] bytes) {
+    private static String bytesToHex(@NonNull byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {
             int v = bytes[j] & 0xFF;
@@ -136,7 +147,8 @@ class ApiRequestSigner {
         return buffer.toString();
     }
 
-    private String hash(String value) {
+    @Nullable
+    private String hash(@NonNull String value) {
         MessageDigest digest;
         String result = null;
         try {

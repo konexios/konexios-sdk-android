@@ -2,6 +2,8 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class DeviceRegistrationModel implements Parcelable {
     @SerializedName("properties")
     @Expose
     private JsonObject properties;
+    @Nullable
     @SerializedName("tags")
     @Expose
     private List<String> tags = new ArrayList<String>();
@@ -156,6 +159,7 @@ public class DeviceRegistrationModel implements Parcelable {
      * @return
      * The tags
      */
+    @Nullable
     public List<String> getTags() {
         return tags;
     }
@@ -226,7 +230,7 @@ public class DeviceRegistrationModel implements Parcelable {
     public DeviceRegistrationModel() {
     }
 
-    protected DeviceRegistrationModel(Parcel in) {
+    protected DeviceRegistrationModel(@NonNull Parcel in) {
         enabled = in.readByte() != 0x00;
         gatewayHid = in.readString();
         info = (JsonObject) in.readValue(JsonObject.class.getClassLoader());
@@ -250,7 +254,7 @@ public class DeviceRegistrationModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
         dest.writeString(gatewayHid);
         dest.writeValue(info);
@@ -270,11 +274,13 @@ public class DeviceRegistrationModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<CommonResponse> CREATOR = new Parcelable.Creator<CommonResponse>() {
+        @NonNull
         @Override
-        public CommonResponse createFromParcel(Parcel in) {
+        public CommonResponse createFromParcel(@NonNull Parcel in) {
             return new CommonResponse(in);
         }
 
+        @NonNull
         @Override
         public CommonResponse[] newArray(int size) {
             return new CommonResponse[size];

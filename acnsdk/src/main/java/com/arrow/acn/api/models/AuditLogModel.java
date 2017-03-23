@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -136,7 +137,7 @@ public class AuditLogModel implements Parcelable {
     }
 
 
-    protected AuditLogModel(Parcel in) {
+    protected AuditLogModel(@NonNull Parcel in) {
         createdBy = in.readString();
         createdString = (String) in.readValue(String.class.getClassLoader());
         objectHid = in.readString();
@@ -151,7 +152,7 @@ public class AuditLogModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(createdBy);
         dest.writeValue(createdString);
         dest.writeString(objectHid);
@@ -162,11 +163,13 @@ public class AuditLogModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<AuditLogModel> CREATOR = new Parcelable.Creator<AuditLogModel>() {
+        @NonNull
         @Override
-        public AuditLogModel createFromParcel(Parcel in) {
+        public AuditLogModel createFromParcel(@NonNull Parcel in) {
             return new AuditLogModel(in);
         }
 
+        @NonNull
         @Override
         public AuditLogModel[] newArray(int size) {
             return new AuditLogModel[size];

@@ -1,5 +1,6 @@
 package com.arrow.acn.api.mqtt.ibm;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.arrow.acn.api.models.ConfigResponse;
@@ -44,12 +45,14 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
         return options;
     }
 
+    @NonNull
     @Override
     protected String getHost() {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
         return "ssl://" + this.mConfigResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
     }
 
+    @NonNull
     @Override
     protected String getClientId() {
         ConfigResponse.Ibm ibm = this.mConfigResponse.getIbm();

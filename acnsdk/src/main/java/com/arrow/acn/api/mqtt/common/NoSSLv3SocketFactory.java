@@ -1,5 +1,7 @@
 package com.arrow.acn.api.mqtt.common;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -84,13 +86,13 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
 
     private class NoSSLv3SSLSocket extends DelegateSSLSocket {
 
-        private NoSSLv3SSLSocket(SSLSocket delegate) {
+        private NoSSLv3SSLSocket(@NonNull SSLSocket delegate) {
             super(delegate);
             delegate.setEnabledProtocols(new String[]{"TLSv1", "TLSv1.1", "TLSv1.2"});
         }
 
         @Override
-        public void setEnabledProtocols(String[] protocols) {
+        public void setEnabledProtocols(@Nullable String[] protocols) {
             FirebaseCrash.logcat(Log.DEBUG, TAG, "setEnabledProtocols");
             if (protocols != null && protocols.length == 1 && "SSLv3".equals(protocols[0])) {
 

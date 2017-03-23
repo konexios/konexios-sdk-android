@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -270,7 +271,7 @@ public class DeviceModel implements Parcelable {
     private class Properties {
     }
 
-    protected DeviceModel(Parcel in) {
+    protected DeviceModel(@NonNull Parcel in) {
         createdDate = in.readString();
         enabled = in.readByte() != 0x00;
         gatewayHid = in.readString();
@@ -291,7 +292,7 @@ public class DeviceModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeValue(createdDate);
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
         dest.writeString(gatewayHid);
@@ -308,11 +309,13 @@ public class DeviceModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceModel> CREATOR = new Parcelable.Creator<DeviceModel>() {
+        @NonNull
         @Override
-        public DeviceModel createFromParcel(Parcel in) {
+        public DeviceModel createFromParcel(@NonNull Parcel in) {
             return new DeviceModel(in);
         }
 
+        @NonNull
         @Override
         public DeviceModel[] newArray(int size) {
             return new DeviceModel[size];

@@ -1,5 +1,6 @@
 package com.arrow.acn.api.common;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.arrow.acn.api.models.ApiError;
@@ -22,7 +23,7 @@ public final class ErrorUtils {
     public static final String COMMON_ERROR_MESSAGE = "Common error";
     public static final int COMMON_ERROR_CODE = 11;
 
-    public static ApiError parseError(Response<?> response) {
+    public static ApiError parseError(@NonNull Response<?> response) {
         Retrofit retrofit = RetrofitHolder.getRetrofit();
         Converter<ResponseBody, ApiError> converter = retrofit.responseBodyConverter(ApiError.class, new Annotation[0]);
         ApiError error;

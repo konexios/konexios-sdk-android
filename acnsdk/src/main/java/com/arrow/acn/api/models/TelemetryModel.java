@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 /**
  * Created by osminin on 10/17/2016.
@@ -40,7 +41,7 @@ public final class TelemetryModel implements Parcelable {
     public TelemetryModel() {
     }
 
-    protected TelemetryModel(Parcel in) {
+    protected TelemetryModel(@NonNull Parcel in) {
         telemetry = in.readString();
         deviceType = in.readString();
     }
@@ -51,18 +52,20 @@ public final class TelemetryModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(telemetry);
         dest.writeString(deviceType);
     }
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<TelemetryModel> CREATOR = new Parcelable.Creator<TelemetryModel>() {
+        @NonNull
         @Override
-        public TelemetryModel createFromParcel(Parcel in) {
+        public TelemetryModel createFromParcel(@NonNull Parcel in) {
             return new TelemetryModel(in);
         }
 
+        @NonNull
         @Override
         public TelemetryModel[] newArray(int size) {
             return new TelemetryModel[size];

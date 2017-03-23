@@ -1,6 +1,7 @@
 package com.arrow.acn.api.mqtt;
 
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.arrow.acn.api.common.RetrofitHolder;
@@ -34,6 +35,7 @@ public final class MqttAcnApiService extends AbstractMqttAcnApiService {
         return connOpts;
     }
 
+    @NonNull
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
         return MESSAGE_TOPIC_PREFIX + mGatewayId;
