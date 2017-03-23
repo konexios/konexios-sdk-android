@@ -3,6 +3,8 @@ package com.arrow.acn.sample.device.androidinternal;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,7 +42,8 @@ public class AndroidSensorUtils {
             TYPE_STEP_COUNTER
     };
 
-    public static Integer[] getAvailableSensors(Context context) {
+    @NonNull
+    public static Integer[] getAvailableSensors(@NonNull Context context) {
         SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = getSensorsList(sensorManager);
         Integer[] sensorTypes = new Integer[sensors.size()];
@@ -50,7 +53,8 @@ public class AndroidSensorUtils {
         return sensorTypes;
     }
 
-    public static List<Sensor> getSensorsList(SensorManager sensorManager) {
+    @NonNull
+    public static List<Sensor> getSensorsList(@NonNull SensorManager sensorManager) {
         HashSet<Sensor> result = new HashSet<>();
         List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
         for (Sensor sensor : sensors) {
@@ -77,7 +81,7 @@ public class AndroidSensorUtils {
         return new ArrayList<>(result);
     }
 
-    private static boolean addSensor(Set<Sensor> sensors, Sensor sensor) {
+    private static boolean addSensor(@NonNull Set<Sensor> sensors, @Nullable Sensor sensor) {
         if (sensor != null) {
             return  sensors.add(sensor);
         }

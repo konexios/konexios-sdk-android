@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -31,7 +33,9 @@ public abstract class DeviceAbstract implements GoogleApiClient.ConnectionCallba
     private final static String TAG = DeviceAbstract.class.getSimpleName();
 
     protected final Context mContext;
+    @NonNull
     private Map<String, IotParameter> iotParamsMap = new HashMap<>();
+    @Nullable
     protected GoogleApiClient mGoogleApiClient;
     private String mDeviceHid;
     private String mGatewayHid;
@@ -56,12 +60,13 @@ public abstract class DeviceAbstract implements GoogleApiClient.ConnectionCallba
         }
     }
 
-    public synchronized void putIotParams(IotParameter... params) {
+    public synchronized void putIotParams(@NonNull IotParameter... params) {
         for (IotParameter param : params) {
             iotParamsMap.put(param.getKey(), param);
         }
     }
 
+    @NonNull
     private synchronized List<IotParameter> getIotParams() {
         if (iotParamsMap.isEmpty())
             return Collections.emptyList();
@@ -86,14 +91,17 @@ public abstract class DeviceAbstract implements GoogleApiClient.ConnectionCallba
         mSender = sender;
     }
 
+    @NonNull
     public abstract DeviceType getDeviceType();
 
+    @NonNull
     public abstract String getDeviceUId();
 
     public abstract void enable();
 
     public abstract void disable();
 
+    @NonNull
     public abstract String getDeviceTypeName();
 
     protected DeviceRegistrationModel getRegisterPayload() {
@@ -114,14 +122,14 @@ public abstract class DeviceAbstract implements GoogleApiClient.ConnectionCallba
                 DeviceRegistrationModel payload = getRegisterPayload();
                 mSender.registerDevice(payload, new RegisterDeviceListener() {
                     @Override
-                    public void onDeviceRegistered(DeviceRegistrationResponse response) {
+                    public void onDeviceRegistered(@NonNull DeviceRegistrationResponse response) {
                         mDeviceHid = response.getHid();
                         mView.setDeviceId(getDeviceUId());
                         FirebaseCrash.logcat(Log.INFO, TAG, "device hid: " + mDeviceHid);
                     }
 
                     @Override
-                    public void onDeviceRegistrationFailed(ApiError error) {
+                    public void onDeviceRegistrationFailed(@NonNull ApiError error) {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "checkAndRegisterDevice, code: "
                                 + error.getStatus() + ", mesage: " + error.getMessage());
                     }

@@ -1,6 +1,7 @@
 package com.arrow.acn.api.common;
 
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -28,14 +29,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public abstract class RetrofitHolder {
     private static final String TAG = RetrofitHolder.class.getSimpleName();
+    @NonNull
     private static ApiRequestSigner requestSigner = new ApiRequestSigner();
     private static Retrofit retrofit;
     private static String sApiKey;
     private static String sApiSecret;
+    @NonNull
     private static OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .addInterceptor(new Interceptor() {
                 @Override
-                public okhttp3.Response intercept(Chain chain) throws IOException {
+                public okhttp3.Response intercept(@NonNull Chain chain) throws IOException {
                     TimeZone tz = TimeZone.getTimeZone("UTC");
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS'Z'");
                     df.setTimeZone(tz);
@@ -87,7 +90,7 @@ public abstract class RetrofitHolder {
         return requestSigner.getApiKey();
     }
 
-    public static IotConnectAPIService getIotConnectAPIService(String endpoint) {
+    public static IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint) {
         if (retrofit == null || !retrofit.baseUrl().toString().equals(endpoint)) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(endpoint)
@@ -111,7 +114,7 @@ public abstract class RetrofitHolder {
             else
                 return "";
             return buffer.readUtf8();
-        } catch (final IOException e) {
+        } catch (@NonNull final IOException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "bodyToString");
             FirebaseCrash.report(e);
             return "did not work";

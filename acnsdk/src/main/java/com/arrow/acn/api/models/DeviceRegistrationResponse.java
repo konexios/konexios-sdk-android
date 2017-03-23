@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -21,7 +22,7 @@ public final class DeviceRegistrationResponse extends CommonResponse implements 
         this.externalId = externalId;
     }
 
-    protected DeviceRegistrationResponse(Parcel in) {
+    protected DeviceRegistrationResponse(@NonNull Parcel in) {
         super(in);
         externalId = in.readString();
     }
@@ -32,18 +33,20 @@ public final class DeviceRegistrationResponse extends CommonResponse implements 
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeString(externalId);
     }
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceRegistrationResponse> CREATOR = new Parcelable.Creator<DeviceRegistrationResponse>() {
+        @NonNull
         @Override
-        public DeviceRegistrationResponse createFromParcel(Parcel in) {
+        public DeviceRegistrationResponse createFromParcel(@NonNull Parcel in) {
             return new DeviceRegistrationResponse(in);
         }
 
+        @NonNull
         @Override
         public DeviceRegistrationResponse[] newArray(int size) {
             return new DeviceRegistrationResponse[size];

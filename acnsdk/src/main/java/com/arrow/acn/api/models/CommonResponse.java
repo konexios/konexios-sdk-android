@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -81,7 +82,7 @@ public class CommonResponse implements Parcelable {
         this.pri = pri;
     }
 
-    protected CommonResponse(Parcel in) {
+    protected CommonResponse(@NonNull Parcel in) {
         hid = in.readString();
         links = (Links) in.readValue(Links.class.getClassLoader());
         message = in.readString();
@@ -94,7 +95,7 @@ public class CommonResponse implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(hid);
         dest.writeValue(links);
         dest.writeString(message);
@@ -103,11 +104,13 @@ public class CommonResponse implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<CommonResponse> CREATOR = new Parcelable.Creator<CommonResponse>() {
+        @NonNull
         @Override
-        public CommonResponse createFromParcel(Parcel in) {
+        public CommonResponse createFromParcel(@NonNull Parcel in) {
             return new CommonResponse(in);
         }
 
+        @NonNull
         @Override
         public CommonResponse[] newArray(int size) {
             return new CommonResponse[size];

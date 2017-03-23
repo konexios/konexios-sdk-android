@@ -2,6 +2,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -220,7 +221,7 @@ public class NodeTypeModel implements Parcelable {
     }
 
 
-    protected NodeTypeModel(Parcel in) {
+    protected NodeTypeModel(@NonNull Parcel in) {
         createdBy = in.readString();
         createdDate = in.readString();
         description = in.readString();
@@ -239,7 +240,7 @@ public class NodeTypeModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(createdBy);
         dest.writeString(createdDate);
         dest.writeString(description);
@@ -254,11 +255,13 @@ public class NodeTypeModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<NodeTypeModel> CREATOR = new Parcelable.Creator<NodeTypeModel>() {
+        @NonNull
         @Override
-        public NodeTypeModel createFromParcel(Parcel in) {
+        public NodeTypeModel createFromParcel(@NonNull Parcel in) {
             return new NodeTypeModel(in);
         }
 
+        @NonNull
         @Override
         public NodeTypeModel[] newArray(int size) {
             return new NodeTypeModel[size];
