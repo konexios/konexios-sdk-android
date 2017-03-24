@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 Arrow Electronics, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License 2.0
+ * which accompanies this distribution, and is available at
+ * http://apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors: Arrow Electronics, Inc.
+ */
+
 package com.arrow.acn.api.models;
 
 import android.os.Parcel;
@@ -11,17 +21,6 @@ import com.google.gson.annotations.SerializedName;
  */
 
 final public class DeviceTypeTelemetryModel implements Parcelable {
-    public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
-        @Override
-        public DeviceTypeTelemetryModel createFromParcel(Parcel in) {
-            return new DeviceTypeTelemetryModel(in);
-        }
-
-        @Override
-        public DeviceTypeTelemetryModel[] newArray(int size) {
-            return new DeviceTypeTelemetryModel[size];
-        }
-    };
     @SerializedName("controllable")
     @Expose
     private boolean controllable;
@@ -34,13 +33,6 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     @SerializedName("type")
     @Expose
     private String type;
-
-    protected DeviceTypeTelemetryModel(Parcel in) {
-        controllable = in.readByte() != 0x00;
-        description = in.readString();
-        name = in.readString();
-        type = in.readString();
-    }
 
     /**
      * @return The controllable
@@ -98,6 +90,14 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
         this.type = type;
     }
 
+
+    protected DeviceTypeTelemetryModel(Parcel in) {
+        controllable = in.readByte() != 0x00;
+        description = in.readString();
+        name = in.readString();
+        type = in.readString();
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -110,4 +110,17 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
         dest.writeString(name);
         dest.writeString(type);
     }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
+        @Override
+        public DeviceTypeTelemetryModel createFromParcel(Parcel in) {
+            return new DeviceTypeTelemetryModel(in);
+        }
+
+        @Override
+        public DeviceTypeTelemetryModel[] newArray(int size) {
+            return new DeviceTypeTelemetryModel[size];
+        }
+    };
 }

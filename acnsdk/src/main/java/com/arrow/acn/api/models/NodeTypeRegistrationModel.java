@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 Arrow Electronics, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License 2.0
+ * which accompanies this distribution, and is available at
+ * http://apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors: Arrow Electronics, Inc.
+ */
+
 package com.arrow.acn.api.models;
 
 import android.os.Parcel;
@@ -8,18 +18,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class NodeTypeRegistrationModel implements Parcelable {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<NodeTypeRegistrationModel> CREATOR = new Parcelable.Creator<NodeTypeRegistrationModel>() {
-        @Override
-        public NodeTypeRegistrationModel createFromParcel(Parcel in) {
-            return new NodeTypeRegistrationModel(in);
-        }
-
-        @Override
-        public NodeTypeRegistrationModel[] newArray(int size) {
-            return new NodeTypeRegistrationModel[size];
-        }
-    };
     @SerializedName("description")
     @Expose
     private String description;
@@ -30,52 +28,65 @@ public class NodeTypeRegistrationModel implements Parcelable {
     @Expose
     private String name;
 
-    protected NodeTypeRegistrationModel(Parcel in) {
-        description = in.readString();
-        enabled = in.readByte() != 0x00;
-        name = in.readString();
-    }
-
     /**
-     * @return The description
+     *
+     * @return
+     * The description
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * @param description The description
+     *
+     * @param description
+     * The description
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * @return The enabled
+     *
+     * @return
+     * The enabled
      */
     public boolean isEnabled() {
         return enabled;
     }
 
     /**
-     * @param enabled The enabled
+     *
+     * @param enabled
+     * The enabled
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
     /**
-     * @return The name
+     *
+     * @return
+     * The name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @param name The name
+     *
+     * @param name
+     * The name
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    protected NodeTypeRegistrationModel(Parcel in) {
+        description = in.readString();
+        enabled = in.readByte() != 0x00;
+        name = in.readString();
     }
 
     @Override
@@ -89,4 +100,17 @@ public class NodeTypeRegistrationModel implements Parcelable {
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
         dest.writeString(name);
     }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<NodeTypeRegistrationModel> CREATOR = new Parcelable.Creator<NodeTypeRegistrationModel>() {
+        @Override
+        public NodeTypeRegistrationModel createFromParcel(Parcel in) {
+            return new NodeTypeRegistrationModel(in);
+        }
+
+        @Override
+        public NodeTypeRegistrationModel[] newArray(int size) {
+            return new NodeTypeRegistrationModel[size];
+        }
+    };
 }
