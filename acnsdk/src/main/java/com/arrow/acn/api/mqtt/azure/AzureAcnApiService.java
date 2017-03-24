@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.mqtt.azure;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
@@ -31,7 +32,9 @@ import java.net.URLEncoder;
 public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     private static final String TAG = AzureAcnApiService.class.getName();
 
+    @NonNull
     private static String sslPrefix = "ssl://";
+    @NonNull
     private static String sslPortSuffix = ":8883";
 
     private final String mAccessKey;
@@ -43,11 +46,13 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
         mHost = host;
     }
 
+    @NonNull
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
         return "devices/" + mGatewayId + "/messages/events/";
     }
 
+    @NonNull
     @Override
     protected String getHost() {
         return sslPrefix + mHost + sslPortSuffix;
@@ -85,12 +90,13 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
         return mGatewayId;
     }
 
+    @NonNull
     @Override
     protected String getSubscribeTopic() {
         return "devices/" + mGatewayId + "/messages/devicebound/#";
     }
 
-    private void reportError(Exception e) {
+    private void reportError(@NonNull Exception e) {
         FirebaseCrash.logcat(Log.ERROR, TAG, e.getClass().getName() + " " + e.getMessage());
         FirebaseCrash.report(e);
     }

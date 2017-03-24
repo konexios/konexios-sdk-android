@@ -16,6 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -187,14 +189,14 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
 
         mTelemetrySendService.registerGateway(gatewayModel, new GatewayRegisterListener() {
             @Override
-            public void onGatewayRegistered(GatewayResponse response) {
+            public void onGatewayRegistered(@NonNull GatewayResponse response) {
                 mGatewayHid = response.getHid();
                 mDevice.setGatewayHid(mGatewayHid);
                 getGatewayConfig();
             }
 
             @Override
-            public void onGatewayRegisterFailed(ApiError error) {
+            public void onGatewayRegisterFailed(@NonNull ApiError error) {
                 Log.e(TAG, "registerGateway failed: code = " + error.getStatus() +
                         ", message: " + error.getMessage());
             }
@@ -212,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
             }
 
             @Override
-            public void onGatewayConfigFailed(ApiError error) {
+            public void onGatewayConfigFailed(@NonNull ApiError error) {
                 Log.e(TAG, "getGatewayConfig failed: code = " + error.getStatus() +
                         ", message: " + error.getMessage());
             }
@@ -225,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
     }
 
     @Override
-    public void update(Map<String, String> parametersMap) {
+    public void update(@NonNull Map<String, String> parametersMap) {
         for (int i = 0; i < mTelemetryContainer.getChildCount(); ++i) {
             View container = mTelemetryContainer.getChildAt(i);
             int sensorType = (int) container.getTag();
@@ -282,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
         mTelemetrySendService.registerDevice(model, listener);
     }
 
-    private void addTelemetryFields(LayoutInflater inflater) {
+    private void addTelemetryFields(@NonNull LayoutInflater inflater) {
         Integer[] availableSensors = AndroidSensorUtils.getAvailableSensors(this);
         mTelemetryContainer.removeAllViews();
         HashSet<Integer> sensorTypes = new HashSet<>();
@@ -344,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
         }
     }
 
-    private void formatAndSetTextWithDefault(String value, String unit, String defaultVal, TextView textView) {
+    private void formatAndSetTextWithDefault(String value, String unit, String defaultVal, @Nullable TextView textView) {
         if (textView != null) {
             if (!TextUtils.isEmpty(value)) {
                 value = value.substring(0, Math.min(TELEMETRY_VALUE_MAX_LENGTH, value.length()));
@@ -361,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
     }
 
     @Override
-    public void onConnectionError(ApiError error) {
+    public void onConnectionError(@NonNull ApiError error) {
         FirebaseCrash.logcat(Log.ERROR, TAG, error.getMessage());
     }
 }

@@ -12,6 +12,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -83,7 +84,7 @@ public class NodeTypeRegistrationModel implements Parcelable {
     }
 
 
-    protected NodeTypeRegistrationModel(Parcel in) {
+    protected NodeTypeRegistrationModel(@NonNull Parcel in) {
         description = in.readString();
         enabled = in.readByte() != 0x00;
         name = in.readString();
@@ -95,7 +96,7 @@ public class NodeTypeRegistrationModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(description);
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
         dest.writeString(name);
@@ -103,11 +104,13 @@ public class NodeTypeRegistrationModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<NodeTypeRegistrationModel> CREATOR = new Parcelable.Creator<NodeTypeRegistrationModel>() {
+        @NonNull
         @Override
-        public NodeTypeRegistrationModel createFromParcel(Parcel in) {
+        public NodeTypeRegistrationModel createFromParcel(@NonNull Parcel in) {
             return new NodeTypeRegistrationModel(in);
         }
 
+        @NonNull
         @Override
         public NodeTypeRegistrationModel[] newArray(int size) {
             return new NodeTypeRegistrationModel[size];

@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.mqtt.common;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -41,8 +42,9 @@ import javax.net.ssl.TrustManagerFactory;
 public final class SslUtil {
     private static final String TAG = SslUtil.class.getName();
 
-    public static SSLSocketFactory getSocketFactory(final String caCertContent, final String certContent,
-                                                    final String keyContent) throws Exception {
+    @NonNull
+    public static SSLSocketFactory getSocketFactory(@NonNull final String caCertContent, @NonNull final String certContent,
+                                                    @NonNull final String keyContent) throws Exception {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getSocketFactory");
         Security.addProvider(new BouncyCastleProvider());
 

@@ -15,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -70,19 +71,20 @@ public final class DeviceAndroid extends DeviceAbstract implements SensorEventLi
             .onBackpressureBuffer(1000)
             .observeOn(Schedulers.computation());
 
-    public DeviceAndroid(Context context) {
+    public DeviceAndroid(@NonNull Context context) {
         super(context);
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensors = new ArrayList<>();
     }
 
+    @NonNull
     @Override
     public DeviceType getDeviceType() {
         return DeviceType.AndroidInternal;
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(@NonNull SensorEvent event) {
         handleSensorChangedEvent(event);
     }
 
@@ -91,6 +93,7 @@ public final class DeviceAndroid extends DeviceAbstract implements SensorEventLi
 
     }
 
+    @NonNull
     @Override
     public String getDeviceUId() {
         final TelephonyManager tm = (TelephonyManager) mContext.
@@ -148,12 +151,13 @@ public final class DeviceAndroid extends DeviceAbstract implements SensorEventLi
         }
     }
 
+    @NonNull
     @Override
     public String getDeviceTypeName() {
         return DEVICE_TYPE_NAME;
     }
 
-    private void handleSensorChangedEvent(SensorEvent event) {
+    private void handleSensorChangedEvent(@NonNull SensorEvent event) {
         int sensorType = event.sensor.getType();
         String x = "", y = "", z = "";
         if (event.values.length >= 1) {

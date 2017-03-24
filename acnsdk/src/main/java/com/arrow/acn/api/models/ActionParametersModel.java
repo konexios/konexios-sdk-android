@@ -12,6 +12,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -91,7 +92,7 @@ public final class ActionParametersModel implements Parcelable {
         mLocation = location;
     }
 
-    protected ActionParametersModel(Parcel in) {
+    protected ActionParametersModel(@NonNull Parcel in) {
         mEmail = in.readString();
         mMessage = in.readString();
         mPhone = in.readString();
@@ -107,7 +108,7 @@ public final class ActionParametersModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mEmail);
         dest.writeString(mMessage);
         dest.writeString(mPhone);
@@ -122,11 +123,13 @@ public final class ActionParametersModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<ActionParametersModel> CREATOR = new Parcelable.Creator<ActionParametersModel>() {
+        @NonNull
         @Override
-        public ActionParametersModel createFromParcel(Parcel in) {
+        public ActionParametersModel createFromParcel(@NonNull Parcel in) {
             return new ActionParametersModel(in);
         }
 
+        @NonNull
         @Override
         public ActionParametersModel[] newArray(int size) {
             return new ActionParametersModel[size];
