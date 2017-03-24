@@ -12,6 +12,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -60,7 +61,7 @@ public final class AccountRequest implements Parcelable {
         mPassword = password;
     }
 
-    protected AccountRequest(Parcel in) {
+    protected AccountRequest(@NonNull Parcel in) {
         mName = in.readString();
         mEmail = in.readString();
         mPassword = in.readString();
@@ -76,7 +77,7 @@ public final class AccountRequest implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mName);
         dest.writeString(mEmail);
         dest.writeString(mPassword);
@@ -85,11 +86,13 @@ public final class AccountRequest implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<AccountRequest> CREATOR = new Parcelable.Creator<AccountRequest>() {
+        @NonNull
         @Override
-        public AccountRequest createFromParcel(Parcel in) {
+        public AccountRequest createFromParcel(@NonNull Parcel in) {
             return new AccountRequest(in);
         }
 
+        @NonNull
         @Override
         public AccountRequest[] newArray(int size) {
             return new AccountRequest[size];

@@ -12,6 +12,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -91,7 +92,7 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     }
 
 
-    protected DeviceTypeTelemetryModel(Parcel in) {
+    protected DeviceTypeTelemetryModel(@NonNull Parcel in) {
         controllable = in.readByte() != 0x00;
         description = in.readString();
         name = in.readString();
@@ -104,7 +105,7 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeByte((byte) (controllable ? 0x01 : 0x00));
         dest.writeString(description);
         dest.writeString(name);
@@ -113,11 +114,13 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
+        @NonNull
         @Override
-        public DeviceTypeTelemetryModel createFromParcel(Parcel in) {
+        public DeviceTypeTelemetryModel createFromParcel(@NonNull Parcel in) {
             return new DeviceTypeTelemetryModel(in);
         }
 
+        @NonNull
         @Override
         public DeviceTypeTelemetryModel[] newArray(int size) {
             return new DeviceTypeTelemetryModel[size];

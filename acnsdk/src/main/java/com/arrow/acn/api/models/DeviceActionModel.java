@@ -12,6 +12,8 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -24,10 +26,13 @@ public final class DeviceActionModel implements Parcelable {
     String mCriteria;
     @SerializedName("description")
     String mDescription;
+    @Nullable
     @SerializedName("enabled")
     Boolean mEnabled;
+    @Nullable
     @SerializedName("expiration")
     Integer mExpiration;
+    @Nullable
     @SerializedName("index")
     Integer mIndex;
     @SerializedName("parameters")
@@ -51,6 +56,7 @@ public final class DeviceActionModel implements Parcelable {
         mDescription = description;
     }
 
+    @Nullable
     public Boolean getEnabled() {
         return mEnabled;
     }
@@ -59,6 +65,7 @@ public final class DeviceActionModel implements Parcelable {
         mEnabled = enabled;
     }
 
+    @Nullable
     public Integer getExpiration() {
         return mExpiration;
     }
@@ -67,6 +74,7 @@ public final class DeviceActionModel implements Parcelable {
         mExpiration = expiration;
     }
 
+    @Nullable
     public Integer getIndex() {
         return mIndex;
     }
@@ -91,7 +99,7 @@ public final class DeviceActionModel implements Parcelable {
         mSystemName = systemName;
     }
 
-    protected DeviceActionModel(Parcel in) {
+    protected DeviceActionModel(@NonNull Parcel in) {
         mCriteria = in.readString();
         mDescription = in.readString();
         byte mEnabledVal = in.readByte();
@@ -111,7 +119,7 @@ public final class DeviceActionModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mCriteria);
         dest.writeString(mDescription);
         if (mEnabled == null) {
@@ -137,11 +145,13 @@ public final class DeviceActionModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceActionModel> CREATOR = new Parcelable.Creator<DeviceActionModel>() {
+        @NonNull
         @Override
-        public DeviceActionModel createFromParcel(Parcel in) {
+        public DeviceActionModel createFromParcel(@NonNull Parcel in) {
             return new DeviceActionModel(in);
         }
 
+        @NonNull
         @Override
         public DeviceActionModel[] newArray(int size) {
             return new DeviceActionModel[size];

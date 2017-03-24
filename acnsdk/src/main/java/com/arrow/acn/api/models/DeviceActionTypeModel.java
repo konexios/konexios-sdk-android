@@ -12,6 +12,8 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -26,6 +28,7 @@ public final class DeviceActionTypeModel implements Parcelable {
     private String mName;
     @SerializedName("description")
     private String mDescription;
+    @Nullable
     @SerializedName("enabled")
     private Boolean isEnabled;
     @SerializedName("systemName")
@@ -59,6 +62,7 @@ public final class DeviceActionTypeModel implements Parcelable {
         mDescription = description;
     }
 
+    @Nullable
     public Boolean getEnabled() {
         return isEnabled;
     }
@@ -91,7 +95,7 @@ public final class DeviceActionTypeModel implements Parcelable {
         mParameters = parameters;
     }
 
-    protected DeviceActionTypeModel(Parcel in) {
+    protected DeviceActionTypeModel(@NonNull Parcel in) {
         mHid = in.readString();
         mName = in.readString();
         mDescription = in.readString();
@@ -108,7 +112,7 @@ public final class DeviceActionTypeModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mHid);
         dest.writeString(mName);
         dest.writeString(mDescription);
@@ -124,11 +128,13 @@ public final class DeviceActionTypeModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceActionTypeModel> CREATOR = new Parcelable.Creator<DeviceActionTypeModel>() {
+        @NonNull
         @Override
-        public DeviceActionTypeModel createFromParcel(Parcel in) {
+        public DeviceActionTypeModel createFromParcel(@NonNull Parcel in) {
             return new DeviceActionTypeModel(in);
         }
 
+        @NonNull
         @Override
         public DeviceActionTypeModel[] newArray(int size) {
             return new DeviceActionTypeModel[size];

@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.rest;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.arrow.acn.api.AbstractTelemetrySenderService;
@@ -33,12 +34,12 @@ public final class RestApiAcnApiService extends AbstractTelemetrySenderService {
     private static final String TAG = RestApiAcnApiService.class.getName();
     private final retrofit2.Callback<ResponseBody> mRestApiCallback = new retrofit2.Callback<ResponseBody>() {
         @Override
-        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+        public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
             FirebaseCrash.logcat(Log.VERBOSE, TAG, "data sent to cloud: " + response.code());
         }
 
         @Override
-        public void onFailure(Call<ResponseBody> call, Throwable t) {
+        public void onFailure(Call<ResponseBody> call, @NonNull Throwable t) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "data sent to cloud failed: " + t.toString());
         }
     };
@@ -49,7 +50,7 @@ public final class RestApiAcnApiService extends AbstractTelemetrySenderService {
     }
 
     @Override
-    public void connect(ConnectionListener listener) {
+    public void connect(@NonNull ConnectionListener listener) {
         listener.onConnectionSuccess();
     }
 
@@ -59,7 +60,7 @@ public final class RestApiAcnApiService extends AbstractTelemetrySenderService {
     }
 
     @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry) {
+    public void sendSingleTelemetry(@NonNull TelemetryModel telemetry) {
         String json = telemetry.getTelemetry();
         RequestBody body = RequestBody.create(Constants.JSON, json);
         Call<ResponseBody> call = mService.sendTelemetry(body);

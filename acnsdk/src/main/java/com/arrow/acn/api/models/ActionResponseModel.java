@@ -12,6 +12,8 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -23,9 +25,11 @@ import java.util.List;
  */
 
 public final class ActionResponseModel implements Parcelable {
+    @Nullable
     @SerializedName("data")
     List<DeviceActionModel> mActions;
 
+    @Nullable
     public List<DeviceActionModel> getActions() {
         return mActions;
     }
@@ -34,7 +38,7 @@ public final class ActionResponseModel implements Parcelable {
         mActions = actions;
     }
 
-    protected ActionResponseModel(Parcel in) {
+    protected ActionResponseModel(@NonNull Parcel in) {
         if (in.readByte() == 0x01) {
             mActions = new ArrayList<>();
             in.readList(mActions, DeviceActionModel.class.getClassLoader());
@@ -49,7 +53,7 @@ public final class ActionResponseModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         if (mActions == null) {
             dest.writeByte((byte) (0x00));
         } else {
@@ -60,11 +64,13 @@ public final class ActionResponseModel implements Parcelable {
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<ActionResponseModel> CREATOR = new Parcelable.Creator<ActionResponseModel>() {
+        @NonNull
         @Override
-        public ActionResponseModel createFromParcel(Parcel in) {
+        public ActionResponseModel createFromParcel(@NonNull Parcel in) {
             return new ActionResponseModel(in);
         }
 
+        @NonNull
         @Override
         public ActionResponseModel[] newArray(int size) {
             return new ActionResponseModel[size];

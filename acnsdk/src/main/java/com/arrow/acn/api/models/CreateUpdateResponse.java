@@ -12,6 +12,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -45,7 +46,7 @@ public final class CreateUpdateResponse implements Parcelable {
         return String.format("[%s | %s]", id, message);
     }
 
-    protected CreateUpdateResponse(Parcel in) {
+    protected CreateUpdateResponse(@NonNull Parcel in) {
         id = in.readString();
         message = in.readString();
     }
@@ -56,18 +57,20 @@ public final class CreateUpdateResponse implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(message);
     }
 
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<CreateUpdateResponse> CREATOR = new Parcelable.Creator<CreateUpdateResponse>() {
+        @NonNull
         @Override
-        public CreateUpdateResponse createFromParcel(Parcel in) {
+        public CreateUpdateResponse createFromParcel(@NonNull Parcel in) {
             return new CreateUpdateResponse(in);
         }
 
+        @NonNull
         @Override
         public CreateUpdateResponse[] newArray(int size) {
             return new CreateUpdateResponse[size];

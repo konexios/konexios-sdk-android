@@ -12,6 +12,7 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -22,11 +23,13 @@ import com.google.gson.annotations.SerializedName;
 public class DeviceEventModel implements Parcelable {
     @SuppressWarnings("unused")
     public final Parcelable.Creator<DeviceEventModel> CREATOR = new Parcelable.Creator<DeviceEventModel>() {
+        @NonNull
         @Override
-        public DeviceEventModel createFromParcel(Parcel in) {
+        public DeviceEventModel createFromParcel(@NonNull Parcel in) {
             return new DeviceEventModel(in);
         }
 
+        @NonNull
         @Override
         public DeviceEventModel[] newArray(int size) {
             return new DeviceEventModel[size];
@@ -41,7 +44,7 @@ public class DeviceEventModel implements Parcelable {
     @SerializedName("status")
     private String mStatus;
 
-    protected DeviceEventModel(Parcel in) {
+    protected DeviceEventModel(@NonNull Parcel in) {
         mDeviceActionTypeName = in.readString();
         mCriteria = in.readString();
         mCreatedDate = in.readString();
@@ -86,7 +89,7 @@ public class DeviceEventModel implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mDeviceActionTypeName);
         dest.writeString(mCriteria);
         if (mCreatedDate == null) {

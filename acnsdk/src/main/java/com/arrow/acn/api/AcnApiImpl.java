@@ -11,6 +11,7 @@
 package com.arrow.acn.api;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.arrow.acn.api.common.ErrorUtils;
@@ -90,6 +91,7 @@ class AcnApiImpl implements AcnApiService {
     protected String mGatewayId;
     private String mGatewayUid;
     private IotConnectAPIService mRestService;
+    @NonNull
     private Gson mGson = new Gson();
     private TelemetrySenderInterface mSenderService;
 
@@ -98,12 +100,13 @@ class AcnApiImpl implements AcnApiService {
     private String mMqttPrefix;
     private ConfigResponse mConfigResponse;
 
+    @NonNull
     protected Gson getGson() {
         return mGson;
     }
 
     @Override
-    public void setRestEndpoint(String endpoint, String apiKey, String apiSecret) {
+    public void setRestEndpoint(@NonNull String endpoint, @NonNull String apiKey, @NonNull String apiSecret) {
         RetrofitHolder.setDefaultApiKey(apiKey);
         RetrofitHolder.setDefaultApiSecret(apiSecret);
         RetrofitHolder.setSecretKey(null);
@@ -118,7 +121,7 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void connect(ConnectionListener listener) {
+    public void connect(@NonNull ConnectionListener listener) {
         if (mConfigResponse == null) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
             ApiError error = new ApiError(COMMON_ERROR_CODE, "config() method must be called first!");
@@ -177,11 +180,11 @@ class AcnApiImpl implements AcnApiService {
         mSenderService.sendBatchTelemetry(telemetry);
     }
 
-    protected void onGatewayResponse(GatewayResponse response) {
+    protected void onGatewayResponse(@NonNull GatewayResponse response) {
         mGatewayId = response.getHid();
     }
 
-    protected void onConfigResponse(ConfigResponse response) {
+    protected void onConfigResponse(@NonNull ConfigResponse response) {
         ConfigResponse.Key keys = response.getKey();
         if (keys != null) {
             RetrofitHolder.setSecretKey(keys.getSecretKey());
@@ -197,13 +200,13 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void registerAccount(AccountRequest accountRequest, final RegisterAccountListener listener) {
+    public void registerAccount(@NonNull AccountRequest accountRequest, @NonNull final RegisterAccountListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount() email: " + accountRequest.getEmail()
                 + ", code: " + accountRequest.getCode());
         Call<AccountResponse> call = mRestService.registerAccount(accountRequest);
         call.enqueue(new Callback<AccountResponse>() {
             @Override
-            public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
+            public void onResponse(Call<AccountResponse> call, @NonNull Response<AccountResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount: " + response.code());
                 try {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
@@ -229,10 +232,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getDeviceActionTypes(final ListResultListener<DeviceActionTypeModel> listener) {
+    public void getDeviceActionTypes(@NonNull final ListResultListener<DeviceActionTypeModel> listener) {
         mRestService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, Response<ListResultModel<DeviceActionTypeModel>> response) {
+            public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, @NonNull Response<ListResultModel<DeviceActionTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -250,10 +253,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getDeviceActions(String deviceHid, final ListResultListener<DeviceActionModel> listener) {
+    public void getDeviceActions(@NonNull String deviceHid, @NonNull final ListResultListener<DeviceActionModel> listener) {
         mRestService.getActions(deviceHid).enqueue(new Callback<ListResultModel<DeviceActionModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<DeviceActionModel>> call, Response<ListResultModel<DeviceActionModel>> response) {
+            public void onResponse(Call<ListResultModel<DeviceActionModel>> call, @NonNull Response<ListResultModel<DeviceActionModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActions response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -270,10 +273,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void postDeviceAction(String deviceHid, DeviceActionModel action, final PostDeviceActionListener listener) {
+    public void postDeviceAction(@NonNull String deviceHid, @NonNull DeviceActionModel action, @NonNull final PostDeviceActionListener listener) {
         mRestService.postAction(deviceHid, action).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.postActionSucceed();
@@ -290,10 +293,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void updateDeviceAction(String deviceHid, int index, DeviceActionModel model, final UpdateDeviceActionListener listener) {
+    public void updateDeviceAction(@NonNull String deviceHid, int index, @NonNull DeviceActionModel model, @NonNull final UpdateDeviceActionListener listener) {
         mRestService.updateAction(deviceHid, index, model).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceActionUpdated();
@@ -310,10 +313,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getDeviceHistoricalEvents(String deviceHid, final PagingResultListener<DeviceEventModel> listener) {
+    public void getDeviceHistoricalEvents(@NonNull String deviceHid, @NonNull final PagingResultListener<DeviceEventModel> listener) {
         mRestService.getHistoricalEvents(deviceHid).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
             @Override
-            public void onResponse(Call<PagingResultModel<DeviceEventModel>> call, Response<PagingResultModel<DeviceEventModel>> response) {
+            public void onResponse(Call<PagingResultModel<DeviceEventModel>> call, @NonNull Response<PagingResultModel<DeviceEventModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getHistoricalEvents response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -330,11 +333,11 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void registerDevice(DeviceRegistrationModel req, final RegisterDeviceListener listener) {
+    public void registerDevice(@NonNull DeviceRegistrationModel req, @NonNull final RegisterDeviceListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "regiterDevice() type: " + req.getType() + ", uid: " + req.getUid());
         mRestService.createOrUpdateDevice(req).enqueue(new Callback<DeviceRegistrationResponse>() {
             @Override
-            public void onResponse(Call<DeviceRegistrationResponse> call, final Response<DeviceRegistrationResponse> response) {
+            public void onResponse(Call<DeviceRegistrationResponse> call, @NonNull final Response<DeviceRegistrationResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createOrUpdateDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceRegistered(response.body());
@@ -352,7 +355,7 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void registerReceivedEvent(String eventHid) {
+    public void registerReceivedEvent(@NonNull String eventHid) {
         mRestService.putReceived(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -367,7 +370,7 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void eventHandlingSucceed(String eventHid) {
+    public void eventHandlingSucceed(@NonNull String eventHid) {
         mRestService.putSucceeded(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -382,7 +385,7 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void eventHandlingFailed(String eventHid) {
+    public void eventHandlingFailed(@NonNull String eventHid) {
         mRestService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -397,10 +400,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void findAllGateways(final GetGatewaysListener listener) {
+    public void findAllGateways(@NonNull final GetGatewaysListener listener) {
         mRestService.findAllGateways().enqueue(new Callback<List<GatewayModel>>() {
             @Override
-            public void onResponse(Call<List<GatewayModel>> call, Response<List<GatewayModel>> response) {
+            public void onResponse(Call<List<GatewayModel>> call, @NonNull Response<List<GatewayModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findAllGateways response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewaysReceived(response.body());
@@ -419,12 +422,12 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void registerGateway(final GatewayModel gatewayModel, final GatewayRegisterListener listener) {
+    public void registerGateway(@NonNull final GatewayModel gatewayModel, @NonNull final GatewayRegisterListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
                 ", applicationHid: " + gatewayModel.getApplicationHid());
         mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
-            public void onResponse(Call<GatewayResponse> call, final Response<GatewayResponse> response) {
+            public void onResponse(Call<GatewayResponse> call, @NonNull final Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     final Handler uiHandler = new Handler();
@@ -459,10 +462,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void findGateway(String hid, final FindGatewayListener listener) {
+    public void findGateway(@NonNull String hid, @NonNull final FindGatewayListener listener) {
         mRestService.findGateway(hid).enqueue(new Callback<GatewayModel>() {
             @Override
-            public void onResponse(Call<GatewayModel> call, Response<GatewayModel> response) {
+            public void onResponse(Call<GatewayModel> call, @NonNull Response<GatewayModel> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayFound(response.body());
@@ -481,10 +484,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void updateGateway(String hid, GatewayModel gatewayModel, final GatewayUpdateListener listener) {
+    public void updateGateway(@NonNull String hid, @NonNull  GatewayModel gatewayModel, @NonNull final GatewayUpdateListener listener) {
         mRestService.updateGateway(hid, gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
-            public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
+            public void onResponse(Call<GatewayResponse> call, @NonNull Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayUpdated(response.body());
@@ -503,12 +506,12 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void checkinGateway(String hid, String gatewayUid, final CheckinGatewayListener listener) {
+    public void checkinGateway(@NonNull String hid, @NonNull String gatewayUid, @NonNull final CheckinGatewayListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "checkinGateway(), hid: " + hid);
         mGatewayUid = gatewayUid;
         mRestService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "checkin response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onCheckinGatewaySuccess();
@@ -528,10 +531,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void sendCommandGateway(String hid, GatewayCommand command, final GatewayCommandsListener listener) {
+    public void sendCommandGateway(@NonNull String hid, @NonNull GatewayCommand command, @NonNull final GatewayCommandsListener listener) {
         mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<GatewayResponse>() {
             @Override
-            public void onResponse(Call<GatewayResponse> call, Response<GatewayResponse> response) {
+            public void onResponse(Call<GatewayResponse> call, @NonNull Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "sendGatewayCommand response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayCommandSent(response.body());
@@ -550,11 +553,11 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getGatewayConfig(final String hid, final GetGatewayConfigListener listener) {
+    public void getGatewayConfig(@NonNull final String hid, @NonNull final GetGatewayConfigListener listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayConfig() hid: " + hid);
         mRestService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
             @Override
-            public void onResponse(Call<ConfigResponse> call, final Response<ConfigResponse> response) {
+            public void onResponse(Call<ConfigResponse> call, @NonNull final Response<ConfigResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     if (mGatewayId == null) {
@@ -579,11 +582,11 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getDevicesList(String gatewayHid, final ListResultListener<DeviceModel> listener) {
+    public void getDevicesList(@NonNull String gatewayHid, @NonNull final ListResultListener<DeviceModel> listener) {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList() hid: " + gatewayHid);
         mRestService.getDevicesByGatewayHid(gatewayHid).enqueue(new Callback<ListResultModel<DeviceModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<DeviceModel>> call, Response<ListResultModel<DeviceModel>> response) {
+            public void onResponse(Call<ListResultModel<DeviceModel>> call, @NonNull Response<ListResultModel<DeviceModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -602,10 +605,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void gatewayHeartbeat(String hid, final CommonRequestListener listener) {
+    public void gatewayHeartbeat(@NonNull String hid, @NonNull final CommonRequestListener listener) {
         mRestService.heartBeat(hid).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "heartBeat response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -624,12 +627,12 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getGatewayLogs(String hid, AuditLogsQuery query, final PagingResultListener<AuditLogModel> listener) {
+    public void getGatewayLogs(@NonNull String hid, @NonNull AuditLogsQuery query, @NonNull final PagingResultListener<AuditLogModel> listener) {
         mRestService.getGatewayLogs(hid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
                 query.getUserHids(), query.getTypes(), query.getSortField(), query.getSortDirection(),
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
             @Override
-            public void onResponse(Call<PagingResultModel<AuditLogModel>> call, Response<PagingResultModel<AuditLogModel>> response) {
+            public void onResponse(Call<PagingResultModel<AuditLogModel>> call, @NonNull Response<PagingResultModel<AuditLogModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -648,10 +651,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void deleteDeviceAction(String deviceHid, int index, final DeleteDeviceActionListener listener) {
+    public void deleteDeviceAction(@NonNull String deviceHid, int index, @NonNull final DeleteDeviceActionListener listener) {
         mRestService.deleteAction(deviceHid, index).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceActionDeleted();
@@ -671,11 +674,11 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void findAllDevices(String userHid, String uid, String type, String gatewayHid,
-                               String enabled, int page, int size, final PagingResultListener<DeviceModel> listener) {
+                               String enabled, int page, int size, @NonNull final PagingResultListener<DeviceModel> listener) {
         mRestService.findAllDevices(userHid, uid, type, gatewayHid, enabled, page, size).
                 enqueue(new Callback<PagingResultModel<DeviceModel>>() {
                     @Override
-                    public void onResponse(Call<PagingResultModel<DeviceModel>> call, Response<PagingResultModel<DeviceModel>> response) {
+                    public void onResponse(Call<PagingResultModel<DeviceModel>> call, @NonNull Response<PagingResultModel<DeviceModel>> response) {
                         FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
                         if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                             listener.onRequestSuccess(response.body().getData());
@@ -694,10 +697,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void findDeviceByHid(String deviceHid, final FindDeviceListener listener) {
+    public void findDeviceByHid(@NonNull String deviceHid, @NonNull final FindDeviceListener listener) {
         mRestService.findDeviceByHid(deviceHid).enqueue(new Callback<DeviceModel>() {
             @Override
-            public void onResponse(Call<DeviceModel> call, Response<DeviceModel> response) {
+            public void onResponse(Call<DeviceModel> call, @NonNull Response<DeviceModel> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findDeviceByHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceFindSuccess(response.body());
@@ -716,10 +719,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void updateDevice(String deviceHid, DeviceRegistrationModel device, final CommonRequestListener listener) {
+    public void updateDevice(@NonNull String deviceHid, @NonNull DeviceRegistrationModel device, @NonNull final CommonRequestListener listener) {
         mRestService.updateExistingDevice(deviceHid, device).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -738,12 +741,12 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, final PagingResultListener<AuditLogModel> listener) {
+    public void getDeviceAuditLogs(@NonNull String deviceHid, @NonNull AuditLogsQuery query, @NonNull final PagingResultListener<AuditLogModel> listener) {
         mRestService.listDeviceAuditLogs(deviceHid, query.getCreatedDateFrom(), query.getCreatedDateTo(),
                 query.getUserHids(), query.getTypes(), query.getSortField(), query.getSortDirection(),
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
             @Override
-            public void onResponse(Call<PagingResultModel<AuditLogModel>> call, Response<PagingResultModel<AuditLogModel>> response) {
+            public void onResponse(Call<PagingResultModel<AuditLogModel>> call, @NonNull Response<PagingResultModel<AuditLogModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getDeviceAuditLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -765,10 +768,10 @@ class AcnApiImpl implements AcnApiService {
 
 
     @Override
-    public void getNodesList(final ListResultListener<NodeModel> listener) {
+    public void getNodesList(@NonNull final ListResultListener<NodeModel> listener) {
         mRestService.getListExistingNodes().enqueue(new Callback<ListResultModel<NodeModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<NodeModel>> call, Response<ListResultModel<NodeModel>> response) {
+            public void onResponse(Call<ListResultModel<NodeModel>> call, @NonNull Response<ListResultModel<NodeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getNodesList response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -787,10 +790,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void createNewNode(NodeRegistrationModel node, final CommonRequestListener listener) {
+    public void createNewNode(@NonNull NodeRegistrationModel node, @NonNull final CommonRequestListener listener) {
         mRestService.createNewNode(node).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNode response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -809,10 +812,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void updateExistingNode(String nodeHid, NodeRegistrationModel node, final CommonRequestListener listener) {
+    public void updateExistingNode(@NonNull String nodeHid, NodeRegistrationModel node, @NonNull final CommonRequestListener listener) {
         mRestService.updateExistingNode(nodeHid, node).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNode response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -834,10 +837,10 @@ class AcnApiImpl implements AcnApiService {
 
 
     @Override
-    public void getListNodeTypes(final ListNodeTypesListener listener) {
+    public void getListNodeTypes(@NonNull final ListNodeTypesListener listener) {
         mRestService.getListNodeTypes().enqueue(new Callback<ListResultModel<NodeTypeModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<NodeTypeModel>> call, Response<ListResultModel<NodeTypeModel>> response) {
+            public void onResponse(Call<ListResultModel<NodeTypeModel>> call, @NonNull Response<ListResultModel<NodeTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getListNodeTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onListNodeTypesSuccess(response.body());
@@ -856,10 +859,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void createNewNodeType(NodeTypeRegistrationModel nodeType, final CommonRequestListener listener) {
+    public void createNewNodeType(@NonNull NodeTypeRegistrationModel nodeType, @NonNull final CommonRequestListener listener) {
         mRestService.createNewNodeType(nodeType).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNodeType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -878,10 +881,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void updateExistingNodeType(String hid, NodeTypeRegistrationModel nodeType, final CommonRequestListener listener) {
+    public void updateExistingNodeType(@NonNull String hid, @NonNull NodeTypeRegistrationModel nodeType, @NonNull final CommonRequestListener listener) {
         mRestService.updateExistingNodeType(hid, nodeType).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNodeType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -902,10 +905,10 @@ class AcnApiImpl implements AcnApiService {
     //device - type api
 
     @Override
-    public void getListDeviceTypes(final ListResultListener<DeviceTypeModel> listener) {
+    public void getListDeviceTypes(@NonNull final ListResultListener<DeviceTypeModel> listener) {
         mRestService.getListDeviceTypes().enqueue(new Callback<ListResultModel<DeviceTypeModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<DeviceTypeModel>> call, Response<ListResultModel<DeviceTypeModel>> response) {
+            public void onResponse(Call<ListResultModel<DeviceTypeModel>> call, @NonNull Response<ListResultModel<DeviceTypeModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getListDeviceTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -924,10 +927,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void createNewDeviceType(DeviceTypeRegistrationModel deviceType, final CommonRequestListener listener) {
+    public void createNewDeviceType(@NonNull DeviceTypeRegistrationModel deviceType, @NonNull final CommonRequestListener listener) {
         mRestService.createNewDeviceType(deviceType).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewDeviceType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -947,10 +950,10 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void updateExistingDeviceType(String hid, DeviceTypeRegistrationModel deviceType,
-                                         final CommonRequestListener listener) {
+                                         @NonNull final CommonRequestListener listener) {
         mRestService.updateExistingDeviceType(hid, deviceType).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDeviceType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
@@ -970,11 +973,11 @@ class AcnApiImpl implements AcnApiService {
 
     //telemetry api
     @Override
-    public void findTelemetryByApplicationHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
+    public void findTelemetryByApplicationHid(@NonNull FindTelemetryRequest request, @NonNull final PagingResultListener<TelemetryItemModel> listener) {
         mRestService.findTelemetryByAppHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
-            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
+            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByApplicationHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -993,11 +996,11 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void findTelemetryByDeviceHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
+    public void findTelemetryByDeviceHid(@NonNull FindTelemetryRequest request, @NonNull final PagingResultListener<TelemetryItemModel> listener) {
         mRestService.findTelemetryByDeviceHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
-            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
+            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByDeviceHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -1016,11 +1019,11 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void findTelemetryByNodeHid(FindTelemetryRequest request, final PagingResultListener<TelemetryItemModel> listener) {
+    public void findTelemetryByNodeHid(@NonNull FindTelemetryRequest request, @NonNull final PagingResultListener<TelemetryItemModel> listener) {
         mRestService.findTelemetryByNodeHid(request.getHid(), request.getFromTimestamp(), request.getToTimestamp(),
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
-            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, Response<PagingResultModel<TelemetryItemModel>> response) {
+            public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByNodeHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
@@ -1039,10 +1042,10 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getLastTelemetry(String deviceHid, final ListResultListener<TelemetryItemModel> listener) {
+    public void getLastTelemetry(String deviceHid, @NonNull final ListResultListener<TelemetryItemModel> listener) {
         mRestService.getLastTelemetry(deviceHid).enqueue(new Callback<ListResultModel<TelemetryItemModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<TelemetryItemModel>> call, Response<ListResultModel<TelemetryItemModel>> response) {
+            public void onResponse(Call<ListResultModel<TelemetryItemModel>> call, @NonNull Response<ListResultModel<TelemetryItemModel>> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "getLastTelemetry response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());

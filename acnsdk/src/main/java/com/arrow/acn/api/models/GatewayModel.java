@@ -12,10 +12,25 @@ package com.arrow.acn.api.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
 public final class GatewayModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<GatewayModel> CREATOR = new Parcelable.Creator<GatewayModel>() {
+        @NonNull
+        @Override
+        public GatewayModel createFromParcel(@NonNull Parcel in) {
+            return new GatewayModel(in);
+        }
+
+        @NonNull
+        @Override
+        public GatewayModel[] newArray(int size) {
+            return new GatewayModel[size];
+        }
+    };
     @SerializedName("uid")
     private String uid;
     @SerializedName("name")
@@ -34,6 +49,21 @@ public final class GatewayModel implements Parcelable {
     private String applicationHid;
     @SerializedName("sdkVersion")
     private String sdkVersion;
+
+    protected GatewayModel(@NonNull Parcel in) {
+
+        uid = in.readString();
+        name = in.readString();
+        type = (GatewayType) in.readValue(GatewayType.class.getClassLoader());
+        userHid = in.readString();
+        osName = in.readString();
+        softwareName = in.readString();
+        softwareVersion = in.readString();
+        sdkVersion = in.readString();
+    }
+
+    public GatewayModel() {
+    }
 
     public String getApplicationHid() {
         return applicationHid;
@@ -107,27 +137,13 @@ public final class GatewayModel implements Parcelable {
         this.sdkVersion = sdkVersion;
     }
 
-    protected GatewayModel(Parcel in) {
-        uid = in.readString();
-        name = in.readString();
-        type = (GatewayType) in.readValue(GatewayType.class.getClassLoader());
-        userHid = in.readString();
-        osName = in.readString();
-        softwareName = in.readString();
-        softwareVersion = in.readString();
-        sdkVersion = in.readString();
-    }
-
-    public GatewayModel() {
-    }
-
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(uid);
         dest.writeString(name);
         dest.writeValue(type);
@@ -137,17 +153,4 @@ public final class GatewayModel implements Parcelable {
         dest.writeString(softwareVersion);
         dest.writeString(sdkVersion);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<GatewayModel> CREATOR = new Parcelable.Creator<GatewayModel>() {
-        @Override
-        public GatewayModel createFromParcel(Parcel in) {
-            return new GatewayModel(in);
-        }
-
-        @Override
-        public GatewayModel[] newArray(int size) {
-            return new GatewayModel[size];
-        }
-    };
 }
