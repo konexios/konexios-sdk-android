@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 Arrow Electronics, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License 2.0
+ * which accompanies this distribution, and is available at
+ * http://apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors: Arrow Electronics, Inc.
+ */
+
 package com.arrow.acn.api.models;
 
 import android.os.Parcel;
@@ -11,8 +21,25 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public final class DeviceRegistrationResponse extends CommonResponse implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<DeviceRegistrationResponse> CREATOR = new Parcelable.Creator<DeviceRegistrationResponse>() {
+        @Override
+        public DeviceRegistrationResponse createFromParcel(Parcel in) {
+            return new DeviceRegistrationResponse(in);
+        }
+
+        @Override
+        public DeviceRegistrationResponse[] newArray(int size) {
+            return new DeviceRegistrationResponse[size];
+        }
+    };
     @SerializedName("externalId")
     private String externalId;
+
+    protected DeviceRegistrationResponse(@NonNull Parcel in) {
+        super(in);
+        externalId = in.readString();
+    }
 
     public String getExternalId() {
         return externalId;
@@ -20,11 +47,6 @@ public final class DeviceRegistrationResponse extends CommonResponse implements 
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
-    }
-
-    protected DeviceRegistrationResponse(@NonNull Parcel in) {
-        super(in);
-        externalId = in.readString();
     }
 
     @Override
@@ -37,19 +59,4 @@ public final class DeviceRegistrationResponse extends CommonResponse implements 
         super.writeToParcel(dest, flags);
         dest.writeString(externalId);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<DeviceRegistrationResponse> CREATOR = new Parcelable.Creator<DeviceRegistrationResponse>() {
-        @NonNull
-        @Override
-        public DeviceRegistrationResponse createFromParcel(@NonNull Parcel in) {
-            return new DeviceRegistrationResponse(in);
-        }
-
-        @NonNull
-        @Override
-        public DeviceRegistrationResponse[] newArray(int size) {
-            return new DeviceRegistrationResponse[size];
-        }
-    };
 }

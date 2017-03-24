@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 Arrow Electronics, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License 2.0
+ * which accompanies this distribution, and is available at
+ * http://apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors: Arrow Electronics, Inc.
+ */
+
 package com.arrow.acn.api.rest;
 
 
@@ -6,25 +16,25 @@ import android.support.annotation.NonNull;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
 import com.arrow.acn.api.models.AuditLogModel;
-import com.arrow.acn.api.models.DeviceActionModel;
 import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.ConfigResponse;
+import com.arrow.acn.api.models.DeviceActionModel;
 import com.arrow.acn.api.models.DeviceActionTypeModel;
 import com.arrow.acn.api.models.DeviceEventModel;
 import com.arrow.acn.api.models.DeviceModel;
+import com.arrow.acn.api.models.DeviceRegistrationModel;
+import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.GatewayCommand;
-import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
-import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.ListResultModel;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
-import com.arrow.acn.api.models.DeviceRegistrationResponse;
+import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryStatsModel;
 
