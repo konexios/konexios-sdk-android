@@ -190,7 +190,15 @@ public interface IotConnectAPIService {
     //Device api
     @NonNull
     @GET("/api/v1/kronos/devices/{hid}/events")
-    Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid);
+    Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid,
+                                                                  @Query("createdDateFrom") String createdDateFrom,
+                                                                  @Query("createdDateTo") String createdDateTo,
+                                                                  @Query("sortField") String sortField,
+                                                                  @Query("sortDirection") String sortDirection,
+                                                                  @Query("statuses[]") List<String> statuses,
+                                                                  @Query("systemNames[]") List<String> systemNames,
+                                                                  @Query("_page") int page,
+                                                                  @Query("_size") int size);
 
     @NonNull
     @GET("/api/v1/kronos/devices")

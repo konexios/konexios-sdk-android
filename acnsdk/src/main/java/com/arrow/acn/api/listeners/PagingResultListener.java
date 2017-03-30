@@ -11,6 +11,7 @@
 package com.arrow.acn.api.listeners;
 
 import com.arrow.acn.api.models.ApiError;
+import com.arrow.acn.api.models.PagingResultModel;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  */
 
 public interface PagingResultListener<T> {
-    void onRequestSuccess(List<T> list);
+    void onRequestSuccess(PagingResultModel<T> list);
 
     void onRequestError(ApiError error);
 }
