@@ -20,7 +20,6 @@ android {
         multiDexEnabled true
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -31,16 +30,6 @@ android {
         }
     }
     productFlavors {
-    }
-    packagingOptions {
-        exclude "META-INF/MSFTSIG.SF"
-        exclude "META-INF/MSFTSIG.RSA"
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'thirdpartynotice.txt'
-        exclude 'META-INF/NOTICE.txt'
     }
     dexOptions {
         // Prevent OutOfMemory with MultiDex during the build phase
@@ -53,11 +42,10 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.jakewharton:butterknife:8.4.0'
-    compile 'com.google.android.gms:play-services:9.2.0'
+
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     // RxJava
     compile 'io.reactivex:rxjava:1.1.1'

@@ -31,6 +31,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.acnsdk.arrow.acnsdk", appContext.getPackageName());
+        assertEquals("com.arrow.acn.api.test", appContext.getPackageName());
     }
 }
