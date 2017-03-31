@@ -34,6 +34,7 @@ import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
+import com.arrow.acn.api.listeners.TelemetryCountListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
@@ -61,6 +62,8 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.TelemetryCountRequest;
+import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
 import com.arrow.acn.api.mqtt.MqttAcnApiService;
@@ -1069,6 +1072,31 @@ class AcnApiImpl implements AcnApiService {
             public void onFailure(Call<ListResultModel<TelemetryItemModel>> call, Throwable t) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
                 listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void getTelemetryItemsCount(TelemetryCountRequest request, final TelemetryCountListener listener) {
+        mRestService.getTelemetryItemsCount(request.getDeviceHid(),
+                request.getTelemetryName(),
+                request.getFromTimestamp(),
+                request.getToTimestamp()).enqueue(new Callback<TelemetryCountResponse>() {
+            @Override
+            public void onResponse(Call<TelemetryCountResponse> call, Response<TelemetryCountResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getTelemetryItemsCount response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onTelemetryItemsCountSuccess(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getTelemetryItemsCount error");
+                    listener.onTelemetryItemsCountError(ErrorUtils.parseError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TelemetryCountResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getTelemetryItemsCount error");
+                listener.onTelemetryItemsCountError(ErrorUtils.parseError(t));
             }
         });
     }

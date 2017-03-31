@@ -35,6 +35,7 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryStatsModel;
 
@@ -145,6 +146,13 @@ public interface IotConnectAPIService {
                                                                        @Query("telemetryNames") String telemetryNames,
                                                                        @Query("_page") int page,
                                                                        @Query("_size") int size);
+
+    @NonNull
+    @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/count")
+    Call<TelemetryCountResponse> getTelemetryItemsCount(@Path("deviceHid") String deviceHid,
+                                                       @Query("telemetryName") String telemetryName,
+                                                       @Query("fromTimestamp") String fromTimestamp,
+                                                       @Query("toTimestamp") String toTimestamp);
 
     @NonNull
     @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/latest")
