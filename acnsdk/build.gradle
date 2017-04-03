@@ -73,6 +73,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
 
     testCompile 'junit:junit:4.12'
+    testCompile 'com.squareup.retrofit2:retrofit-mock:2.2.0'
 }
 
 // Goole play services
