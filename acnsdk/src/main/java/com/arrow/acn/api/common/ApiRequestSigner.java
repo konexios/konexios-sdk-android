@@ -31,7 +31,7 @@ import static android.content.ContentValues.TAG;
 /**
  * Created by osminin on 4/8/2016.
  */
-class ApiRequestSigner {
+public class ApiRequestSigner {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     private String secretKey;
@@ -43,58 +43,58 @@ class ApiRequestSigner {
     private String payload;
     private List<String> parameters;
 
-    ApiRequestSigner() {
+    public ApiRequestSigner() {
         this.parameters = new ArrayList<>();
         this.payload = "";
     }
 
     @NonNull
-    ApiRequestSigner payload(@Nullable String payload) {
+    public ApiRequestSigner payload(@Nullable String payload) {
         if (payload != null)
             this.payload = payload;
         return this;
     }
 
     @NonNull
-    ApiRequestSigner method(@NonNull String method) {
+    public ApiRequestSigner method(@NonNull String method) {
         this.method = method.toUpperCase();
         return this;
     }
 
     @NonNull
-    ApiRequestSigner canonicalUri(String uri) {
+    public ApiRequestSigner canonicalUri(String uri) {
         this.uri = uri;
         return this;
     }
 
     @NonNull
-    ApiRequestSigner apiKey(String apiKey) {
+    public ApiRequestSigner setApiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
     }
 
-    String getApiKey() {
+    public String getApiKey() {
         return apiKey;
     }
 
-    String getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
     @NonNull
-    ApiRequestSigner setSecretKey(String secretKey) {
+    public ApiRequestSigner setSecretKey(String secretKey) {
         this.secretKey = secretKey;
         return this;
     }
 
     @NonNull
-    ApiRequestSigner timestamp(String timestamp) {
+    public ApiRequestSigner timestamp(String timestamp) {
         this.timestamp = timestamp;
         return this;
     }
 
     @NonNull
-    String signV1() {
+    public String signV1() {
         StringBuffer canonicalRequest = new StringBuffer(buildCanonicalRequest());
         canonicalRequest.append(hash(payload));
 
@@ -112,7 +112,7 @@ class ApiRequestSigner {
     }
 
     @NonNull
-    String encode(@NonNull String key, @NonNull String data) {
+    public String encode(@NonNull String key, @NonNull String data) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");

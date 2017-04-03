@@ -63,7 +63,7 @@ public abstract class RetrofitHolder {
                             sApiKey : requestSigner.getApiKey();
                     String signature = requestSigner.method(chain.request().method())
                             .canonicalUri(chain.request().url().uri().getPath())
-                            .apiKey(apiKey).timestamp(nowAsISO).payload(body).signV1();
+                            .setApiKey(apiKey).timestamp(nowAsISO).payload(body).signV1();
                     Request request = chain.request().newBuilder()
                             .addHeader("Accept", "application/json")
                             .addHeader("Content-Type", "application/json")
@@ -93,11 +93,19 @@ public abstract class RetrofitHolder {
     }
 
     public static void setApiKey(String apiKey) {
-        requestSigner.apiKey(apiKey);
+        requestSigner.setApiKey(apiKey);
     }
 
     public static String getApiKey() {
         return requestSigner.getApiKey();
+    }
+
+    public static String getDefaultApiKey() {
+        return sApiKey;
+    }
+
+    public static String getDefaultApiSecret() {
+        return sApiSecret;
     }
 
     public static IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint) {
