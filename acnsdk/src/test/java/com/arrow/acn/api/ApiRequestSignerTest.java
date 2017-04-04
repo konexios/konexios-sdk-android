@@ -13,10 +13,7 @@ package com.arrow.acn.api;
 import com.arrow.acn.api.common.ApiRequestSigner;
 
 import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,35 +21,41 @@ import static org.junit.Assert.assertEquals;
  * Created by osminin on 4/3/2017.
  */
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ApiRequestSignerTest {
+
+    private static final String RND_API_KEY = "kjg23asd123g456nbjhf6123kdlfghfg908jh43jh11234dfliyasfk376nx2n9b";
+    private static final String RND_SECRET_KEY = "AK40L17HD/G72HLKHD2314/SAGdLAFRMC452DASF4h=";
+    private static final String METHOD = "get";
+    private static final String PATH = "http://google.com";
+    private static final String RND_TIME_STRING = "2017-04-04T09:10:01.334Z";
+    private static final String BODY = "some body";
+    private static final String RESULT_SIGNATURE = "84743c7ca35a225af9d69012dfafbff677a2baeeec25dcf62499c7561c97f7f0";
+
 
     public ApiRequestSigner mRequestSigner;
 
     @Before
     public void init() {
         mRequestSigner = new ApiRequestSigner();
+        mRequestSigner.setSecretKey(RND_SECRET_KEY);
+        mRequestSigner.setApiKey(RND_API_KEY);
     }
 
     @Test
-    public void test1_setSecretKey() {
-        //random key
-        String testKey = "AK40L17HD/G72HLKHD2314/SAGdLAFRMC452DASF4h=";
-        mRequestSigner.setSecretKey(testKey);
-        assertEquals(testKey, mRequestSigner.getSecretKey());
+    public void test_setSecretKey() {
+        assertEquals(RND_SECRET_KEY, mRequestSigner.getSecretKey());
     }
 
     @Test
-    public void test2_setApiKey() {
-        //random key
-        String testKey = "kjg23asd123g456nbjhf6123kdlfghfg908jh43jh11234dfliyasfk376nx2n9b";
-        mRequestSigner.setApiKey(testKey);
-        assertEquals(testKey, mRequestSigner.getApiKey());
+    public void test_setApiKey() {
+        assertEquals(RND_API_KEY, mRequestSigner.getApiKey());
     }
 
     @Test
-    public void test3_signingTest() {
-
+    public void test_signing() {
+        String signature = mRequestSigner.method(METHOD)
+                .canonicalUri(PATH).timestamp(RND_TIME_STRING).payload(BODY).signV1();
+        assertEquals(RESULT_SIGNATURE, signature);
     }
 
 }

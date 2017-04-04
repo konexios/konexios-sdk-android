@@ -33,11 +33,9 @@ public final class ErrorUtils {
     public static final String COMMON_ERROR_MESSAGE = "Common error";
     public static final int COMMON_ERROR_CODE = 11;
 
-    public static ApiError parseError(@NonNull Response<?> response) {
-        Retrofit retrofit = RetrofitHolder.getRetrofit();
+    public static ApiError parseError(@NonNull Response<?> response, Retrofit retrofit) {
         Converter<ResponseBody, ApiError> converter = retrofit.responseBodyConverter(ApiError.class, new Annotation[0]);
         ApiError error;
-
         try {
             error = converter.convert(response.errorBody());
             if (TextUtils.isEmpty(error.getMessage())) {

@@ -100,6 +100,12 @@ class AcnApiImpl implements AcnApiService {
     private String mMqttPrefix;
     private ConfigResponse mConfigResponse;
 
+    private RetrofitHolder mRetrofitHolder;
+
+    AcnApiImpl(RetrofitHolder retrofitHolder) {
+        mRetrofitHolder = retrofitHolder;
+    }
+
     @NonNull
     protected Gson getGson() {
         return mGson;
@@ -107,11 +113,11 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void setRestEndpoint(@NonNull String endpoint, @NonNull String apiKey, @NonNull String apiSecret) {
-        RetrofitHolder.setDefaultApiKey(apiKey);
-        RetrofitHolder.setDefaultApiSecret(apiSecret);
-        RetrofitHolder.setSecretKey(null);
-        RetrofitHolder.setApiKey(null);
-        mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
+        mRetrofitHolder.setDefaultApiKey(apiKey);
+        mRetrofitHolder.setDefaultApiSecret(apiSecret);
+        mRetrofitHolder.setSecretKey(null);
+        mRetrofitHolder.setApiKey(null);
+        mRestService = mRetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
     @Override
@@ -141,7 +147,8 @@ class AcnApiImpl implements AcnApiService {
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
         if (cloud.equalsIgnoreCase("ArrowConnect") ||
                 cloud.equalsIgnoreCase("IotConnect")) {
-            mSenderService = new MqttAcnApiService(mMqttHost, mMqttPrefix, mGatewayId, mServerCommandsListener);
+            mSenderService = new MqttAcnApiService(mMqttHost, mMqttPrefix, mGatewayId,
+                    mRetrofitHolder, mServerCommandsListener);
         } else if (cloud.equalsIgnoreCase("IBM")) {
             mSenderService = new IbmAcnApiService(mGatewayId, mConfigResponse);
         } else if (cloud.equalsIgnoreCase("AWS")) {
@@ -187,8 +194,8 @@ class AcnApiImpl implements AcnApiService {
     protected void onConfigResponse(@NonNull ConfigResponse response) {
         ConfigResponse.Key keys = response.getKey();
         if (keys != null) {
-            RetrofitHolder.setSecretKey(keys.getSecretKey());
-            RetrofitHolder.setApiKey(keys.getApiKey());
+            mRetrofitHolder.setSecretKey(keys.getSecretKey());
+            mRetrofitHolder.setApiKey(keys.getApiKey());
         }
         mConfigResponse = response;
         FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + mConfigResponse.getCloudPlatform());
@@ -212,7 +219,7 @@ class AcnApiImpl implements AcnApiService {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
                         listener.onAccountRegistered(response.body());
                     } else {
-                        ApiError error = ErrorUtils.parseError(response);
+                        ApiError error = ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit());
                         listener.onAccountRegisterFailed(error);
                     }
                 } catch (Exception e) {
@@ -240,7 +247,7 @@ class AcnApiImpl implements AcnApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -261,7 +268,7 @@ class AcnApiImpl implements AcnApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -281,7 +288,7 @@ class AcnApiImpl implements AcnApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.postActionSucceed();
                 } else {
-                    listener.postActionFailed(ErrorUtils.parseError(response));
+                    listener.postActionFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -301,7 +308,7 @@ class AcnApiImpl implements AcnApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceActionUpdated();
                 } else {
-                    listener.onDeviceActionUpdateFailed(ErrorUtils.parseError(response));
+                    listener.onDeviceActionUpdateFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -321,7 +328,7 @@ class AcnApiImpl implements AcnApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -342,7 +349,7 @@ class AcnApiImpl implements AcnApiService {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceRegistered(response.body());
                 } else {
-                    listener.onDeviceRegistrationFailed(ErrorUtils.parseError(response));
+                    listener.onDeviceRegistrationFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -409,7 +416,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onGatewaysReceived(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
-                    listener.onGatewaysFailed(ErrorUtils.parseError(response));
+                    listener.onGatewaysFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -449,7 +456,7 @@ class AcnApiImpl implements AcnApiService {
 
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
-                    listener.onGatewayRegisterFailed(ErrorUtils.parseError(response));
+                    listener.onGatewayRegisterFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -471,7 +478,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onGatewayFound(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
-                    listener.onGatewayFindError(ErrorUtils.parseError(response));
+                    listener.onGatewayFindError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -493,7 +500,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onGatewayUpdated(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
-                    listener.onGatewayUpdateFailed(ErrorUtils.parseError(response));
+                    listener.onGatewayUpdateFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -517,7 +524,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onCheckinGatewaySuccess();
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
-                    ApiError error = ErrorUtils.parseError(response);
+                    ApiError error = ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit());
                     listener.onCheckinGatewayError(error);
                 }
             }
@@ -540,7 +547,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onGatewayCommandSent(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
-                    listener.onGatewayCommandFailed(ErrorUtils.parseError(response));
+                    listener.onGatewayCommandFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -569,7 +576,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onGatewayConfigReceived(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
-                    listener.onGatewayConfigFailed(ErrorUtils.parseError(response));
+                    listener.onGatewayConfigFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -592,7 +599,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -614,7 +621,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -638,7 +645,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -660,7 +667,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onDeviceActionDeleted();
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                    listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(response));
+                    listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -684,7 +691,7 @@ class AcnApiImpl implements AcnApiService {
                             listener.onRequestSuccess(response.body().getData());
                         } else {
                             FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                            listener.onRequestError(ErrorUtils.parseError(response));
+                            listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                         }
                     }
 
@@ -706,7 +713,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onDeviceFindSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findDeviceByHid error");
-                    listener.onDeviceFindFailed(ErrorUtils.parseError(response));
+                    listener.onDeviceFindFailed(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -728,7 +735,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDevice error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -752,7 +759,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -777,7 +784,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -799,7 +806,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -821,7 +828,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -846,7 +853,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onListNodeTypesSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getListNodeTypes error");
-                    listener.onListNodeTypesFiled(ErrorUtils.parseError(response));
+                    listener.onListNodeTypesFiled(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -868,7 +875,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNodeType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -890,7 +897,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNodeType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -914,7 +921,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -936,7 +943,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -959,7 +966,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -983,7 +990,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -1006,7 +1013,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -1029,7 +1036,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 
@@ -1051,7 +1058,7 @@ class AcnApiImpl implements AcnApiService {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(ErrorUtils.parseError(response, mRetrofitHolder.getRetrofit()));
                 }
             }
 

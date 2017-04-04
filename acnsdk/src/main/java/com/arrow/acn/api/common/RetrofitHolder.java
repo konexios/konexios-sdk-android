@@ -37,15 +37,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by osminin on 3/15/2016.
  */
-public abstract class RetrofitHolder {
+public class RetrofitHolder {
     private static final String TAG = RetrofitHolder.class.getSimpleName();
     @NonNull
-    private static ApiRequestSigner requestSigner = new ApiRequestSigner();
-    private static Retrofit retrofit;
-    private static String sApiKey;
-    private static String sApiSecret;
+    private final ApiRequestSigner mRequestSigner = new ApiRequestSigner();
+    private Retrofit mRetrofit;
+    private String mApiKey;
+    private String mApiSecret;
     @NonNull
-    private static OkHttpClient okHttpClient = new OkHttpClient.Builder()
+    private OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .addInterceptor(new Interceptor() {
                 @Override
                 public okhttp3.Response intercept(@NonNull Chain chain) throws IOException {
@@ -55,13 +55,13 @@ public abstract class RetrofitHolder {
                     String nowAsISO = df.format(new Date()).replace(" ", "T");
 
                     String body = bodyToString(chain.request().body());
-                    if (TextUtils.isEmpty(requestSigner.getSecretKey()) &&
-                            !TextUtils.isEmpty(sApiSecret)) {
-                        requestSigner.setSecretKey(sApiSecret);
+                    if (TextUtils.isEmpty(mRequestSigner.getSecretKey()) &&
+                            !TextUtils.isEmpty(mApiSecret)) {
+                        mRequestSigner.setSecretKey(mApiSecret);
                     }
-                    String apiKey = TextUtils.isEmpty(requestSigner.getApiKey()) ?
-                            sApiKey : requestSigner.getApiKey();
-                    String signature = requestSigner.method(chain.request().method())
+                    String apiKey = TextUtils.isEmpty(mRequestSigner.getApiKey()) ?
+                            mApiKey : mRequestSigner.getApiKey();
+                    String signature = mRequestSigner.method(chain.request().method())
                             .canonicalUri(chain.request().url().uri().getPath())
                             .setApiKey(apiKey).timestamp(nowAsISO).payload(body).signV1();
                     Request request = chain.request().newBuilder()
@@ -80,50 +80,50 @@ public abstract class RetrofitHolder {
             .sslSocketFactory(new NoSSLv3SocketFactory())
             .build();
 
-    public static void setDefaultApiKey(String apiKey) {
-        RetrofitHolder.sApiKey = apiKey;
+    public void setDefaultApiKey(String apiKey) {
+        mApiKey = apiKey;
     }
 
-    public static void setDefaultApiSecret(String apiSecret) {
-        RetrofitHolder.sApiSecret = apiSecret;
+    public void setDefaultApiSecret(String apiSecret) {
+        mApiSecret = apiSecret;
     }
 
-    public static void setSecretKey(String secretKey) {
-        requestSigner.setSecretKey(secretKey);
+    public void setSecretKey(String secretKey) {
+        mRequestSigner.setSecretKey(secretKey);
     }
 
-    public static void setApiKey(String apiKey) {
-        requestSigner.setApiKey(apiKey);
+    public void setApiKey(String apiKey) {
+        mRequestSigner.setApiKey(apiKey);
     }
 
-    public static String getApiKey() {
-        return requestSigner.getApiKey();
+    public String getApiKey() {
+        return mRequestSigner.getApiKey();
     }
 
-    public static String getDefaultApiKey() {
-        return sApiKey;
+    public String getDefaultApiKey() {
+        return mApiKey;
     }
 
-    public static String getDefaultApiSecret() {
-        return sApiSecret;
+    public String getDefaultApiSecret() {
+        return mApiSecret;
     }
 
-    public static IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint) {
-        if (retrofit == null || !retrofit.baseUrl().toString().equals(endpoint)) {
-            retrofit = new Retrofit.Builder()
+    public IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint) {
+        if (mRetrofit == null || !mRetrofit.baseUrl().toString().equals(endpoint)) {
+            mRetrofit = new Retrofit.Builder()
                     .baseUrl(endpoint)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build();
         }
-        return retrofit.create(IotConnectAPIService.class);
+        return mRetrofit.create(IotConnectAPIService.class);
     }
 
-    public static Retrofit getRetrofit() {
-        return retrofit;
+    public Retrofit getRetrofit() {
+        return mRetrofit;
     }
 
-    private static String bodyToString(final RequestBody request) {
+    private String bodyToString(final RequestBody request) {
         try {
             final RequestBody copy = request;
             final Buffer buffer = new Buffer();
