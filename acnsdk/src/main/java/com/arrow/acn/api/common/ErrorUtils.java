@@ -23,17 +23,17 @@ import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
+import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_MESSAGE;
+import static com.arrow.acn.api.models.ApiError.NETWORK_ERROR_CODE;
+import static com.arrow.acn.api.models.ApiError.NETWORK_ERROR_MESSAGE;
+
 /**
  * Created by osminin on 11/7/2016.
  */
 
 public final class ErrorUtils {
-    public static final String NETWORK_ERROR_MESSAGE = "Network error";
-    public static final int NETWORK_ERROR_CODE = 1;
-    public static final String COMMON_ERROR_MESSAGE = "Common error";
-    public static final int COMMON_ERROR_CODE = 11;
-
-    public static ApiError parseError(@NonNull Response<?> response, Retrofit retrofit) {
+    static ApiError parseError(@NonNull Response<?> response, Retrofit retrofit) {
         Converter<ResponseBody, ApiError> converter = retrofit.responseBodyConverter(ApiError.class, new Annotation[0]);
         ApiError error;
         try {

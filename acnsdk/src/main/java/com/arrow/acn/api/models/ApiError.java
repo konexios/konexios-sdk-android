@@ -14,6 +14,10 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class ApiError {
+    public static final String NETWORK_ERROR_MESSAGE = "Network error";
+    public static final int NETWORK_ERROR_CODE = 1;
+    public static final String COMMON_ERROR_MESSAGE = "Common error";
+    public static final int COMMON_ERROR_CODE = 11;
 
     @SerializedName("status")
     @Expose
