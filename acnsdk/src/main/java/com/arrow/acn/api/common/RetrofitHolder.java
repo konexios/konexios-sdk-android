@@ -16,7 +16,6 @@ import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 /**
  * Created by osminin on 4/4/2017.
@@ -24,10 +23,18 @@ import retrofit2.Retrofit;
 
 public interface RetrofitHolder {
     void setDefaultApiKey(String apiKey);
+
     void setDefaultApiSecret(String apiSecret);
+
     void setSecretKey(String secretKey);
-    void setApiKey(String apiKey);
+
+    String getSecretKey();
+
     String getApiKey();
+
+    void setApiKey(String apiKey);
+
     IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint);
+
     ApiError convertToApiError(@NonNull Response<?> response);
 }

@@ -22,7 +22,8 @@ public final class AcnApiServiceFactory {
     private static AcnApiService service;
 
     public static AcnApiService createAcnApiService() {
-        service = new AcnApiImpl(new RetrofitHolderImpl());
+        service = new AcnApiImpl(new RetrofitHolderImpl(),
+                new SenderServiceFactoryImpl());
         return service;
     }
 

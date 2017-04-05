@@ -98,6 +98,11 @@ public class RetrofitHolderImpl implements RetrofitHolder {
     }
 
     @Override
+    public String getSecretKey() {
+        return mRequestSigner.getSecretKey();
+    }
+
+    @Override
     public void setApiKey(String apiKey) {
         mRequestSigner.setApiKey(apiKey);
     }

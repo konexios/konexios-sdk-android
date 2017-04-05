@@ -92,6 +92,9 @@ public class CommonResponse implements Parcelable {
         this.pri = pri;
     }
 
+    public CommonResponse() {
+    }
+
     protected CommonResponse(@NonNull Parcel in) {
         hid = in.readString();
         links = (Links) in.readValue(Links.class.getClassLoader());

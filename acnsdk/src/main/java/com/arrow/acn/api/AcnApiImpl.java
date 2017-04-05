@@ -79,6 +79,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
+import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.ARROW_CONNECT;
+import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.AWS;
+import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.AZURE;
+import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.IBM;
 
 /**
  * Created by osminin on 6/17/2016.
@@ -100,10 +104,13 @@ class AcnApiImpl implements AcnApiService {
     private String mMqttPrefix;
     private ConfigResponse mConfigResponse;
 
-    private RetrofitHolder mRetrofitHolder;
+    private final RetrofitHolder mRetrofitHolder;
+    private final SenderServiceFactory mSenderServiceFactory;
 
-    AcnApiImpl(RetrofitHolder retrofitHolder) {
+    AcnApiImpl(RetrofitHolder retrofitHolder,
+               SenderServiceFactory senderServiceFactory) {
         mRetrofitHolder = retrofitHolder;
+        mSenderServiceFactory = senderServiceFactory;
     }
 
     @NonNull
@@ -138,26 +145,22 @@ class AcnApiImpl implements AcnApiService {
             ApiError error = new ApiError(COMMON_ERROR_CODE, "registerGateway or checkinGateway" +
                     "method must be called first!");
             listener.onConnectionError(error);
+            return;
         }
         if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
             FirebaseCrash.logcat(Log.DEBUG, TAG, "connect(), old service is disconnected");
         }
-        String cloud = mConfigResponse.getCloudPlatform();
+        ConfigResponse.CloudPlatform cloud = mConfigResponse.getCloudPlatform();
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
-        if (cloud.equalsIgnoreCase("ArrowConnect") ||
-                cloud.equalsIgnoreCase("IotConnect")) {
-            mSenderService = new MqttAcnApiService(mMqttHost, mMqttPrefix, mGatewayId,
-                    mRetrofitHolder, mServerCommandsListener);
-        } else if (cloud.equalsIgnoreCase("IBM")) {
-            mSenderService = new IbmAcnApiService(mGatewayId, mConfigResponse);
-        } else if (cloud.equalsIgnoreCase("AWS")) {
-            mSenderService = new AwsAcnApiService(mGatewayId, mConfigResponse);
-        } else if (cloud.equalsIgnoreCase("AZURE")) {
-            mSenderService = new AzureAcnApiService(mGatewayUid,
-                    mConfigResponse.getAzure().getAccessKey(),
-                    mConfigResponse.getAzure().getHost());
-        } else {
+        mSenderService = mSenderServiceFactory.createTelemetrySender(mRetrofitHolder,
+                mConfigResponse,
+                mGatewayUid,
+                mGatewayId,
+                mMqttHost,
+                mMqttPrefix,
+                mServerCommandsListener);
+        if (mSenderService == null) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
             ApiError error = new ApiError(COMMON_ERROR_CODE, "invalid cloud platform: " + cloud);
             listener.onConnectionError(error);
