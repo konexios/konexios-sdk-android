@@ -29,4 +29,14 @@ public class FakeData {
     public static final String AUTH_METHOD = "some_auth_method";
     public static final String AUTH_TOKEN = "some_auth_token";
 
+    //AWS
+    public static final String CA_CERT = "some_ca_cert";
+    public static final String CLIENT_CERT = "some_client_cert";
+    public static final String AWS_HOST = "some_aws_host";
+    public static final String AWS_PORT = "some_aws_port";
+    public static final String AWS_PRIVATE_KEY = "some_private_key";
+
+    //Azure
+    public static final String AZURE_HOST = "some_azure_host";
+    public static final String AZURE_ACCESS_KEY = "some_azure_access";
 }

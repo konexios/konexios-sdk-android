@@ -22,20 +22,14 @@ import com.arrow.acn.api.models.ConfigResponse;
 
 public final class FakeSenderServiceFactory implements SenderServiceFactory {
 
-    private FakeTelemetrySender mSender;
-
     @Override
     public TelemetrySenderInterface createTelemetrySender(RetrofitHolder retrofitHolder,
                                                           ConfigResponse configResponse,
                                                           String gatewayUid, String gatewayId,
                                                           String mqttHost, String mqttPrefix,
                                                           ServerCommandsListener serverCommandsListener) {
-        mSender = new FakeTelemetrySender(retrofitHolder, configResponse, gatewayUid, gatewayId,
+        TelemetrySenderInterface sender = new FakeTelemetrySender(retrofitHolder, configResponse, gatewayUid, gatewayId,
                 mqttHost, mqttPrefix, serverCommandsListener);
-        return mSender;
-    }
-
-    public FakeTelemetrySender getCachedSender() {
-        return mSender;
+        return sender;
     }
 }
