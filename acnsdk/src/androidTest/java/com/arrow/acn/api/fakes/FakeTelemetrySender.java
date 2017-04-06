@@ -20,6 +20,13 @@ import com.arrow.acn.api.models.TelemetryModel;
 
 import java.util.List;
 
+import static com.arrow.acn.api.fakes.FakeData.AWS_HOST;
+import static com.arrow.acn.api.fakes.FakeData.AWS_PORT;
+import static com.arrow.acn.api.fakes.FakeData.AWS_PRIVATE_KEY;
+import static com.arrow.acn.api.fakes.FakeData.AZURE_ACCESS_KEY;
+import static com.arrow.acn.api.fakes.FakeData.AZURE_HOST;
+import static com.arrow.acn.api.fakes.FakeData.CA_CERT;
+import static com.arrow.acn.api.fakes.FakeData.CLIENT_CERT;
 import static com.arrow.acn.api.fakes.FakeData.GATEWAY_UID;
 import static com.arrow.acn.api.fakes.FakeData.MQTT_HOST;
 import static com.arrow.acn.api.fakes.FakeData.MQTT_PREFIX;
@@ -76,6 +83,15 @@ public final class FakeTelemetrySender implements TelemetrySenderInterface {
             assertEquals(AUTH_TOKEN, configResponse.getIbm().getAuthToken());
             assertNull(configResponse.getAws());
             assertNull(configResponse.getAzure());
+        } else if(platform == ConfigResponse.CloudPlatform.AWS) {
+            assertEquals(CA_CERT, configResponse.getAws().getCaCert());
+            assertEquals(CLIENT_CERT, configResponse.getAws().getClientCert());
+            assertEquals(AWS_HOST, configResponse.getAws().getHost());
+            assertEquals(AWS_PORT, configResponse.getAws().getPort());
+            assertEquals(AWS_PRIVATE_KEY, configResponse.getAws().getPrivateKey());
+        } else if(platform == ConfigResponse.CloudPlatform.AZURE) {
+            assertEquals(AZURE_HOST, configResponse.getAzure().getHost());
+            assertEquals(AZURE_ACCESS_KEY, configResponse.getAzure().getAccessKey());
         } else {
             listener.onConnectionError(new ApiError(ApiError.COMMON_ERROR_CODE, "no such platform type"));
         }
@@ -105,37 +121,5 @@ public final class FakeTelemetrySender implements TelemetrySenderInterface {
     @Override
     public boolean isConnected() {
         return false;
-    }
-
-    public RetrofitHolder getRetrofitHolder() {
-        return retrofitHolder;
-    }
-
-    public ConfigResponse getConfigResponse() {
-        return configResponse;
-    }
-
-    public String getGatewayUid() {
-        return gatewayUid;
-    }
-
-    public String getGatewayId() {
-        return gatewayId;
-    }
-
-    public String getMqttHost() {
-        return mqttHost;
-    }
-
-    public String getMqttPrefix() {
-        return mqttPrefix;
-    }
-
-    public ServerCommandsListener getServerCommandsListener() {
-        return serverCommandsListener;
-    }
-
-    public ConfigResponse.CloudPlatform getPlatform() {
-        return platform;
     }
 }

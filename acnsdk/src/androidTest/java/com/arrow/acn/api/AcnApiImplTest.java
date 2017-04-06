@@ -13,6 +13,7 @@ package com.arrow.acn.api;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import com.arrow.acn.api.common.RetrofitHolder;
 import com.arrow.acn.api.fakes.FakeRestService;
 import com.arrow.acn.api.fakes.FakeRetrofitHolder;
 import com.arrow.acn.api.fakes.FakeSenderServiceFactory;
@@ -29,6 +30,13 @@ import org.junit.runner.RunWith;
 
 import static com.arrow.acn.api.fakes.FakeData.API_KEY;
 import static com.arrow.acn.api.fakes.FakeData.API_SECRET_KEY;
+import static com.arrow.acn.api.fakes.FakeData.AWS_HOST;
+import static com.arrow.acn.api.fakes.FakeData.AWS_PORT;
+import static com.arrow.acn.api.fakes.FakeData.AWS_PRIVATE_KEY;
+import static com.arrow.acn.api.fakes.FakeData.AZURE_ACCESS_KEY;
+import static com.arrow.acn.api.fakes.FakeData.AZURE_HOST;
+import static com.arrow.acn.api.fakes.FakeData.CA_CERT;
+import static com.arrow.acn.api.fakes.FakeData.CLIENT_CERT;
 import static com.arrow.acn.api.fakes.FakeData.GATEWAY_HID;
 import static com.arrow.acn.api.fakes.FakeData.GATEWAY_UID;
 import static com.arrow.acn.api.fakes.FakeData.MQTT_HOST;
@@ -49,8 +57,8 @@ import static org.junit.Assert.assertNull;
 public class AcnApiImplTest {
     private AcnApiService mApiService;
     private FakeRestService mRestService;
-    private FakeRetrofitHolder mRetrofitHolder;
-    private FakeSenderServiceFactory mFakeSenderServiceFactory;
+    private RetrofitHolder mRetrofitHolder;
+    private SenderServiceFactory mFakeSenderServiceFactory;
 
     @Before
     public void init() {
@@ -87,16 +95,32 @@ public class AcnApiImplTest {
         test_getConfig(expectedResponse);
     }
 
-    /*@Test
+    @Test
     public void test_connectAws() {
         String cloud = "AwS";
-        test_getConfig(cloud);
+        ConfigResponse.Aws aws = new ConfigResponse.Aws();
+        aws.setCaCert(CA_CERT);
+        aws.setClientCert(CLIENT_CERT);
+        aws.setHost(AWS_HOST);
+        aws.setPort(AWS_PORT);
+        aws.setPrivateKey(AWS_PRIVATE_KEY);
+        final ConfigResponse expectedResponse = new ConfigResponse();
+        expectedResponse.setCloudPlatform(cloud);
+        expectedResponse.setAws(aws);
+        test_getConfig(expectedResponse);
     }
+
     @Test
     public void test_connectAzure() {
         String cloud = "Azure";
-        test_getConfig(cloud);
-    }*/
+        ConfigResponse.Azure azure = new ConfigResponse.Azure();
+        azure.setHost(AZURE_HOST);
+        azure.setAccessKey(AZURE_ACCESS_KEY);
+        final ConfigResponse expectedResponse = new ConfigResponse();
+        expectedResponse.setCloudPlatform(cloud);
+        expectedResponse.setAzure(azure);
+        test_getConfig(expectedResponse);
+    }
 
 
     private void test_getConfig(final ConfigResponse expectedResponse) {
@@ -144,7 +168,7 @@ public class AcnApiImplTest {
         mApiService.connect(new ConnectionListener() {
             @Override
             public void onConnectionSuccess() {
-
+                //test passed
             }
 
             @Override

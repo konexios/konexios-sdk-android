@@ -62,10 +62,6 @@ import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
-import com.arrow.acn.api.mqtt.MqttAcnApiService;
-import com.arrow.acn.api.mqtt.aws.AwsAcnApiService;
-import com.arrow.acn.api.mqtt.azure.AzureAcnApiService;
-import com.arrow.acn.api.mqtt.ibm.IbmAcnApiService;
 import com.arrow.acn.api.rest.IotConnectAPIService;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
@@ -79,10 +75,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
-import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.ARROW_CONNECT;
-import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.AWS;
-import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.AZURE;
-import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.IBM;
 
 /**
  * Created by osminin on 6/17/2016.

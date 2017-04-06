@@ -183,6 +183,9 @@ public final class ConfigResponse implements Parcelable {
             mPrivateKey = privateKey;
         }
 
+        public Aws() {
+        }
+
         protected Aws(@NonNull Parcel in) {
             mHost = in.readString();
             mPort = in.readString();
@@ -369,6 +372,9 @@ public final class ConfigResponse implements Parcelable {
 
         public void setHost(String host) {
             this.host = host;
+        }
+
+        public Azure() {
         }
 
         protected Azure(@NonNull Parcel in) {
