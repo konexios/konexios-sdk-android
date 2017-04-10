@@ -411,24 +411,25 @@ public final class ConfigResponse implements Parcelable {
 
     public enum CloudPlatform {
         NONE (""),
-        ARROW_CONNECT ("ARROWCONNECT"),
+        ARROW_CONNECT ("ARROWCONNECT", "IotConnect"),
         IBM ("IBM"),
         AWS ("AWS"),
         AZURE ("AZURE");
 
-        CloudPlatform(String str) {
+        CloudPlatform(String ... str) {
             mString = str;
         }
-        private String mString;
+        private String[] mString;
 
-        public String getString() {
+        public String[] getString() {
             return mString;
         }
 
         public static CloudPlatform getPlatform(String str) {
             CloudPlatform res = NONE;
             for (CloudPlatform tmp : CloudPlatform.values()) {
-                if (tmp.getString().equalsIgnoreCase(str)) {
+                for (String keys : tmp.getString())
+                if (keys.equalsIgnoreCase(str)) {
                     res = tmp;
                 }
             }
@@ -437,7 +438,7 @@ public final class ConfigResponse implements Parcelable {
 
         @Override
         public String toString() {
-            return mString;
+            return mString[0];
         }
     }
 }
