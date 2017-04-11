@@ -83,7 +83,6 @@ import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 class AcnApiImpl implements AcnApiService {
     private static final String TAG = AcnApiImpl.class.getName();
 
-    protected Handler mServiceThreadHandler;
     protected String mGatewayId;
     private String mGatewayUid;
     private IotConnectAPIService mRestService;
@@ -160,11 +159,6 @@ class AcnApiImpl implements AcnApiService {
         }
         mSenderService.connect(listener);
         FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() done!");
-    }
-
-    @Override
-    public void initialize(Handler handler) {
-        mServiceThreadHandler = handler;
     }
 
     @Override
@@ -432,22 +426,9 @@ class AcnApiImpl implements AcnApiService {
             public void onResponse(Call<GatewayResponse> call, @NonNull final Response<GatewayResponse> response) {
                 FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    final Handler uiHandler = new Handler();
-                    final Runnable handleInUiThread = new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onGatewayRegistered(response.body());
-                        }
-                    };
-                    Runnable handleInServiceThread = new Runnable() {
-                        @Override
-                        public void run() {
-                            onGatewayResponse(response.body());
-                            mGatewayUid = gatewayModel.getUid();
-                            uiHandler.post(handleInUiThread);
-                        }
-                    };
-                    mServiceThreadHandler.post(handleInServiceThread);
+                    onGatewayResponse(response.body());
+                    mGatewayUid = gatewayModel.getUid();
+                    listener.onGatewayRegistered(response.body());
 
                 } else {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
