@@ -59,7 +59,7 @@ import java.util.List;
 public interface AcnApiService {
 
     /**
-     * sets endpoint server environment url
+     * sets endpoint server environment url and user credentials. Should be called before any other calls
      *
      * @param endpoint  - String url like "http://pegasuskronos01-dev.cloudapp.net:28880"
      * @param apiKey
@@ -68,19 +68,14 @@ public interface AcnApiService {
     void setRestEndpoint(String endpoint, String apiKey, String apiSecret);
 
     /**
-     * sets mqtt server host and userName prefix
+     * sets mqtt server host and userName prefix. It's used only for connection to simple mqtt
+     * server type (aka ArrowConnect ot IotConnect types). It's useless for Azure, Aws and Ibm types
+     * of connection because for them credentials are returned from getGatewayConfig call.
      *
      * @param host   String contains host like "tcp://pegasusqueue01-dev.cloudapp.net:46953"
      * @param prefix String contains prefix like "/themis.dev"
      */
     void setMqttEndpoint(String host, String prefix);
-
-    /**
-     * initialize service with a context and bind it with activity's lifecycle
-     *
-     * @param handler -
-     */
-    void initialize(Handler handler);
 
     /**
      * make persistent connection to the cloud, should be called only after gateway registration
