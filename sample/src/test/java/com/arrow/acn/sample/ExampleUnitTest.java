@@ -8,7 +8,7 @@
  * Contributors: Arrow Electronics, Inc.
  */
 
-package com.kronossdk.sample;
+package com.arrow.acn.sample;
 
 import org.junit.Test;
 

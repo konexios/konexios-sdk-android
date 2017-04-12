@@ -13,9 +13,6 @@ package com.arrow.acn.api.mqtt.common;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
-
-import org.spongycastle.crypto.examples.JPAKEExample;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openssl.PEMKeyPair;
 import org.spongycastle.openssl.PEMParser;
@@ -35,6 +32,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import timber.log.Timber;
+
 /**
  * Created by osminin on 6/21/2016.
  */
@@ -45,7 +44,7 @@ public final class SslUtil {
     @NonNull
     public static SSLSocketFactory getSocketFactory(@NonNull final String caCertContent, @NonNull final String certContent,
                                                     @NonNull final String keyContent) throws Exception {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getSocketFactory");
+        Timber.d("getSocketFactory");
         Security.addProvider(new BouncyCastleProvider());
 
         // load CA certificate
@@ -58,7 +57,6 @@ public final class SslUtil {
 
         // load client private key
         PEMParser parser = new PEMParser(new StringReader(keyContent));
-        JPAKEExample jpakeExample;
         PEMKeyPair pemKeyPair = (PEMKeyPair) parser.readObject();
         JcaPEMKeyConverter keyConverter = new JcaPEMKeyConverter();
         KeyPair key = keyConverter.getKeyPair(pemKeyPair);

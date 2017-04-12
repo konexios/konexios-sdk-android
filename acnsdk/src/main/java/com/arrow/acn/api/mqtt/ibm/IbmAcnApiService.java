@@ -16,16 +16,16 @@ import android.util.Log;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.common.NoSSLv3SocketFactory;
-import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+
+import timber.log.Timber;
 
 /**
  * Created by osminin on 9/2/2016.
  */
 
 public final class IbmAcnApiService extends AbstractMqttAcnApiService {
-    private static final String TAG = IbmAcnApiService.class.getName();
 
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";
     private static final String IOT_DEVICE_USERNAME = "use-token-auth";
@@ -41,7 +41,7 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
 
     @Override
     protected MqttConnectOptions getMqttOptions() {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getMqttOptions");
+        Timber.d("getMqttOptions");
         MqttConnectOptions options = super.getMqttOptions();
         options.setCleanSession(true);
         options.setUserName(IOT_DEVICE_USERNAME);
@@ -49,8 +49,7 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
         try {
             options.setSocketFactory(new NoSSLv3SocketFactory());
         } catch (Exception e) {
-            e.printStackTrace();
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
         return options;
     }
@@ -58,7 +57,7 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
     @NonNull
     @Override
     protected String getHost() {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
+        Timber.d("getHost");
         return "ssl://" + this.mConfigResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
     }
 

@@ -41,7 +41,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:621198320726:android:f0ee975464b0df91",
         "android_client_info": {
-          "package_name": "com.arrow.acn.api"
+          "package_name": "com.arrow.acn.sample"
         }
       },
       "oauth_client": [

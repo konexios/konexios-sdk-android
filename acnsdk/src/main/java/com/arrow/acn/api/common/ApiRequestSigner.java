@@ -15,7 +15,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.arrow.acn.api.Constants;
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -26,7 +25,7 @@ import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import static android.content.ContentValues.TAG;
+import timber.log.Timber;
 
 /**
  * Created by osminin on 4/8/2016.
@@ -122,8 +121,7 @@ public class ApiRequestSigner {
             String result = bytesToHex(raw);
             return result;
         } catch (Exception e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "encode");
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
         return "";
     }
@@ -166,8 +164,7 @@ public class ApiRequestSigner {
             byte[] hash = digest.digest(value.getBytes("UTF-8"));
             result = bytesToHex(hash);
         } catch (Exception e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "hash");
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
         return result;
     }
