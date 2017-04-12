@@ -14,10 +14,10 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
+import com.arrow.acn.api.mqtt.azure.auth.IotHubSasToken;
 import com.google.firebase.crash.FirebaseCrash;
-import com.microsoft.azure.sdk.iot.device.DeviceClientConfig;
-import com.microsoft.azure.sdk.iot.device.auth.IotHubSasToken;
-import com.microsoft.azure.sdk.iot.device.transport.TransportUtils;
+import com.arrow.acn.api.mqtt.azure.transport.TransportUtils;
+
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -72,8 +72,8 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
                     config.getTokenValidSecs() + 1l);
             options.setCleanSession(false);
             String clientIdentifier = "DeviceClientType="
-                    + URLEncoder.encode(TransportUtils.javaDeviceClientIdentifier
-                    + TransportUtils.clientVersion, "UTF-8");
+                    + URLEncoder.encode(TransportUtils.getJavaServiceClientIdentifier()
+                    + TransportUtils.getServiceVersion(), "UTF-8");
             String iotHubUserName = config.getIotHubHostname() + "/" + config.getDeviceId() + "/" + clientIdentifier;
             options.setUserName(iotHubUserName);
             options.setPassword(sasToken.toString().toCharArray());
