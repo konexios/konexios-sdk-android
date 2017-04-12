@@ -32,16 +32,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    packagingOptions {
-        exclude "META-INF/MSFTSIG.SF"
-        exclude "META-INF/MSFTSIG.RSA"
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'thirdpartynotice.txt'
-        exclude 'META-INF/NOTICE.txt'
-    }
 }
 
 dependencies {
@@ -66,9 +56,6 @@ dependencies {
     compile 'com.madgag.spongycastle:core:1.54.0.0'
     compile 'com.madgag.spongycastle:prov:1.54.0.0'
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
-
-    //Azure
-    compile('com.microsoft.azure.sdk.iot:iot-device-client:1.1.22')
 
     compile 'com.android.support:multidex:1.0.1'
 

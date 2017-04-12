@@ -10,8 +10,6 @@
 
 package com.arrow.acn.api;
 
-import android.os.Handler;
-
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
