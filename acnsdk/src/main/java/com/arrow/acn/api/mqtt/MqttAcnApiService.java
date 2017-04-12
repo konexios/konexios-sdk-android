@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.arrow.acn.api.common.RetrofitHolder;
-import com.arrow.acn.api.common.RetrofitHolderImpl;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

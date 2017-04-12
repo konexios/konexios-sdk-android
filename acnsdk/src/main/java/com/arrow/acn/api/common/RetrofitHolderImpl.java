@@ -13,13 +13,11 @@ package com.arrow.acn.api.common;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.arrow.acn.api.Constants;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.mqtt.common.NoSSLv3SocketFactory;
 import com.arrow.acn.api.rest.IotConnectAPIService;
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -35,12 +33,12 @@ import okio.Buffer;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import timber.log.Timber;
 
 /**
  * Created by osminin on 3/15/2016.
  */
 public class RetrofitHolderImpl implements RetrofitHolder {
-    private static final String TAG = RetrofitHolderImpl.class.getSimpleName();
     @NonNull
     private final ApiRequestSigner mRequestSigner = new ApiRequestSigner();
     private Retrofit mRetrofit;
@@ -93,23 +91,23 @@ public class RetrofitHolderImpl implements RetrofitHolder {
     }
 
     @Override
-    public void setSecretKey(String secretKey) {
-        mRequestSigner.setSecretKey(secretKey);
-    }
-
-    @Override
     public String getSecretKey() {
         return mRequestSigner.getSecretKey();
     }
 
     @Override
-    public void setApiKey(String apiKey) {
-        mRequestSigner.setApiKey(apiKey);
+    public void setSecretKey(String secretKey) {
+        mRequestSigner.setSecretKey(secretKey);
     }
 
     @Override
     public String getApiKey() {
         return mRequestSigner.getApiKey();
+    }
+
+    @Override
+    public void setApiKey(String apiKey) {
+        mRequestSigner.setApiKey(apiKey);
     }
 
     @Override
@@ -139,8 +137,7 @@ public class RetrofitHolderImpl implements RetrofitHolder {
                 return "";
             return buffer.readUtf8();
         } catch (@NonNull final IOException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "bodyToString");
-            FirebaseCrash.report(e);
+            Timber.e(e);
             return "did not work";
         }
     }

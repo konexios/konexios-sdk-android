@@ -10,21 +10,19 @@
 
 package com.arrow.acn.api.mqtt.aws;
 
-import android.util.Log;
-
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.common.SslUtil;
-import com.google.firebase.crash.FirebaseCrash;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+
+import timber.log.Timber;
 
 /**
  * Created by osminin on 6/20/2016.
  */
 
 public final class AwsAcnApiService extends AbstractMqttAcnApiService {
-    private static final String TAG = AwsAcnApiService.class.getName();
 
     public AwsAcnApiService(String gatewayId, ConfigResponse configResponse) {
         super(gatewayId, configResponse);
@@ -32,7 +30,7 @@ public final class AwsAcnApiService extends AbstractMqttAcnApiService {
 
     @Override
     protected MqttConnectOptions getMqttOptions() {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getMqttOptions");
+        Timber.d("getMqttOptions");
         MqttConnectOptions options = super.getMqttOptions();
         String rootCert = this.mConfigResponse.getAws().getCaCert();
         String clientCert = this.mConfigResponse.getAws().getClientCert();
@@ -41,20 +39,20 @@ public final class AwsAcnApiService extends AbstractMqttAcnApiService {
             options.setSocketFactory(SslUtil.getSocketFactory(rootCert, clientCert, privateKey));
         } catch (Exception e) {
             e.printStackTrace();
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
         return options;
     }
 
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getPublisherTopic");
+        Timber.d("getPublisherTopic");
         return String.format("telemetries/devices/%s", mGatewayId);
     }
 
     @Override
     protected String getHost() {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getHost");
+        Timber.d("getHost");
         return "ssl://".concat(this.mConfigResponse.getAws().getHost());
     }
 

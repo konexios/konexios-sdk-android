@@ -11,11 +11,9 @@
 package com.arrow.acn.api.mqtt.azure;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.azure.auth.IotHubSasToken;
-import com.google.firebase.crash.FirebaseCrash;
 import com.arrow.acn.api.mqtt.azure.transport.TransportUtils;
 
 
@@ -24,6 +22,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+
+import timber.log.Timber;
 
 /**
  * Created by osminin on 2/2/2017.
@@ -97,7 +97,6 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     }
 
     private void reportError(@NonNull Exception e) {
-        FirebaseCrash.logcat(Log.ERROR, TAG, e.getClass().getName() + " " + e.getMessage());
-        FirebaseCrash.report(e);
+        Timber.e(e);
     }
 }
