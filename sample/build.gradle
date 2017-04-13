@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId "com.arrow.acn.sample"
         minSdkVersion 19
-        targetSdkVersion 19
+        targetSdkVersion 24
         multiDexEnabled true
         versionCode 1
         versionName "1.0"

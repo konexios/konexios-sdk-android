@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.mqtt.azure;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
@@ -29,6 +30,7 @@ import timber.log.Timber;
  * Created by osminin on 2/2/2017.
  */
 
+@Keep
 public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     private static final String TAG = AzureAcnApiService.class.getName();
 

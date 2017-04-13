@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.mqtt;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -41,6 +42,7 @@ import timber.log.Timber;
  * Created by osminin on 6/17/2016.
  */
 
+@Keep
 public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderService {
     protected static final String MESSAGE_TOPIC_PREFIX = "krs.tel.gts.";
     private static final String SUBSCRIBE_TOPIC_PREFIX = "krs.cmd.stg.";

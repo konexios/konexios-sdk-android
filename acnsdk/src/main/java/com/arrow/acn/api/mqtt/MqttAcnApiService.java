@@ -11,6 +11,7 @@
 package com.arrow.acn.api.mqtt;
 
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -23,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
  * Created by osminin on 6/22/2016.
  */
 
+@Keep
 public final class MqttAcnApiService extends AbstractMqttAcnApiService {
 
     private final String mHost;

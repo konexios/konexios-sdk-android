@@ -10,6 +10,8 @@
 
 package com.arrow.acn.api;
 
+import android.support.annotation.Keep;
+
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
@@ -54,6 +56,7 @@ import java.util.List;
  * Created by osminin on 6/17/2016.
  */
 
+@Keep
 public interface AcnApiService {
 
     /**
