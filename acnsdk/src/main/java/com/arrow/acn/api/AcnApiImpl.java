@@ -11,6 +11,7 @@
 package com.arrow.acn.api;
 
 import android.os.Handler;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -80,6 +81,7 @@ import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
  * Created by osminin on 6/17/2016.
  */
 
+@Keep
 class AcnApiImpl implements AcnApiService {
     private static final String TAG = AcnApiImpl.class.getName();
 

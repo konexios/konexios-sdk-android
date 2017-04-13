@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.common;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.models.ApiError;
@@ -21,6 +22,7 @@ import retrofit2.Response;
  * Created by osminin on 4/4/2017.
  */
 
+@Keep
 public interface RetrofitHolder {
     void setDefaultApiKey(String apiKey);
 

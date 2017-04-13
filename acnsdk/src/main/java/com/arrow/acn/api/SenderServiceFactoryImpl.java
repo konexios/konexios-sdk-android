@@ -10,6 +10,8 @@
 
 package com.arrow.acn.api;
 
+import android.support.annotation.Keep;
+
 import com.arrow.acn.api.common.RetrofitHolder;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
@@ -27,6 +29,7 @@ import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.IBM;
  * Created by osminin on 4/5/2017.
  */
 
+@Keep
 final class SenderServiceFactoryImpl implements SenderServiceFactory {
     @Override
     public TelemetrySenderInterface createTelemetrySender(RetrofitHolder retrofitHolder,

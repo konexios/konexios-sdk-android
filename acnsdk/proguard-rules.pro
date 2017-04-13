@@ -64,3 +64,6 @@
 -dontwarn javax.naming.**
 
 -keep class com.arrow.acn.api.mqtt.common.NoSSLv3SocketFactory { *; }
+
+# Keep the BuildConfig
+-keep class com.arrow.acn.api.BuildConfig { *; }

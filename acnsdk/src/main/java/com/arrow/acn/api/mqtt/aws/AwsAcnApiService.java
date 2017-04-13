@@ -10,6 +10,8 @@
 
 package com.arrow.acn.api.mqtt.aws;
 
+import android.support.annotation.Keep;
+
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.common.SslUtil;
@@ -22,6 +24,7 @@ import timber.log.Timber;
  * Created by osminin on 6/20/2016.
  */
 
+@Keep
 public final class AwsAcnApiService extends AbstractMqttAcnApiService {
 
     public AwsAcnApiService(String gatewayId, ConfigResponse configResponse) {

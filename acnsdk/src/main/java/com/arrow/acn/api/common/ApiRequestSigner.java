@@ -12,7 +12,6 @@ package com.arrow.acn.api.common;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.arrow.acn.api.Constants;
 
@@ -47,6 +46,16 @@ public class ApiRequestSigner {
         this.payload = "";
     }
 
+    private static String bytesToHex(@NonNull byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars).toLowerCase();
+    }
+
     @NonNull
     public ApiRequestSigner payload(@Nullable String payload) {
         if (payload != null)
@@ -66,14 +75,14 @@ public class ApiRequestSigner {
         return this;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
     @NonNull
     public ApiRequestSigner setApiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
-    }
-
-    public String getApiKey() {
-        return apiKey;
     }
 
     public String getSecretKey() {
@@ -124,16 +133,6 @@ public class ApiRequestSigner {
             Timber.e(e);
         }
         return "";
-    }
-
-    private static String bytesToHex(@NonNull byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars).toLowerCase();
     }
 
     private String buildCanonicalRequest() {

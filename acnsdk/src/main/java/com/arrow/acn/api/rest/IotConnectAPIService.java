@@ -11,6 +11,7 @@
 package com.arrow.acn.api.rest;
 
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.models.AccountRequest;
@@ -54,6 +55,8 @@ import retrofit2.http.Query;
 /**
  * Created by osminin on 3/15/2016.
  */
+
+@Keep
 public interface IotConnectAPIService {
 
     //Account api

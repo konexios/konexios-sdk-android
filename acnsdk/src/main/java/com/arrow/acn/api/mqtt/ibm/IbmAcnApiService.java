@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.mqtt.ibm;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -25,6 +26,7 @@ import timber.log.Timber;
  * Created by osminin on 9/2/2016.
  */
 
+@Keep
 public final class IbmAcnApiService extends AbstractMqttAcnApiService {
 
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";
