@@ -1,5 +1,14 @@
+/*
+ * Copyright (c) 2017 Arrow Electronics, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License 2.0
+ * which accompanies this distribution, and is available at
+ * http://apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors: Arrow Electronics, Inc.
+ */
+
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 24
@@ -12,8 +21,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -24,39 +37,23 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
+
+    compile 'com.android.support:support-annotations:25.3.1'
 
     //Retrofit
-    compile 'com.squareup.retrofit2:retrofit:2.+'
-    compile 'com.squareup.retrofit2:converter-gson:2.+'
+    compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
 
-    // Firebase
-    compile 'com.google.firebase:firebase-core:9.2.0'
-    compile 'com.google.firebase:firebase-crash:9.2.0'
+    //Timber
+    compile 'com.jakewharton.timber:timber:4.5.1'
 
     //Paho
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1'
 
     //Castle
     compile 'com.madgag.spongycastle:core:1.54.0.0'
     compile 'com.madgag.spongycastle:prov:1.54.0.0'
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
 
-    //Azure
-    compile ('com.microsoft.azure.sdk.iot:iot-device-client:1.0.17')
-
     testCompile 'junit:junit:4.12'
 }
-
-/*
- * Copyright (c) 2017 Arrow Electronics, Inc.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License 2.0
- * which accompanies this distribution, and is available at
- * http://apache.org/licenses/LICENSE-2.0
- *
- * Contributors: Arrow Electronics, Inc.
- */
-
-// Goole play services
-apply plugin: 'com.google.gms.google-services'

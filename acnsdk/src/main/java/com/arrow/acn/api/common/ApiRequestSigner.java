@@ -12,10 +12,8 @@ package com.arrow.acn.api.common;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.arrow.acn.api.Constants;
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -26,12 +24,12 @@ import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import static android.content.ContentValues.TAG;
+import timber.log.Timber;
 
 /**
  * Created by osminin on 4/8/2016.
  */
-class ApiRequestSigner {
+public class ApiRequestSigner {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     private String secretKey;
@@ -43,58 +41,68 @@ class ApiRequestSigner {
     private String payload;
     private List<String> parameters;
 
-    ApiRequestSigner() {
+    public ApiRequestSigner() {
         this.parameters = new ArrayList<>();
         this.payload = "";
     }
 
+    private static String bytesToHex(@NonNull byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars).toLowerCase();
+    }
+
     @NonNull
-    ApiRequestSigner payload(@Nullable String payload) {
+    public ApiRequestSigner payload(@Nullable String payload) {
         if (payload != null)
             this.payload = payload;
         return this;
     }
 
     @NonNull
-    ApiRequestSigner method(@NonNull String method) {
+    public ApiRequestSigner method(@NonNull String method) {
         this.method = method.toUpperCase();
         return this;
     }
 
     @NonNull
-    ApiRequestSigner canonicalUri(String uri) {
+    public ApiRequestSigner canonicalUri(String uri) {
         this.uri = uri;
         return this;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
     @NonNull
-    ApiRequestSigner apiKey(String apiKey) {
+    public ApiRequestSigner setApiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
     }
 
-    String getApiKey() {
-        return apiKey;
-    }
-
-    String getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
     @NonNull
-    ApiRequestSigner setSecretKey(String secretKey) {
+    public ApiRequestSigner setSecretKey(String secretKey) {
         this.secretKey = secretKey;
         return this;
     }
 
     @NonNull
-    ApiRequestSigner timestamp(String timestamp) {
+    public ApiRequestSigner timestamp(String timestamp) {
         this.timestamp = timestamp;
         return this;
     }
 
     @NonNull
-    String signV1() {
+    public String signV1() {
         StringBuffer canonicalRequest = new StringBuffer(buildCanonicalRequest());
         canonicalRequest.append(hash(payload));
 
@@ -112,7 +120,7 @@ class ApiRequestSigner {
     }
 
     @NonNull
-    String encode(@NonNull String key, @NonNull String data) {
+    public String encode(@NonNull String key, @NonNull String data) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -122,20 +130,9 @@ class ApiRequestSigner {
             String result = bytesToHex(raw);
             return result;
         } catch (Exception e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "encode");
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
         return "";
-    }
-
-    private static String bytesToHex(@NonNull byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars).toLowerCase();
     }
 
     private String buildCanonicalRequest() {
@@ -166,8 +163,7 @@ class ApiRequestSigner {
             byte[] hash = digest.digest(value.getBytes("UTF-8"));
             result = bytesToHex(hash);
         } catch (Exception e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "hash");
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
         return result;
     }

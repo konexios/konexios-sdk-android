@@ -11,6 +11,8 @@
 package com.arrow.acn.api;
 
 
+import com.arrow.acn.api.common.RetrofitHolderImpl;
+
 /**
  * Created by osminin on 9/21/2016.
  */
@@ -20,7 +22,8 @@ public final class AcnApiServiceFactory {
     private static AcnApiService service;
 
     public static AcnApiService createAcnApiService() {
-        service = new AcnApiImpl();
+        service = new AcnApiImpl(new RetrofitHolderImpl(),
+                new SenderServiceFactoryImpl());
         return service;
     }
 

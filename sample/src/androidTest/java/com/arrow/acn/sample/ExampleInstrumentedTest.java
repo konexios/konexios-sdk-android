@@ -8,7 +8,7 @@
  * Contributors: Arrow Electronics, Inc.
  */
 
-package com.kronossdk.sample;
+package com.arrow.acn.sample;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -31,6 +31,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.kronossdk.sample", appContext.getPackageName());
+        assertEquals("com.arrow.acn.sample", appContext.getPackageName());
     }
 }

@@ -113,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
 
         //Once instance of AcnApiService is created it could be got by getAcnApiService() call
         mTelemetrySendService = AcnApiServiceFactory.getAcnApiService();
-        mTelemetrySendService.initialize(new Handler());
 
         registerGateway();
 

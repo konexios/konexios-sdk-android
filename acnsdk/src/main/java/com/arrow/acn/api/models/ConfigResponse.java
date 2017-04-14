@@ -31,6 +31,9 @@ public final class ConfigResponse implements Parcelable {
     @SerializedName("azure")
     private Azure mAzure;
 
+    public ConfigResponse() {
+    }
+
     public Ibm getIbm() {
         return mIbm;
     }
@@ -39,8 +42,8 @@ public final class ConfigResponse implements Parcelable {
         mIbm = ibm;
     }
 
-    public String getCloudPlatform() {
-        return mCloudPlatform;
+    public CloudPlatform getCloudPlatform() {
+        return CloudPlatform.getPlatform(mCloudPlatform);
     }
 
     public void setCloudPlatform(String cloudPlatform) {
@@ -91,6 +94,9 @@ public final class ConfigResponse implements Parcelable {
 
         public void setSecretKey(String secretKey) {
             mSecretKey = secretKey;
+        }
+
+        public Key() {
         }
 
         protected Key(@NonNull Parcel in) {
@@ -175,6 +181,9 @@ public final class ConfigResponse implements Parcelable {
 
         public void setPrivateKey(String privateKey) {
             mPrivateKey = privateKey;
+        }
+
+        public Aws() {
         }
 
         protected Aws(@NonNull Parcel in) {
@@ -267,6 +276,9 @@ public final class ConfigResponse implements Parcelable {
             mAuthToken = authToken;
         }
 
+        public Ibm() {
+        }
+
         protected Ibm(@NonNull Parcel in) {
             mOrganicationId = in.readString();
             mGatewayType = in.readString();
@@ -305,7 +317,7 @@ public final class ConfigResponse implements Parcelable {
         };
     }
 
-    protected ConfigResponse(@NonNull Parcel in) {
+    public ConfigResponse(@NonNull Parcel in) {
         mCloudPlatform = in.readString();
         mKey = (Key) in.readValue(Key.class.getClassLoader());
         mAws = (Aws) in.readValue(Aws.class.getClassLoader());
@@ -362,6 +374,9 @@ public final class ConfigResponse implements Parcelable {
             this.host = host;
         }
 
+        public Azure() {
+        }
+
         protected Azure(@NonNull Parcel in) {
             accessKey = in.readString();
             host = in.readString();
@@ -392,5 +407,38 @@ public final class ConfigResponse implements Parcelable {
                 return new Azure[size];
             }
         };
+    }
+
+    public enum CloudPlatform {
+        NONE (""),
+        ARROW_CONNECT ("ARROWCONNECT", "IotConnect"),
+        IBM ("IBM"),
+        AWS ("AWS"),
+        AZURE ("AZURE");
+
+        CloudPlatform(String ... str) {
+            mString = str;
+        }
+        private String[] mString;
+
+        public String[] getString() {
+            return mString;
+        }
+
+        public static CloudPlatform getPlatform(String str) {
+            CloudPlatform res = NONE;
+            for (CloudPlatform tmp : CloudPlatform.values()) {
+                for (String keys : tmp.getString())
+                if (keys.equalsIgnoreCase(str)) {
+                    res = tmp;
+                }
+            }
+            return res;
+        }
+
+        @Override
+        public String toString() {
+            return mString[0];
+        }
     }
 }

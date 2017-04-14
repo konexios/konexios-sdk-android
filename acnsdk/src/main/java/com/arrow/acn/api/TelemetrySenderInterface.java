@@ -10,6 +10,8 @@
 
 package com.arrow.acn.api;
 
+import android.support.annotation.Keep;
+
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.models.TelemetryModel;
 
@@ -19,6 +21,7 @@ import java.util.List;
  * Created by osminin on 10/26/2016.
  */
 
+@Keep
 public interface TelemetrySenderInterface {
     void connect(ConnectionListener listener);
 

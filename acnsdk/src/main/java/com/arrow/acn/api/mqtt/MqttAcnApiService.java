@@ -11,6 +11,7 @@
 package com.arrow.acn.api.mqtt;
 
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -23,20 +24,24 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
  * Created by osminin on 6/22/2016.
  */
 
+@Keep
 public final class MqttAcnApiService extends AbstractMqttAcnApiService {
 
-    private String mHost;
-    private String mMqttPrefix;
+    private final String mHost;
+    private final String mMqttPrefix;
+    private final RetrofitHolder mRetrofitHolder;
 
-    public MqttAcnApiService(String host, String mqttPrefix, String gatewayId, ServerCommandsListener listener) {
+    public MqttAcnApiService(String host, String mqttPrefix, String gatewayId,
+                             RetrofitHolder retrofitHolder, ServerCommandsListener listener) {
         super(gatewayId, listener);
         mHost = host;
         mMqttPrefix = mqttPrefix;
+        mRetrofitHolder = retrofitHolder;
     }
 
     protected MqttConnectOptions getMqttOptions() {
         String userName = mMqttPrefix + ":" + mGatewayId;
-        String apiKey = RetrofitHolder.getApiKey();
+        String apiKey = mRetrofitHolder.getApiKey();
         apiKey = !TextUtils.isEmpty(apiKey) ? apiKey : mConfigResponse.getKey().getApiKey();
         MqttConnectOptions connOpts = super.getMqttOptions();
         connOpts.setUserName(userName);
