@@ -10,14 +10,13 @@
 
 package com.arrow.acn.api.mqtt.azure;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
-import com.google.firebase.crash.FirebaseCrash;
-import com.microsoft.azure.sdk.iot.device.DeviceClientConfig;
-import com.microsoft.azure.sdk.iot.device.auth.IotHubSasToken;
-import com.microsoft.azure.sdk.iot.device.transport.TransportUtils;
+import com.arrow.acn.api.mqtt.azure.auth.IotHubSasToken;
+import com.arrow.acn.api.mqtt.azure.transport.TransportUtils;
+
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -25,10 +24,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
+import timber.log.Timber;
+
 /**
  * Created by osminin on 2/2/2017.
  */
 
+@Keep
 public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     private static final String TAG = AzureAcnApiService.class.getName();
 
@@ -72,8 +74,8 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
                     config.getTokenValidSecs() + 1l);
             options.setCleanSession(false);
             String clientIdentifier = "DeviceClientType="
-                    + URLEncoder.encode(TransportUtils.javaDeviceClientIdentifier
-                    + TransportUtils.clientVersion, "UTF-8");
+                    + URLEncoder.encode(TransportUtils.getJavaServiceClientIdentifier()
+                    + TransportUtils.getServiceVersion(), "UTF-8");
             String iotHubUserName = config.getIotHubHostname() + "/" + config.getDeviceId() + "/" + clientIdentifier;
             options.setUserName(iotHubUserName);
             options.setPassword(sasToken.toString().toCharArray());
@@ -97,7 +99,6 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     }
 
     private void reportError(@NonNull Exception e) {
-        FirebaseCrash.logcat(Log.ERROR, TAG, e.getClass().getName() + " " + e.getMessage());
-        FirebaseCrash.report(e);
+        Timber.e(e);
     }
 }

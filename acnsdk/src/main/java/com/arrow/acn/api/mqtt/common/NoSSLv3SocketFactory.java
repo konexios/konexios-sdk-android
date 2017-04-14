@@ -14,8 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,9 +32,12 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import timber.log.Timber;
+
+import static android.content.ContentValues.TAG;
+
 
 public class NoSSLv3SocketFactory extends SSLSocketFactory {
-    private static final String TAG = NoSSLv3SocketFactory.class.getName();
     private final SSLSocketFactory delegate;
 
     public NoSSLv3SocketFactory() {
@@ -103,15 +104,15 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
 
         @Override
         public void setEnabledProtocols(@Nullable String[] protocols) {
-            FirebaseCrash.logcat(Log.DEBUG, TAG, "setEnabledProtocols");
+            Timber.d("setEnabledProtocols");
             if (protocols != null && protocols.length == 1 && "SSLv3".equals(protocols[0])) {
 
                 List<String> enabledProtocols = new ArrayList<String>(Arrays.asList(delegate.getEnabledProtocols()));
                 if (enabledProtocols.size() > 1) {
                     enabledProtocols.remove("SSLv3");
-                    FirebaseCrash.logcat(Log.DEBUG, TAG, "Removed SSLv3 from enabled protocols");
+                    Timber.d("Removed SSLv3 from enabled protocols");
                 } else {
-                    FirebaseCrash.logcat(Log.DEBUG, TAG, "SSL stuck with protocol available for " + String.valueOf(enabledProtocols));
+                    Timber.d("SSL stuck with protocol available for ", String.valueOf(enabledProtocols));
                 }
                 protocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
             }

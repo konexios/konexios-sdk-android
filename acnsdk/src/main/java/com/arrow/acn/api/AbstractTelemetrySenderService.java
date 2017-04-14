@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.models.TelemetryModel;
@@ -20,6 +21,7 @@ import java.util.List;
  * Created by osminin on 10/26/2016.
  */
 
+@Keep
 public abstract class AbstractTelemetrySenderService implements TelemetrySenderInterface {
 
     @NonNull

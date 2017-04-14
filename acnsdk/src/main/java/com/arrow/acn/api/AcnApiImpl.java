@@ -11,6 +11,7 @@
 package com.arrow.acn.api;
 
 import android.os.Handler;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -66,12 +67,7 @@ import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
-import com.arrow.acn.api.mqtt.MqttAcnApiService;
-import com.arrow.acn.api.mqtt.aws.AwsAcnApiService;
-import com.arrow.acn.api.mqtt.azure.AzureAcnApiService;
-import com.arrow.acn.api.mqtt.ibm.IbmAcnApiService;
 import com.arrow.acn.api.rest.IotConnectAPIService;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
@@ -81,17 +77,18 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
-import static com.arrow.acn.api.common.ErrorUtils.COMMON_ERROR_CODE;
+import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 
 /**
  * Created by osminin on 6/17/2016.
  */
 
+@Keep
 class AcnApiImpl implements AcnApiService {
     private static final String TAG = AcnApiImpl.class.getName();
 
-    protected Handler mServiceThreadHandler;
     protected String mGatewayId;
     private String mGatewayUid;
     private IotConnectAPIService mRestService;
@@ -104,6 +101,18 @@ class AcnApiImpl implements AcnApiService {
     private String mMqttPrefix;
     private ConfigResponse mConfigResponse;
 
+    private final RetrofitHolder mRetrofitHolder;
+    private final SenderServiceFactory mSenderServiceFactory;
+
+    AcnApiImpl(RetrofitHolder retrofitHolder,
+               SenderServiceFactory senderServiceFactory) {
+        mRetrofitHolder = retrofitHolder;
+        mSenderServiceFactory = senderServiceFactory;
+        if (BuildConfig.DEBUG && Timber.forest().isEmpty()) {
+            Timber.plant(new Timber.DebugTree());
+        }
+    }
+
     @NonNull
     protected Gson getGson() {
         return mGson;
@@ -111,15 +120,17 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void setRestEndpoint(@NonNull String endpoint, @NonNull String apiKey, @NonNull String apiSecret) {
-        RetrofitHolder.setDefaultApiKey(apiKey);
-        RetrofitHolder.setDefaultApiSecret(apiSecret);
-        RetrofitHolder.setSecretKey(null);
-        RetrofitHolder.setApiKey(null);
-        mRestService = RetrofitHolder.getIotConnectAPIService(endpoint);
+        Timber.d("setRestEndpoint");
+        mRetrofitHolder.setDefaultApiKey(apiKey);
+        mRetrofitHolder.setDefaultApiSecret(apiSecret);
+        mRetrofitHolder.setSecretKey(null);
+        mRetrofitHolder.setApiKey(null);
+        mRestService = mRetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
     @Override
     public void setMqttEndpoint(String host, String prefix) {
+        Timber.d("setMqttEndpoint");
         mMqttHost = host;
         mMqttPrefix = prefix;
     }
@@ -127,46 +138,38 @@ class AcnApiImpl implements AcnApiService {
     @Override
     public void connect(@NonNull ConnectionListener listener) {
         if (mConfigResponse == null) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
+            Timber.e("connect() mConfigResponse is NULL");
             ApiError error = new ApiError(COMMON_ERROR_CODE, "config() method must be called first!");
             listener.onConnectionError(error);
             return;
         } else if (mGatewayUid == null) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() mConfigResponse is NULL");
+            Timber.e("connect() mConfigResponse is NULL");
             ApiError error = new ApiError(COMMON_ERROR_CODE, "registerGateway or checkinGateway" +
                     "method must be called first!");
             listener.onConnectionError(error);
+            return;
         }
         if (mSenderService != null && mSenderService.isConnected()) {
             mSenderService.disconnect();
-            FirebaseCrash.logcat(Log.DEBUG, TAG, "connect(), old service is disconnected");
+            Timber.d("connect(), old service is disconnected");
         }
-        String cloud = mConfigResponse.getCloudPlatform();
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() cloudPlatform: " + cloud);
-        if (cloud.equalsIgnoreCase("ArrowConnect") ||
-                cloud.equalsIgnoreCase("IotConnect")) {
-            mSenderService = new MqttAcnApiService(mMqttHost, mMqttPrefix, mGatewayId, mServerCommandsListener);
-        } else if (cloud.equalsIgnoreCase("IBM")) {
-            mSenderService = new IbmAcnApiService(mGatewayId, mConfigResponse);
-        } else if (cloud.equalsIgnoreCase("AWS")) {
-            mSenderService = new AwsAcnApiService(mGatewayId, mConfigResponse);
-        } else if (cloud.equalsIgnoreCase("AZURE")) {
-            mSenderService = new AzureAcnApiService(mGatewayUid,
-                    mConfigResponse.getAzure().getAccessKey(),
-                    mConfigResponse.getAzure().getHost());
-        } else {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "connect() invalid cloud platform: " + cloud);
+        ConfigResponse.CloudPlatform cloud = mConfigResponse.getCloudPlatform();
+        Timber.d("connect() cloudPlatform: " + cloud);
+        mSenderService = mSenderServiceFactory.createTelemetrySender(mRetrofitHolder,
+                mConfigResponse,
+                mGatewayUid,
+                mGatewayId,
+                mMqttHost,
+                mMqttPrefix,
+                mServerCommandsListener);
+        if (mSenderService == null) {
+            Timber.e("connect() invalid cloud platform: " + cloud);
             ApiError error = new ApiError(COMMON_ERROR_CODE, "invalid cloud platform: " + cloud);
             listener.onConnectionError(error);
             return;
         }
         mSenderService.connect(listener);
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "connect() done!");
-    }
-
-    @Override
-    public void initialize(Handler handler) {
-        mServiceThreadHandler = handler;
+        Timber.d("connect() done!");
     }
 
     @Override
@@ -191,11 +194,11 @@ class AcnApiImpl implements AcnApiService {
     protected void onConfigResponse(@NonNull ConfigResponse response) {
         ConfigResponse.Key keys = response.getKey();
         if (keys != null) {
-            RetrofitHolder.setSecretKey(keys.getSecretKey());
-            RetrofitHolder.setApiKey(keys.getApiKey());
+            mRetrofitHolder.setSecretKey(keys.getSecretKey());
+            mRetrofitHolder.setApiKey(keys.getApiKey());
         }
         mConfigResponse = response;
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "onConfigResponse() cloudPlatform: " + mConfigResponse.getCloudPlatform());
+        Timber.d("onConfigResponse() cloudPlatform: " + mConfigResponse.getCloudPlatform());
     }
 
     @Override
@@ -205,32 +208,32 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void registerAccount(@NonNull AccountRequest accountRequest, @NonNull final RegisterAccountListener listener) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount() email: " + accountRequest.getEmail()
+        Timber.d("registerAccount() email: " + accountRequest.getEmail()
                 + ", code: " + accountRequest.getCode());
         Call<AccountResponse> call = mRestService.registerAccount(accountRequest);
         call.enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, @NonNull Response<AccountResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerAccount: " + response.code());
+                Timber.d("registerAccount: " + response.code());
                 try {
                     if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
                         listener.onAccountRegistered(response.body());
                     } else {
-                        ApiError error = ErrorUtils.parseError(response);
+                        ApiError error = mRetrofitHolder.convertToApiError(response);
                         listener.onAccountRegisterFailed(error);
                     }
                 } catch (Exception e) {
                     listener.onAccountRegisterFailed(ErrorUtils.parseError(e));
                     e.printStackTrace();
-                    FirebaseCrash.report(e);
+                    Timber.e(e);
                 }
             }
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable t) {
                 listener.onAccountRegisterFailed(ErrorUtils.parseError(t));
-                FirebaseCrash.logcat(Log.ERROR, TAG, "registerAccount() failed");
-                FirebaseCrash.report(t);
+                Timber.e("registerAccount() failed");
+                Timber.e(t);
             }
         });
     }
@@ -240,17 +243,17 @@ class AcnApiImpl implements AcnApiService {
         mRestService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, @NonNull Response<ListResultModel<DeviceActionTypeModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
+                Timber.d("getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceActionTypeModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getActionTypes error");
+                Timber.e("getActionTypes error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -261,11 +264,11 @@ class AcnApiImpl implements AcnApiService {
         mRestService.getActions(deviceHid).enqueue(new Callback<ListResultModel<DeviceActionModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionModel>> call, @NonNull Response<ListResultModel<DeviceActionModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getActions response");
+                Timber.d("getActions response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
@@ -281,11 +284,11 @@ class AcnApiImpl implements AcnApiService {
         mRestService.postAction(deviceHid, action).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
+                Timber.d("getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.postActionSucceed();
                 } else {
-                    listener.postActionFailed(ErrorUtils.parseError(response));
+                    listener.postActionFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
@@ -301,11 +304,11 @@ class AcnApiImpl implements AcnApiService {
         mRestService.updateAction(deviceHid, index, model).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getActionTypes response");
+                Timber.d("getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceActionUpdated();
                 } else {
-                    listener.onDeviceActionUpdateFailed(ErrorUtils.parseError(response));
+                    listener.onDeviceActionUpdateFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
@@ -330,11 +333,11 @@ class AcnApiImpl implements AcnApiService {
                 request.getSize()).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<DeviceEventModel>> call, @NonNull Response<PagingResultModel<DeviceEventModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getHistoricalEvents response");
+                Timber.d("getHistoricalEvents response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
@@ -347,21 +350,21 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void registerDevice(@NonNull DeviceRegistrationModel req, @NonNull final RegisterDeviceListener listener) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "regiterDevice() type: " + req.getType() + ", uid: " + req.getUid());
+        Timber.d("regiterDevice() type: " + req.getType() + ", uid: " + req.getUid());
         mRestService.createOrUpdateDevice(req).enqueue(new Callback<DeviceRegistrationResponse>() {
             @Override
             public void onResponse(Call<DeviceRegistrationResponse> call, @NonNull final Response<DeviceRegistrationResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "createOrUpdateDevice response");
+                Timber.d("createOrUpdateDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceRegistered(response.body());
                 } else {
-                    listener.onDeviceRegistrationFailed(ErrorUtils.parseError(response));
+                    listener.onDeviceRegistrationFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<DeviceRegistrationResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "createOrUpdateDevice error");
+                Timber.e("createOrUpdateDevice error");
                 listener.onDeviceRegistrationFailed(ErrorUtils.parseError(t));
             }
         });
@@ -372,12 +375,12 @@ class AcnApiImpl implements AcnApiService {
         mRestService.putReceived(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerReceivedEvent response");
+                Timber.d("registerReceivedEvent response");
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "registerReceivedEvent error");
+                Timber.e("registerReceivedEvent error");
             }
         });
     }
@@ -387,12 +390,12 @@ class AcnApiImpl implements AcnApiService {
         mRestService.putSucceeded(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "eventHandlingSucceed response");
+                Timber.d("eventHandlingSucceed response");
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "eventHandlingSucceed error");
+                Timber.e("eventHandlingSucceed error");
             }
         });
     }
@@ -402,12 +405,12 @@ class AcnApiImpl implements AcnApiService {
         mRestService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "eventHandlingSucceed response");
+                Timber.d("eventHandlingSucceed response");
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "eventHandlingSucceed error");
+                Timber.e("eventHandlingSucceed error");
             }
         });
     }
@@ -417,18 +420,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.findAllGateways().enqueue(new Callback<List<GatewayModel>>() {
             @Override
             public void onResponse(Call<List<GatewayModel>> call, @NonNull Response<List<GatewayModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "findAllGateways response");
+                Timber.d("findAllGateways response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewaysReceived(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
-                    listener.onGatewaysFailed(ErrorUtils.parseError(response));
+                    Timber.e("findAllGateways error");
+                    listener.onGatewaysFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<List<GatewayModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "findAllGateways error");
+                Timber.e("findAllGateways error");
                 listener.onGatewaysFailed(ErrorUtils.parseError(t));
             }
         });
@@ -436,39 +439,26 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void registerGateway(@NonNull final GatewayModel gatewayModel, @NonNull final GatewayRegisterListener listener) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway(), uid: " + gatewayModel.getUid() +
+        Timber.d("registerGateway(), uid: " + gatewayModel.getUid() +
                 ", applicationHid: " + gatewayModel.getApplicationHid());
         mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, @NonNull final Response<GatewayResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "registerGateway response");
+                Timber.d("registerGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    final Handler uiHandler = new Handler();
-                    final Runnable handleInUiThread = new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onGatewayRegistered(response.body());
-                        }
-                    };
-                    Runnable handleInServiceThread = new Runnable() {
-                        @Override
-                        public void run() {
-                            onGatewayResponse(response.body());
-                            mGatewayUid = gatewayModel.getUid();
-                            uiHandler.post(handleInUiThread);
-                        }
-                    };
-                    mServiceThreadHandler.post(handleInServiceThread);
+                    onGatewayResponse(response.body());
+                    mGatewayUid = gatewayModel.getUid();
+                    listener.onGatewayRegistered(response.body());
 
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
-                    listener.onGatewayRegisterFailed(ErrorUtils.parseError(response));
+                    Timber.e("registerGateway error");
+                    listener.onGatewayRegisterFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "registerGateway error");
+                Timber.e("registerGateway error");
                 listener.onGatewayRegisterFailed(ErrorUtils.parseError(t));
             }
         });
@@ -479,40 +469,40 @@ class AcnApiImpl implements AcnApiService {
         mRestService.findGateway(hid).enqueue(new Callback<GatewayModel>() {
             @Override
             public void onResponse(Call<GatewayModel> call, @NonNull Response<GatewayModel> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "findGateway response");
+                Timber.d("findGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayFound(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
-                    listener.onGatewayFindError(ErrorUtils.parseError(response));
+                    Timber.e("findGateway error");
+                    listener.onGatewayFindError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayModel> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "findGateway error");
+                Timber.e("findGateway error");
                 listener.onGatewayFindError(ErrorUtils.parseError(t));
             }
         });
     }
 
     @Override
-    public void updateGateway(@NonNull String hid, @NonNull  GatewayModel gatewayModel, @NonNull final GatewayUpdateListener listener) {
+    public void updateGateway(@NonNull String hid, @NonNull GatewayModel gatewayModel, @NonNull final GatewayUpdateListener listener) {
         mRestService.updateGateway(hid, gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, @NonNull Response<GatewayResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateGateway response");
+                Timber.d("updateGateway response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayUpdated(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
-                    listener.onGatewayUpdateFailed(ErrorUtils.parseError(response));
+                    Timber.e("updateGateway error");
+                    listener.onGatewayUpdateFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "updateGateway error");
+                Timber.e("updateGateway error");
                 listener.onGatewayUpdateFailed(ErrorUtils.parseError(t));
             }
         });
@@ -520,24 +510,24 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void checkinGateway(@NonNull String hid, @NonNull String gatewayUid, @NonNull final CheckinGatewayListener listener) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "checkinGateway(), hid: " + hid);
+        Timber.d("checkinGateway(), hid: " + hid);
         mGatewayUid = gatewayUid;
         mRestService.checkin(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "checkin response");
+                Timber.d("checkin response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onCheckinGatewaySuccess();
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
-                    ApiError error = ErrorUtils.parseError(response);
+                    Timber.e("checkin error");
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
                     listener.onCheckinGatewayError(error);
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "checkin error");
+                Timber.e("checkin error");
                 listener.onCheckinGatewayError(ErrorUtils.parseError(t));
             }
         });
@@ -548,18 +538,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, @NonNull Response<GatewayResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "sendGatewayCommand response");
+                Timber.d("sendGatewayCommand response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayCommandSent(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
-                    listener.onGatewayCommandFailed(ErrorUtils.parseError(response));
+                    Timber.e("sendGatewayCommand error");
+                    listener.onGatewayCommandFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "sendGatewayCommand error");
+                Timber.e("sendGatewayCommand error");
                 listener.onGatewayCommandFailed(ErrorUtils.parseError(t));
             }
         });
@@ -567,11 +557,11 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void getGatewayConfig(@NonNull final String hid, @NonNull final GetGatewayConfigListener listener) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayConfig() hid: " + hid);
+        Timber.d("getGatewayConfig() hid: " + hid);
         mRestService.getConfig(hid).enqueue(new Callback<ConfigResponse>() {
             @Override
             public void onResponse(Call<ConfigResponse> call, @NonNull final Response<ConfigResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getConfig response");
+                Timber.d("getConfig response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     if (mGatewayId == null) {
                         //this means that gateway id has been stored on a client side and we have
@@ -581,14 +571,14 @@ class AcnApiImpl implements AcnApiService {
                     onConfigResponse(response.body());
                     listener.onGatewayConfigReceived(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
-                    listener.onGatewayConfigFailed(ErrorUtils.parseError(response));
+                    Timber.e("getConfig error");
+                    listener.onGatewayConfigFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ConfigResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getConfig error");
+                Timber.e("getConfig error");
                 listener.onGatewayConfigFailed(ErrorUtils.parseError(t));
             }
         });
@@ -596,22 +586,22 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void getDevicesList(@NonNull String gatewayHid, @NonNull final ListResultListener<DeviceModel> listener) {
-        FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList() hid: " + gatewayHid);
+        Timber.d("getDevicesList() hid: " + gatewayHid);
         mRestService.getDevicesByGatewayHid(gatewayHid).enqueue(new Callback<ListResultModel<DeviceModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceModel>> call, @NonNull Response<ListResultModel<DeviceModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getDevicesList response");
+                Timber.d("getDevicesList response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("getDevicesList error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getDevicesList error");
+                Timber.e("getDevicesList error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -622,18 +612,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.heartBeat(hid).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "heartBeat response");
+                Timber.d("heartBeat response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("heartBeat error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "heartBeat error");
+                Timber.e("heartBeat error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -646,18 +636,18 @@ class AcnApiImpl implements AcnApiService {
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<AuditLogModel>> call, @NonNull Response<PagingResultModel<AuditLogModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getGatewayLogs response");
+                Timber.d("getGatewayLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("getGatewayLogs error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getGatewayLogs error");
+                Timber.e("getGatewayLogs error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -668,18 +658,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.deleteAction(deviceHid, index).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
+                Timber.d("deleteAction response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceActionDeleted();
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                    listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(response));
+                    Timber.e("deleteAction error");
+                    listener.onDeviceActionDeleteFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
+                Timber.e("deleteAction error");
                 listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(t));
             }
         });
@@ -692,18 +682,18 @@ class AcnApiImpl implements AcnApiService {
                 enqueue(new Callback<PagingResultModel<DeviceModel>>() {
                     @Override
                     public void onResponse(Call<PagingResultModel<DeviceModel>> call, @NonNull Response<PagingResultModel<DeviceModel>> response) {
-                        FirebaseCrash.logcat(Log.DEBUG, TAG, "deleteAction response");
+                        Timber.d("deleteAction response");
                         if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                             listener.onRequestSuccess(response.body());
                         } else {
-                            FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
-                            listener.onRequestError(ErrorUtils.parseError(response));
+                            Timber.e("deleteAction error");
+                            listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                         }
                     }
 
                     @Override
                     public void onFailure(Call<PagingResultModel<DeviceModel>> call, Throwable t) {
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "deleteAction error");
+                        Timber.e("deleteAction error");
                         listener.onRequestError(ErrorUtils.parseError(t));
                     }
                 });
@@ -714,18 +704,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.findDeviceByHid(deviceHid).enqueue(new Callback<DeviceModel>() {
             @Override
             public void onResponse(Call<DeviceModel> call, @NonNull Response<DeviceModel> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "findDeviceByHid response");
+                Timber.d("findDeviceByHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onDeviceFindSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "findDeviceByHid error");
-                    listener.onDeviceFindFailed(ErrorUtils.parseError(response));
+                    Timber.e("findDeviceByHid error");
+                    listener.onDeviceFindFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<DeviceModel> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "findDeviceByHid error");
+                Timber.e("findDeviceByHid error");
                 listener.onDeviceFindFailed(ErrorUtils.parseError(t));
             }
         });
@@ -736,18 +726,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.updateExistingDevice(deviceHid, device).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDevice response");
+                Timber.d("updateExistingDevice response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDevice error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("updateExistingDevice error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDevice error");
+                Timber.e("updateExistingDevice error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -760,18 +750,18 @@ class AcnApiImpl implements AcnApiService {
                 query.getPage(), query.getSize()).enqueue(new Callback<PagingResultModel<AuditLogModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<AuditLogModel>> call, @NonNull Response<PagingResultModel<AuditLogModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getDeviceAuditLogs response");
+                Timber.d("getDeviceAuditLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("getDeviceAuditLogs error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getDeviceAuditLogs error");
+                Timber.e("getDeviceAuditLogs error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -785,18 +775,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.getListExistingNodes().enqueue(new Callback<ListResultModel<NodeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<NodeModel>> call, @NonNull Response<ListResultModel<NodeModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getNodesList response");
+                Timber.d("getNodesList response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("getNodesList error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<NodeModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getNodesList error");
+                Timber.e("getNodesList error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -807,18 +797,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.createNewNode(node).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNode response");
+                Timber.d("createNewNode response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("createNewNode error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNode error");
+                Timber.e("createNewNode error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -829,18 +819,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.updateExistingNode(nodeHid, node).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNode response");
+                Timber.d("updateExistingNode response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("updateExistingNode error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNode error");
+                Timber.e("updateExistingNode error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -854,18 +844,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.getListNodeTypes().enqueue(new Callback<ListResultModel<NodeTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<NodeTypeModel>> call, @NonNull Response<ListResultModel<NodeTypeModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getListNodeTypes response");
+                Timber.d("getListNodeTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onListNodeTypesSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getListNodeTypes error");
-                    listener.onListNodeTypesFiled(ErrorUtils.parseError(response));
+                    Timber.e("getListNodeTypes error");
+                    listener.onListNodeTypesFiled(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<NodeTypeModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getListNodeTypes error");
+                Timber.e("getListNodeTypes error");
                 listener.onListNodeTypesFiled(ErrorUtils.parseError(t));
             }
         });
@@ -876,18 +866,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.createNewNodeType(nodeType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewNodeType response");
+                Timber.d("createNewNodeType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNodeType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("createNewNodeType error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "createNewNodeType error");
+                Timber.e("createNewNodeType error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -898,18 +888,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.updateExistingNodeType(hid, nodeType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingNodeType response");
+                Timber.d("updateExistingNodeType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNodeType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("updateExistingNodeType error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingNodeType error");
+                Timber.e("updateExistingNodeType error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -922,18 +912,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.getListDeviceTypes().enqueue(new Callback<ListResultModel<DeviceTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceTypeModel>> call, @NonNull Response<ListResultModel<DeviceTypeModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getListDeviceTypes response");
+                Timber.d("getListDeviceTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("getListDeviceTypes error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<DeviceTypeModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getListDeviceTypes error");
+                Timber.e("getListDeviceTypes error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -944,18 +934,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.createNewDeviceType(deviceType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "createNewDeviceType response");
+                Timber.d("createNewDeviceType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("createNewDeviceType error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "createNewDeviceType error");
+                Timber.e("createNewDeviceType error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -967,18 +957,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.updateExistingDeviceType(hid, deviceType).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "updateExistingDeviceType response");
+                Timber.d("updateExistingDeviceType response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("updateExistingDeviceType error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "updateExistingDeviceType error");
+                Timber.e("updateExistingDeviceType error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -991,18 +981,18 @@ class AcnApiImpl implements AcnApiService {
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByApplicationHid response");
+                Timber.d("findTelemetryByApplicationHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("findTelemetryByApplicationHid error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByApplicationHid error");
+                Timber.e("findTelemetryByApplicationHid error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -1014,18 +1004,18 @@ class AcnApiImpl implements AcnApiService {
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByDeviceHid response");
+                Timber.d("findTelemetryByDeviceHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("findTelemetryByDeviceHid error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByDeviceHid error");
+                Timber.e("findTelemetryByDeviceHid error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -1037,18 +1027,18 @@ class AcnApiImpl implements AcnApiService {
                 request.getTelemetryNames(), request.getPage(), request.getSize()).enqueue(new Callback<PagingResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "findTelemetryByNodeHid response");
+                Timber.d("findTelemetryByNodeHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("findTelemetryByNodeHid error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<PagingResultModel<TelemetryItemModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "findTelemetryByNodeHid error");
+                Timber.e("findTelemetryByNodeHid error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
@@ -1059,18 +1049,18 @@ class AcnApiImpl implements AcnApiService {
         mRestService.getLastTelemetry(deviceHid).enqueue(new Callback<ListResultModel<TelemetryItemModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<TelemetryItemModel>> call, @NonNull Response<ListResultModel<TelemetryItemModel>> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getLastTelemetry response");
+                Timber.d("getLastTelemetry response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onRequestSuccess(response.body().getData());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
-                    listener.onRequestError(ErrorUtils.parseError(response));
+                    Timber.e("getLastTelemetry error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<TelemetryItemModel>> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getLastTelemetry error");
+                Timber.e("getLastTelemetry error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });

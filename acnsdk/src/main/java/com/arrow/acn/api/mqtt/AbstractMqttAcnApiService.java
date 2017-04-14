@@ -10,9 +10,9 @@
 
 package com.arrow.acn.api.mqtt;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.arrow.acn.api.AbstractTelemetrySenderService;
 import com.arrow.acn.api.common.ErrorUtils;
@@ -21,7 +21,6 @@ import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.models.GatewayEventModel;
 import com.arrow.acn.api.models.TelemetryModel;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -37,13 +36,15 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Created by osminin on 6/17/2016.
  */
 
+@Keep
 public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderService {
     protected static final String MESSAGE_TOPIC_PREFIX = "krs.tel.gts.";
-    private static final String TAG = AbstractMqttAcnApiService.class.getName();
     private static final String SUBSCRIBE_TOPIC_PREFIX = "krs.cmd.stg.";
     private final static int DEFAULT_CONNECTION_TIMEOUT_SECS = 60;
     private final static int DEFAULT_KEEP_ALIVE_INTERVAL_SECS = 60;
@@ -52,30 +53,28 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     private final IMqttActionListener mMqttTelemetryCallback = new IMqttActionListener() {
         @Override
         public void onSuccess(@NonNull IMqttToken asyncActionToken) {
-            FirebaseCrash.logcat(Log.VERBOSE, TAG, "data sent to cloud: " + asyncActionToken.getResponse().toString());
+            Timber.v("data sent to cloud: " + asyncActionToken.getResponse().toString());
         }
 
         @Override
         public void onFailure(@NonNull IMqttToken asyncActionToken, Throwable exception) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "data sent to cloud: " + asyncActionToken.getException());
-            FirebaseCrash.report(exception);
+            Timber.e(exception);
         }
     };
     protected String mGatewayId;
-    private ServerCommandsListener mServerCommandsListener;
     protected ConfigResponse mConfigResponse;
+    private ServerCommandsListener mServerCommandsListener;
     @NonNull
     private Gson mGson = new Gson();
-    private ConnectionListener mExternalConnListener;
     private final MqttCallback mMqttIncomingMessageListener = new MqttCallback() {
         @Override
         public void connectionLost(Throwable cause) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "connectionLost");
+            Timber.e("connectionLost");
         }
 
         @Override
         public void messageArrived(String topic, @NonNull MqttMessage message) throws Exception {
-            FirebaseCrash.logcat(Log.VERBOSE, TAG, "IMqttMessageListener messageArrived");
+            Timber.v("IMqttMessageListener messageArrived");
             String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
             GatewayEventModel model = mGson.fromJson(payload, GatewayEventModel.class);
             mServerCommandsListener.onServerCommand(model);
@@ -83,32 +82,31 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
-            FirebaseCrash.logcat(Log.VERBOSE, TAG, "deliveryComplete");
+            Timber.v("deliveryComplete");
         }
     };
+    private ConnectionListener mExternalConnListener;
     @Nullable
     private MqttAsyncClient mMqttClient;
     private final IMqttActionListener mMqttConnectCallback = new IMqttActionListener() {
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
-            FirebaseCrash.logcat(Log.DEBUG, TAG, "MQTT connect onSuccess");
+            Timber.d("MQTT connect onSuccess");
             mExternalConnListener.onConnectionSuccess();
             try {
                 String topic = getSubscribeTopic();
-                FirebaseCrash.logcat(Log.VERBOSE, TAG, "subscribing to topic: " + topic);
+                Timber.v("subscribing to topic: " + topic);
                 mMqttClient.subscribe(topic, QOS);
             } catch (MqttException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "subscribe");
-                FirebaseCrash.report(e);
+                Timber.e(e);
             }
 
         }
 
         @Override
         public void onFailure(IMqttToken asyncActionToken, @NonNull Throwable exception) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "MQTT connect failure");
             mExternalConnListener.onConnectionError(ErrorUtils.parseError(exception));
-            FirebaseCrash.report(exception);
+            Timber.e(exception);
             exception.printStackTrace();
         }
     };
@@ -135,12 +133,11 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
 
     @Override
     public void disconnect() {
-        FirebaseCrash.logcat(Log.VERBOSE, TAG, "disconnect");
+        Timber.v("disconnect");
         try {
             mMqttClient.disconnect();
         } catch (MqttException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "disconnect");
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
     }
 
@@ -166,8 +163,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
             try {
                 mMqttClient.publish(topic, message).setActionCallback(mMqttTelemetryCallback);
             } catch (MqttException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "sendMqttMessage");
-                FirebaseCrash.report(e);
+                Timber.e(e);
             }
         }
     }
@@ -179,14 +175,13 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
             if (mMqttClient != null) {
                 mMqttClient.disconnect();
             }
-            FirebaseCrash.logcat(Log.VERBOSE, TAG, "connecting to host: " + getHost() + ", clientId: " + clientId);
+            Timber.v("connecting to host: " + getHost() + ", clientId: " + clientId);
             mMqttClient = new MqttAsyncClient(getHost(), clientId, null);
             mMqttClient.setCallback(mMqttIncomingMessageListener);
             mMqttClient.connect(connOpts, null, mMqttConnectCallback);
         } catch (MqttException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "connectMqtt");
             mExternalConnListener.onConnectionError(ErrorUtils.parseError(e));
-            FirebaseCrash.report(e);
+            Timber.e(e);
         }
     }
 

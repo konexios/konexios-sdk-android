@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        //the first creation of acn lib
         mAcnApiService = AcnApiServiceFactory.createAcnApiService();
         //TODO: replace DEFAULT_API_KEY and DEFAULT_API_SECRET with valid keys
         mAcnApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
