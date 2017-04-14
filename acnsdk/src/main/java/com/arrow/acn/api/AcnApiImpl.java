@@ -35,6 +35,7 @@ import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
+import com.arrow.acn.api.listeners.TelemetryCountListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
@@ -55,12 +56,15 @@ import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
+import com.arrow.acn.api.models.HistoricalEventsRequest;
 import com.arrow.acn.api.models.ListResultModel;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.TelemetryCountRequest;
+import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
 import com.arrow.acn.api.rest.IotConnectAPIService;
@@ -316,13 +320,22 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void getDeviceHistoricalEvents(@NonNull String deviceHid, @NonNull final PagingResultListener<DeviceEventModel> listener) {
-        mRestService.getHistoricalEvents(deviceHid).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
+    public void getDeviceHistoricalEvents(@NonNull HistoricalEventsRequest request,
+                                          @NonNull final PagingResultListener<DeviceEventModel> listener) {
+        mRestService.getHistoricalEvents(request.getHid(),
+                request.getCreatedDateFrom(),
+                request.getCreatedDateTo(),
+                request.getSortField(),
+                request.getSortDirection(),
+                request.getStatuses(),
+                request.getSystemNames(),
+                request.getPage(),
+                request.getSize()).enqueue(new Callback<PagingResultModel<DeviceEventModel>>() {
             @Override
             public void onResponse(Call<PagingResultModel<DeviceEventModel>> call, @NonNull Response<PagingResultModel<DeviceEventModel>> response) {
                 Timber.d("getHistoricalEvents response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onRequestSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body());
                 } else {
                     listener.onRequestError(mRetrofitHolder.convertToApiError(response));
                 }
@@ -625,7 +638,7 @@ class AcnApiImpl implements AcnApiService {
             public void onResponse(Call<PagingResultModel<AuditLogModel>> call, @NonNull Response<PagingResultModel<AuditLogModel>> response) {
                 Timber.d("getGatewayLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onRequestSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body());
                 } else {
                     Timber.e("getGatewayLogs error");
                     listener.onRequestError(mRetrofitHolder.convertToApiError(response));
@@ -671,7 +684,7 @@ class AcnApiImpl implements AcnApiService {
                     public void onResponse(Call<PagingResultModel<DeviceModel>> call, @NonNull Response<PagingResultModel<DeviceModel>> response) {
                         Timber.d("deleteAction response");
                         if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                            listener.onRequestSuccess(response.body().getData());
+                            listener.onRequestSuccess(response.body());
                         } else {
                             Timber.e("deleteAction error");
                             listener.onRequestError(mRetrofitHolder.convertToApiError(response));
@@ -739,7 +752,7 @@ class AcnApiImpl implements AcnApiService {
             public void onResponse(Call<PagingResultModel<AuditLogModel>> call, @NonNull Response<PagingResultModel<AuditLogModel>> response) {
                 Timber.d("getDeviceAuditLogs response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onRequestSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body());
                 } else {
                     Timber.e("getDeviceAuditLogs error");
                     listener.onRequestError(mRetrofitHolder.convertToApiError(response));
@@ -970,7 +983,7 @@ class AcnApiImpl implements AcnApiService {
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
                 Timber.d("findTelemetryByApplicationHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onRequestSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body());
                 } else {
                     Timber.e("findTelemetryByApplicationHid error");
                     listener.onRequestError(mRetrofitHolder.convertToApiError(response));
@@ -993,7 +1006,7 @@ class AcnApiImpl implements AcnApiService {
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
                 Timber.d("findTelemetryByDeviceHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onRequestSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body());
                 } else {
                     Timber.e("findTelemetryByDeviceHid error");
                     listener.onRequestError(mRetrofitHolder.convertToApiError(response));
@@ -1016,7 +1029,7 @@ class AcnApiImpl implements AcnApiService {
             public void onResponse(Call<PagingResultModel<TelemetryItemModel>> call, @NonNull Response<PagingResultModel<TelemetryItemModel>> response) {
                 Timber.d("findTelemetryByNodeHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onRequestSuccess(response.body().getData());
+                    listener.onRequestSuccess(response.body());
                 } else {
                     Timber.e("findTelemetryByNodeHid error");
                     listener.onRequestError(mRetrofitHolder.convertToApiError(response));
@@ -1049,6 +1062,31 @@ class AcnApiImpl implements AcnApiService {
             public void onFailure(Call<ListResultModel<TelemetryItemModel>> call, Throwable t) {
                 Timber.e("getLastTelemetry error");
                 listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void getTelemetryItemsCount(TelemetryCountRequest request, final TelemetryCountListener listener) {
+        mRestService.getTelemetryItemsCount(request.getDeviceHid(),
+                request.getTelemetryName(),
+                request.getFromTimestamp(),
+                request.getToTimestamp()).enqueue(new Callback<TelemetryCountResponse>() {
+            @Override
+            public void onResponse(Call<TelemetryCountResponse> call, Response<TelemetryCountResponse> response) {
+                FirebaseCrash.logcat(Log.DEBUG, TAG, "getTelemetryItemsCount response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onTelemetryItemsCountSuccess(response.body());
+                } else {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "getTelemetryItemsCount error");
+                    listener.onTelemetryItemsCountError(ErrorUtils.parseError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TelemetryCountResponse> call, Throwable t) {
+                FirebaseCrash.logcat(Log.ERROR, TAG, "getTelemetryItemsCount error");
+                listener.onTelemetryItemsCountError(ErrorUtils.parseError(t));
             }
         });
     }
