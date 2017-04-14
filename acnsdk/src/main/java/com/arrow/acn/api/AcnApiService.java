@@ -30,6 +30,7 @@ import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
+import com.arrow.acn.api.listeners.TelemetryCountListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AuditLogModel;
@@ -44,9 +45,11 @@ import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
+import com.arrow.acn.api.models.HistoricalEventsRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
+import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
 
@@ -126,6 +129,8 @@ public interface AcnApiService {
 
     void getLastTelemetry(String deviceHid, ListResultListener<TelemetryItemModel> listener);
 
+    void getTelemetryItemsCount(TelemetryCountRequest request, TelemetryCountListener listener);
+
     /**
      * check whether if current service supports sending batch telemetry
      *
@@ -173,7 +178,7 @@ public interface AcnApiService {
     void findAllDevices(String userHid, String uid, String type, String gatewayHid, String enabled,
                         int page, int size, PagingResultListener<DeviceModel> listener);
 
-    void getDeviceHistoricalEvents(String deviceHid, PagingResultListener<DeviceEventModel> listener);
+    void getDeviceHistoricalEvents(HistoricalEventsRequest request, PagingResultListener<DeviceEventModel> listener);
 
     void findDeviceByHid(String deviceHid, FindDeviceListener listener);
 

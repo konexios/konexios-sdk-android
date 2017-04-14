@@ -35,6 +35,7 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryStatsModel;
 
@@ -147,6 +148,13 @@ public interface IotConnectAPIService {
                                                                        @Query("_size") int size);
 
     @NonNull
+    @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/count")
+    Call<TelemetryCountResponse> getTelemetryItemsCount(@Path("deviceHid") String deviceHid,
+                                                       @Query("telemetryName") String telemetryName,
+                                                       @Query("fromTimestamp") String fromTimestamp,
+                                                       @Query("toTimestamp") String toTimestamp);
+
+    @NonNull
     @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/latest")
     Call<ListResultModel<TelemetryItemModel>> getLastTelemetry(@Path("deviceHid") String deviceHid);
 
@@ -190,7 +198,15 @@ public interface IotConnectAPIService {
     //Device api
     @NonNull
     @GET("/api/v1/kronos/devices/{hid}/events")
-    Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid);
+    Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid,
+                                                                  @Query("createdDateFrom") String createdDateFrom,
+                                                                  @Query("createdDateTo") String createdDateTo,
+                                                                  @Query("sortField") String sortField,
+                                                                  @Query("sortDirection") String sortDirection,
+                                                                  @Query("statuses[]") List<String> statuses,
+                                                                  @Query("systemNames[]") List<String> systemNames,
+                                                                  @Query("_page") int page,
+                                                                  @Query("_size") int size);
 
     @NonNull
     @GET("/api/v1/kronos/devices")
