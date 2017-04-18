@@ -1074,18 +1074,18 @@ class AcnApiImpl implements AcnApiService {
                 request.getToTimestamp()).enqueue(new Callback<TelemetryCountResponse>() {
             @Override
             public void onResponse(Call<TelemetryCountResponse> call, Response<TelemetryCountResponse> response) {
-                FirebaseCrash.logcat(Log.DEBUG, TAG, "getTelemetryItemsCount response");
+                Timber.d("getTelemetryItemsCount");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onTelemetryItemsCountSuccess(response.body());
                 } else {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "getTelemetryItemsCount error");
-                    listener.onTelemetryItemsCountError(ErrorUtils.parseError(response));
+                    Timber.e("getTelemetryItemsCount error");
+                    listener.onTelemetryItemsCountError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<TelemetryCountResponse> call, Throwable t) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "getTelemetryItemsCount error");
+                Timber.e("getTelemetryItemsCount error");
                 listener.onTelemetryItemsCountError(ErrorUtils.parseError(t));
             }
         });
