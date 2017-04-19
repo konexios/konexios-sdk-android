@@ -10,10 +10,8 @@
 
 package com.arrow.acn.api;
 
-import android.os.Handler;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
@@ -87,22 +85,18 @@ import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 
 @Keep
 class AcnApiImpl implements AcnApiService {
-    private static final String TAG = AcnApiImpl.class.getName();
-
+    private final RetrofitHolder mRetrofitHolder;
+    private final SenderServiceFactory mSenderServiceFactory;
     protected String mGatewayId;
     private String mGatewayUid;
     private IotConnectAPIService mRestService;
     @NonNull
     private Gson mGson = new Gson();
     private TelemetrySenderInterface mSenderService;
-
     private ServerCommandsListener mServerCommandsListener;
     private String mMqttHost;
     private String mMqttPrefix;
     private ConfigResponse mConfigResponse;
-
-    private final RetrofitHolder mRetrofitHolder;
-    private final SenderServiceFactory mSenderServiceFactory;
 
     AcnApiImpl(RetrofitHolder retrofitHolder,
                SenderServiceFactory senderServiceFactory) {
