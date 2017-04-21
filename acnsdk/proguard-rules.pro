@@ -34,7 +34,8 @@
 -keep class com.arrow.acn.api.listeners.** { *; }
 
 -keep class com.arrow.acn.api.AcnApiService { *; }
--keep class com.arrow.acn.api.AcnApiServiceFactory { *; }
+-keep class com.arrow.acn.api.AcnApi { *; }
+-keep class com.arrow.acn.api.AcnApi.Builder { *; }
 
 -keep class org.spongycastle.crypto.* {*;}
 -keep class org.spongycastle.crypto.agreement.** {*;}

@@ -65,9 +65,9 @@ public class AcnApiImplTest {
         mRestService = new FakeRestService();
         mRetrofitHolder = new FakeRetrofitHolder(mRestService);
         mFakeSenderServiceFactory = new FakeSenderServiceFactory();
-        mApiService = new AcnApiImpl(mRetrofitHolder, mFakeSenderServiceFactory);
-        mApiService.setRestEndpoint(null, null, null);
-        mApiService.setMqttEndpoint(MQTT_HOST, MQTT_PREFIX);
+        mApiService = new AcnApiImpl(mRetrofitHolder, mFakeSenderServiceFactory, true);
+        ((AcnApiImpl)mApiService).setRestEndpoint(null, null, null);
+        ((AcnApiImpl)mApiService).setMqttEndpoint(MQTT_HOST, MQTT_PREFIX);
     }
 
     @Test

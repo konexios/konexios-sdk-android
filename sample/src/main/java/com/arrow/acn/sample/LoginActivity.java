@@ -15,12 +15,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-
-import android.os.Build;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -32,8 +31,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.arrow.acn.api.AcnApi;
 import com.arrow.acn.api.AcnApiService;
-import com.arrow.acn.api.AcnApiServiceFactory;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
@@ -44,14 +43,9 @@ import com.arrow.acn.api.models.ApiError;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
-    private final static String TAG = LoginActivity.class.getSimpleName();
     public final static String ACCOUNT_RESPONSE_EXTRA = "account_response";
-    // DEV
-    public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:12001";
-    //TODO: replace with real keys
-    public static final String DEFAULT_API_KEY = "api key goes here";
-    public static final String DEFAULT_API_SECRET = "api secret goes here";
 
+    private final static String TAG = LoginActivity.class.getSimpleName();
     private static final String ACCOUNT_LOGIN_SP_KEY = "com.arrow.kronos.sample.login_key";
     private static final String ACCOUNT_PASSWORD_SP_KEY = "com.arrow.kronos.sample.password_key";
     private static final String CODE_PASSWORD_SP_KEY = "com.arrow.kronos.sample.code_key";
@@ -97,11 +91,7 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
 
         //the first creation of acn lib
-        mAcnApiService = AcnApiServiceFactory.createAcnApiService();
-        //TODO: replace DEFAULT_API_KEY and DEFAULT_API_SECRET with valid keys
-        mAcnApiService.setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY,
-                DEFAULT_API_SECRET);
-
+        mAcnApiService = App.getAcnApiService();
         initViews();
     }
 
