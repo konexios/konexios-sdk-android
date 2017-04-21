@@ -34,6 +34,7 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryStatsModel;
 import com.arrow.acn.api.rest.IotConnectAPIService;
@@ -163,6 +164,12 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
+    public Call<TelemetryCountResponse> getTelemetryItemsCount(@Path("deviceHid") String deviceHid, @Query("telemetryName") String telemetryName, @Query("fromTimestamp") String fromTimestamp, @Query("toTimestamp") String toTimestamp) {
+        return null;
+    }
+
+    @NonNull
+    @Override
     public Call<ListResultModel<TelemetryItemModel>> getLastTelemetry(@Path("deviceHid") String deviceHid) {
         return null;
     }
@@ -223,7 +230,7 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid) {
+    public Call<PagingResultModel<DeviceEventModel>> getHistoricalEvents(@Path("hid") String hid, @Query("createdDateFrom") String createdDateFrom, @Query("createdDateTo") String createdDateTo, @Query("sortField") String sortField, @Query("sortDirection") String sortDirection, @Query("statuses[]") List<String> statuses, @Query("systemNames[]") List<String> systemNames, @Query("_page") int page, @Query("_size") int size) {
         return null;
     }
 
