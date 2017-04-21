@@ -10,13 +10,12 @@
 
 package com.arrow.acn.api;
 
-import android.os.Handler;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
+import com.arrow.acn.api.common.RetrofitHolderImpl;
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
@@ -68,7 +67,6 @@ import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
 import com.arrow.acn.api.rest.IotConnectAPIService;
-import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -87,39 +85,28 @@ import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 
 @Keep
 class AcnApiImpl implements AcnApiService {
-    private static final String TAG = AcnApiImpl.class.getName();
-
+    private final RetrofitHolder mRetrofitHolder;
+    private final SenderServiceFactory mSenderServiceFactory;
     protected String mGatewayId;
     private String mGatewayUid;
     private IotConnectAPIService mRestService;
-    @NonNull
-    private Gson mGson = new Gson();
     private TelemetrySenderInterface mSenderService;
-
     private ServerCommandsListener mServerCommandsListener;
     private String mMqttHost;
     private String mMqttPrefix;
     private ConfigResponse mConfigResponse;
 
-    private final RetrofitHolder mRetrofitHolder;
-    private final SenderServiceFactory mSenderServiceFactory;
-
     AcnApiImpl(RetrofitHolder retrofitHolder,
-               SenderServiceFactory senderServiceFactory) {
+               SenderServiceFactory senderServiceFactory,
+               boolean isDebug) {
         mRetrofitHolder = retrofitHolder;
         mSenderServiceFactory = senderServiceFactory;
-        if (BuildConfig.DEBUG && Timber.forest().isEmpty()) {
+        if ((BuildConfig.DEBUG || isDebug) && Timber.forest().isEmpty()) {
             Timber.plant(new Timber.DebugTree());
         }
     }
 
-    @NonNull
-    protected Gson getGson() {
-        return mGson;
-    }
-
-    @Override
-    public void setRestEndpoint(@NonNull String endpoint, @NonNull String apiKey, @NonNull String apiSecret) {
+    void setRestEndpoint(@NonNull String endpoint, @NonNull String apiKey, @NonNull String apiSecret) {
         Timber.d("setRestEndpoint");
         mRetrofitHolder.setDefaultApiKey(apiKey);
         mRetrofitHolder.setDefaultApiSecret(apiSecret);
@@ -128,8 +115,7 @@ class AcnApiImpl implements AcnApiService {
         mRestService = mRetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
-    @Override
-    public void setMqttEndpoint(String host, String prefix) {
+    void setMqttEndpoint(String host, String prefix) {
         Timber.d("setMqttEndpoint");
         mMqttHost = host;
         mMqttPrefix = prefix;
@@ -1100,4 +1086,6 @@ class AcnApiImpl implements AcnApiService {
     public boolean isConnected() {
         return mSenderService != null && mSenderService.isConnected();
     }
+
+
 }
