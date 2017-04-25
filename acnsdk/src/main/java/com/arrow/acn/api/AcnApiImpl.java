@@ -15,12 +15,12 @@ import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
-import com.arrow.acn.api.common.RetrofitHolderImpl;
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.DeleteDeviceActionListener;
 import com.arrow.acn.api.listeners.FindDeviceListener;
+import com.arrow.acn.api.listeners.FindDeviceStateListener;
 import com.arrow.acn.api.listeners.FindGatewayListener;
 import com.arrow.acn.api.listeners.GatewayCommandsListener;
 import com.arrow.acn.api.listeners.GatewayRegisterListener;
@@ -29,6 +29,7 @@ import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.GetGatewaysListener;
 import com.arrow.acn.api.listeners.ListNodeTypesListener;
 import com.arrow.acn.api.listeners.ListResultListener;
+import com.arrow.acn.api.listeners.MessageStatusListener;
 import com.arrow.acn.api.listeners.PagingResultListener;
 import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
@@ -51,12 +52,15 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
 import com.arrow.acn.api.models.HistoricalEventsRequest;
 import com.arrow.acn.api.models.ListResultModel;
+import com.arrow.acn.api.models.MessageStatusResponse;
+import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
@@ -955,6 +959,145 @@ class AcnApiImpl implements AcnApiService {
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("updateExistingDeviceType error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    //device-state-api
+
+    @Override
+    public void findDeviceState(String deviceHid, final FindDeviceStateListener listener) {
+        mRestService.findDeviceState(deviceHid).enqueue(new Callback<FindDeviceStateResponse>() {
+            @Override
+            public void onResponse(Call<FindDeviceStateResponse> call, Response<FindDeviceStateResponse> response) {
+                Timber.d("findDeviceState: ");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onDeviceStateSuccess(response.body());
+                } else {
+                    Timber.e("findDeviceState error");
+                    listener.onDeviceStateError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FindDeviceStateResponse> call, Throwable t) {
+                Timber.e("findDeviceState error");
+                listener.onDeviceStateError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void createNewDeviceStateTransaction(String hid,
+                                                NewDeviceStateTransactionRequest request,
+                                                final CommonRequestListener listener) {
+        mRestService.createNewDeviceStateTransaction(hid, request).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("createNewDeviceStateTransaction: ok");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("createNewDeviceStateTransaction error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("createNewDeviceStateTransaction error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void deviceStateTransactionComplete(String hid, String transHid, final MessageStatusListener listener) {
+        mRestService.deviceStateTransactionComplete(hid, transHid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("deviceStateTransactionComplete: ok");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("deviceStateTransactionComplete error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("deviceStateTransactionComplete error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void deviceStateTransactionError(String hid, String transHid, String error,
+                                            final MessageStatusListener listener) {
+        mRestService.deviceStateTransactionError(hid, transHid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("deviceStateTransactionError: ok");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("deviceStateTransactionError error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("deviceStateTransactionError error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void deviceStateTransactionReceived(String hid, String transHid, final MessageStatusListener listener) {
+        mRestService.deviceStateTransactionReceived(hid, transHid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("deviceStateTransactionReceived: ok");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("deviceStateTransactionReceived error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("deviceStateTransactionReceived error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void updateDeviceStateTransaction(String hid,
+                                             NewDeviceStateTransactionRequest request,
+                                             final CommonRequestListener listener) {
+        mRestService.updateDeviceStateTransaction(hid, request).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("updateDeviceStateTransaction: ok");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("updateDeviceStateTransaction error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("updateDeviceStateTransaction error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });

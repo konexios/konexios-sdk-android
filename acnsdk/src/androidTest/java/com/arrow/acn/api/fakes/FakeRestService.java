@@ -25,10 +25,13 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
 import com.arrow.acn.api.models.ListResultModel;
+import com.arrow.acn.api.models.MessageStatusResponse;
+import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
@@ -315,6 +318,42 @@ public final class FakeRestService implements IotConnectAPIService {
     @NonNull
     @Override
     public Call<CommonResponse> updateExistingDeviceType(@Path("hid") String hid, @Body DeviceTypeRegistrationModel body) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<FindDeviceStateResponse> findDeviceState(@Path("hid") String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<CommonResponse> createNewDeviceStateTransaction(@Path("hid") String hid, @Body NewDeviceStateTransactionRequest body) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> deviceStateTransactionComplete(@Path("hid") String hid, @Path("transHid") String transId) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> deviceStateTransactionError(@Path("hid") String hid, @Path("transHid") String transId) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> deviceStateTransactionReceived(@Path("hid") String hid, @Path("transHid") String transId) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<CommonResponse> updateDeviceStateTransaction(@Path("hid") String hid, @Body NewDeviceStateTransactionRequest body) {
         return null;
     }
 }

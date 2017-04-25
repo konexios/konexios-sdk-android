@@ -17,6 +17,7 @@ import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.DeleteDeviceActionListener;
 import com.arrow.acn.api.listeners.FindDeviceListener;
+import com.arrow.acn.api.listeners.FindDeviceStateListener;
 import com.arrow.acn.api.listeners.FindGatewayListener;
 import com.arrow.acn.api.listeners.GatewayCommandsListener;
 import com.arrow.acn.api.listeners.GatewayRegisterListener;
@@ -25,6 +26,7 @@ import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.GetGatewaysListener;
 import com.arrow.acn.api.listeners.ListNodeTypesListener;
 import com.arrow.acn.api.listeners.ListResultListener;
+import com.arrow.acn.api.listeners.MessageStatusListener;
 import com.arrow.acn.api.listeners.PagingResultListener;
 import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
@@ -46,6 +48,7 @@ import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.HistoricalEventsRequest;
+import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
@@ -217,4 +220,22 @@ public interface AcnApiService {
 
     void updateExistingDeviceType(String hid,
                                   DeviceTypeRegistrationModel deviceType, CommonRequestListener listener);
+
+    //device-state-api
+
+    void findDeviceState(String deviceHid, FindDeviceStateListener listener);
+
+    void createNewDeviceStateTransaction(String hid,
+                                         NewDeviceStateTransactionRequest request,
+                                         CommonRequestListener listener);
+
+    void deviceStateTransactionComplete(String hid, String transHid, MessageStatusListener listener);
+
+    void deviceStateTransactionError(String hid, String transHid, String error, MessageStatusListener listener);
+
+    void deviceStateTransactionReceived(String hid, String transHid, MessageStatusListener listener);
+
+    void updateDeviceStateTransaction(String hid,
+                                      NewDeviceStateTransactionRequest request,
+                                      CommonRequestListener listener);
 }

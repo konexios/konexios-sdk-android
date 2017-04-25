@@ -10,9 +10,35 @@
 
 package com.arrow.acn.api.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by osminin on 10/11/2016.
  */
 
-public final class Links {
+public final class Links implements Parcelable{
+    protected Links(Parcel in) {
+    }
+
+    public static final Creator<Links> CREATOR = new Creator<Links>() {
+        @Override
+        public Links createFromParcel(Parcel in) {
+            return new Links(in);
+        }
+
+        @Override
+        public Links[] newArray(int size) {
+            return new Links[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+    }
 }
