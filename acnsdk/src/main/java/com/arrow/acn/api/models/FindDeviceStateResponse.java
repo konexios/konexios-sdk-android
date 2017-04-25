@@ -13,8 +13,15 @@ package com.arrow.acn.api.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created by osminin on 4/24/2017.
@@ -48,14 +55,14 @@ public class FindDeviceStateResponse implements Parcelable {
     private String pri;
     @SerializedName("states")
     @Expose
-    private States states;
+    private JsonElement states;
 
     protected FindDeviceStateResponse(Parcel in) {
         deviceHid = in.readString();
         hid = in.readString();
         links = (Links) in.readValue(Links.class.getClassLoader());
         pri = in.readString();
-        states = (States) in.readValue(States.class.getClassLoader());
+        states = (JsonElement) in.readValue(JsonElement.class.getClassLoader());
     }
 
     public String getDeviceHid() {
@@ -90,12 +97,29 @@ public class FindDeviceStateResponse implements Parcelable {
         this.pri = pri;
     }
 
-    public States getStates() {
+    public JsonElement getStates() {
         return states;
     }
 
-    public void setStates(States states) {
+    public void setStates(JsonElement states) {
         this.states = states;
+    }
+
+    public Map<String, Map<String, String>> getMappedStates() {
+        if (states == null) {
+            return null;
+        }
+        Gson gson = new Gson();
+        Type stringStringMap = new TypeToken<Map<String, Map<String, String>>>(){}.getType();
+        return gson.fromJson(states, stringStringMap);
+    }
+
+    public FindDeviceStateResponse addState(String key, String value) {
+        if (states == null) {
+            states = new JsonObject();
+        }
+        states.getAsJsonObject().addProperty(key, value);
+        return this;
     }
 
     @Override

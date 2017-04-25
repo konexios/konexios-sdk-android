@@ -13,8 +13,16 @@ package com.arrow.acn.api.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created by osminin on 4/24/2017.
@@ -35,7 +43,7 @@ public class NewDeviceStateTransactionRequest implements Parcelable {
     };
     @SerializedName("states")
     @Expose
-    private States states;
+    private JsonElement states;
     @SerializedName("timestamp")
     @Expose
     private String timestamp;
@@ -44,15 +52,15 @@ public class NewDeviceStateTransactionRequest implements Parcelable {
     }
 
     protected NewDeviceStateTransactionRequest(Parcel in) {
-        states = (States) in.readValue(States.class.getClassLoader());
+        states = (JsonElement) in.readValue(JsonElement.class.getClassLoader());
         timestamp = in.readString();
     }
 
-    public States getStates() {
+    public JsonElement getStates() {
         return states;
     }
 
-    public void setStates(States states) {
+    public void setStates(JsonElement states) {
         this.states = states;
     }
 
@@ -62,6 +70,23 @@ public class NewDeviceStateTransactionRequest implements Parcelable {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Map<String, String> getMappedStates() {
+        if (states == null) {
+            return null;
+        }
+        Gson gson = new Gson();
+        Type stringStringMap = new TypeToken<Map<String, String>>(){}.getType();
+        return gson.fromJson(states, stringStringMap);
+    }
+
+    public NewDeviceStateTransactionRequest addState(String key, String value) {
+        if (states == null) {
+            states = new JsonObject();
+        }
+        states.getAsJsonObject().addProperty(key, value);
+        return this;
     }
 
     @Override
