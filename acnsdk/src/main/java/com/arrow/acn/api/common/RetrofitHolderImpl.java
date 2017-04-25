@@ -24,6 +24,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.Executor;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -44,6 +45,7 @@ public class RetrofitHolderImpl implements RetrofitHolder {
     private Retrofit mRetrofit;
     private String mApiKey;
     private String mApiSecret;
+    private final Executor mExecutor;
     @NonNull
     private OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .addInterceptor(new Interceptor() {
@@ -80,6 +82,11 @@ public class RetrofitHolderImpl implements RetrofitHolder {
             .sslSocketFactory(new NoSSLv3SocketFactory())
             .build();
 
+
+    public RetrofitHolderImpl(Executor executor) {
+        mExecutor = executor;
+    }
+
     @Override
     public void setDefaultApiKey(String apiKey) {
         mApiKey = apiKey;
@@ -113,11 +120,15 @@ public class RetrofitHolderImpl implements RetrofitHolder {
     @Override
     public IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint) {
         if (mRetrofit == null || !mRetrofit.baseUrl().toString().equals(endpoint)) {
-            mRetrofit = new Retrofit.Builder()
+            Retrofit.Builder builder = new Retrofit.Builder()
                     .baseUrl(endpoint)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(okHttpClient)
-                    .build();
+                    .client(okHttpClient);
+            if (mExecutor != null) {
+                builder.callbackExecutor(mExecutor);
+            }
+            mRetrofit = builder.build();
+
         }
         return mRetrofit.create(IotConnectAPIService.class);
     }
