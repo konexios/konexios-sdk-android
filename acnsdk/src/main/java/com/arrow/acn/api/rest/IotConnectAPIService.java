@@ -27,6 +27,7 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
@@ -298,13 +299,14 @@ public interface IotConnectAPIService {
                                                          @Body NewDeviceStateTransactionRequest body);
 
     @NonNull
-    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/complete")
-    Call<MessageStatusResponse> deviceStateTransactionComplete(@Path("hid") String hid,
-                                                               @Path("transHid") String transId);
+    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/succeeded")
+    Call<MessageStatusResponse> deviceStateTransactionSucceeded(@Path("hid") String hid,
+                                                                @Path("transHid") String transId);
     @NonNull
-    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/error")
-    Call<MessageStatusResponse> deviceStateTransactionError(@Path("hid") String hid,
-                                                            @Path("transHid") String transId);
+    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/failed")
+    Call<MessageStatusResponse> deviceStateTransactionFailed(@Path("hid") String hid,
+                                                             @Path("transHid") String transId,
+                                                             @Body ErrorBodyModel error);
 
     @NonNull
     @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/received")
