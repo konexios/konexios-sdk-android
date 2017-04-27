@@ -25,6 +25,7 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
@@ -335,13 +336,13 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<MessageStatusResponse> deviceStateTransactionComplete(@Path("hid") String hid, @Path("transHid") String transId) {
+    public Call<MessageStatusResponse> deviceStateTransactionSucceeded(@Path("hid") String hid, @Path("transHid") String transId) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<MessageStatusResponse> deviceStateTransactionError(@Path("hid") String hid, @Path("transHid") String transId) {
+    public Call<MessageStatusResponse> deviceStateTransactionFailed(@Path("hid") String hid, @Path("transHid") String transId, @Body ErrorBodyModel error) {
         return null;
     }
 

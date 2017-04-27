@@ -52,6 +52,7 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
@@ -1013,45 +1014,45 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void deviceStateTransactionComplete(String hid, String transHid, final MessageStatusListener listener) {
-        mRestService.deviceStateTransactionComplete(hid, transHid).enqueue(new Callback<MessageStatusResponse>() {
+    public void deviceStateTransactionSucceeded(String hid, String transHid, final MessageStatusListener listener) {
+        mRestService.deviceStateTransactionSucceeded(hid, transHid).enqueue(new Callback<MessageStatusResponse>() {
             @Override
             public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
-                Timber.d("deviceStateTransactionComplete: ok");
+                Timber.d("deviceStateTransactionSucceeded: ok");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onResponse(response.body());
                 } else {
-                    Timber.e("deviceStateTransactionComplete error");
+                    Timber.e("deviceStateTransactionSucceeded error");
                     listener.onError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
-                Timber.e("deviceStateTransactionComplete error");
+                Timber.e("deviceStateTransactionSucceeded error");
                 listener.onError(ErrorUtils.parseError(t));
             }
         });
     }
 
     @Override
-    public void deviceStateTransactionError(String hid, String transHid, String error,
-                                            final MessageStatusListener listener) {
-        mRestService.deviceStateTransactionError(hid, transHid).enqueue(new Callback<MessageStatusResponse>() {
+    public void deviceStateTransactionFailed(String hid, String transHid, ErrorBodyModel error,
+                                             final MessageStatusListener listener) {
+        mRestService.deviceStateTransactionFailed(hid, transHid, error).enqueue(new Callback<MessageStatusResponse>() {
             @Override
             public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
-                Timber.d("deviceStateTransactionError: ok");
+                Timber.d("deviceStateTransactionFailed: ok");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onResponse(response.body());
                 } else {
-                    Timber.e("deviceStateTransactionError error");
+                    Timber.e("deviceStateTransactionFailed error");
                     listener.onError(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
-                Timber.e("deviceStateTransactionError error");
+                Timber.e("deviceStateTransactionFailed error");
                 listener.onError(ErrorUtils.parseError(t));
             }
         });

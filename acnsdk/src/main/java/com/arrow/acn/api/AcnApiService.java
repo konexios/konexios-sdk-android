@@ -44,6 +44,7 @@ import com.arrow.acn.api.models.DeviceModel;
 import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
@@ -229,9 +230,10 @@ public interface AcnApiService {
                                          NewDeviceStateTransactionRequest request,
                                          CommonRequestListener listener);
 
-    void deviceStateTransactionComplete(String hid, String transHid, MessageStatusListener listener);
+    void deviceStateTransactionSucceeded(String hid, String transHid, MessageStatusListener listener);
 
-    void deviceStateTransactionError(String hid, String transHid, String error, MessageStatusListener listener);
+    void deviceStateTransactionFailed(String hid, String transHid, ErrorBodyModel error,
+                                      MessageStatusListener listener);
 
     void deviceStateTransactionReceived(String hid, String transHid, MessageStatusListener listener);
 
