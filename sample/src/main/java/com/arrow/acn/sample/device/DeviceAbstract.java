@@ -19,11 +19,20 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.arrow.acn.api.AcnApiService;
+import com.arrow.acn.api.listeners.CommonRequestListener;
+import com.arrow.acn.api.listeners.FindDeviceStateListener;
+import com.arrow.acn.api.listeners.MessageStatusListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.models.ApiError;
+import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
+import com.arrow.acn.api.models.FindDeviceStateResponse;
+import com.arrow.acn.api.models.MessageStatusResponse;
+import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.TelemetryModel;
+import com.arrow.acn.sample.App;
 import com.arrow.acn.sample.InternalSensorsView;
 import com.arrow.acn.sample.TelemetrySender;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,10 +40,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +158,13 @@ public abstract class DeviceAbstract implements GoogleApiClient.ConnectionCallba
                 });
             }
         }
+    }
+
+    private static String getFormattedDateTime(Long timestamp) {
+        Date date = new Date(timestamp);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        String formattedDate = format.format(date);
+        return formattedDate;
     }
 
     public void pollingTask() {

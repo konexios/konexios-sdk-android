@@ -22,13 +22,17 @@ import com.arrow.acn.api.AcnApiService;
 public final class App extends Application {
     // DEV
     public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:12001";
-    //TODO: replace with real keys
-    public static final String DEFAULT_API_KEY = "api key goes here";
-    public static final String DEFAULT_API_SECRET = "api secret goes here";
+    //TODO: define ApiKey and ApiSecret variables in gradle.properties file
+    public static final String DEFAULT_API_KEY = BuildConfig.API_KEY;
+    public static final String DEFAULT_API_SECRET = BuildConfig.API_SECRET;
     public static final String MQTT_CONNECT_URL_DEV = "tcp://pgsdev01.arrowconnect.io:1883";
     public static final String MQTT_CLIENT_PREFIX_DEV = "/themis.dev";
 
     private static AcnApiService mAcnApiService;
+
+    public static AcnApiService getAcnApiService() {
+        return mAcnApiService;
+    }
 
     @Override
     public void onCreate() {
@@ -39,9 +43,5 @@ public final class App extends Application {
                 .setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV)
                 .setDebug(true)
                 .build();
-    }
-
-    public static AcnApiService getAcnApiService() {
-        return mAcnApiService;
     }
 }

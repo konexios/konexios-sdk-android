@@ -27,10 +27,14 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.ErrorBodyModel;
+import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
 import com.arrow.acn.api.models.ListResultModel;
+import com.arrow.acn.api.models.MessageStatusResponse;
+import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
@@ -285,4 +289,32 @@ public interface IotConnectAPIService {
     @PUT("/api/v1/kronos/devices/types/{hid}")
     Call<CommonResponse> updateExistingDeviceType(@Path("hid")String hid, @Body DeviceTypeRegistrationModel body);
 
+    @NonNull
+    @GET("/api/v1/kronos/devices/{hid}/state")
+    Call<FindDeviceStateResponse> findDeviceState(@Path("hid") String hid);
+
+    @NonNull
+    @POST("/api/v1/kronos/devices/{hid}/state/request")
+    Call<CommonResponse> createNewDeviceStateTransaction(@Path("hid") String hid,
+                                                         @Body NewDeviceStateTransactionRequest body);
+
+    @NonNull
+    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/succeeded")
+    Call<MessageStatusResponse> deviceStateTransactionSucceeded(@Path("hid") String hid,
+                                                                @Path("transHid") String transId);
+    @NonNull
+    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/failed")
+    Call<MessageStatusResponse> deviceStateTransactionFailed(@Path("hid") String hid,
+                                                             @Path("transHid") String transId,
+                                                             @Body ErrorBodyModel error);
+
+    @NonNull
+    @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/received")
+    Call<MessageStatusResponse> deviceStateTransactionReceived(@Path("hid") String hid,
+                                                               @Path("transHid") String transId);
+
+    @NonNull
+    @POST("/api/v1/kronos/devices/{hid}/state/update")
+    Call<CommonResponse> updateDeviceStateTransaction(@Path("hid") String hid,
+                                                      @Body NewDeviceStateTransactionRequest body);
 }
