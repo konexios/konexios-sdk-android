@@ -10,6 +10,9 @@
 
 package com.arrow.acn.api.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
@@ -18,7 +21,7 @@ import java.util.Map;
 /**
  * Created by osminin on 4/29/2016.
  */
-public final class GatewayEventModel {
+public final class GatewayEventModel implements Parcelable{
     public static final String DEVICE_HID_KEY = "deviceHid";
 
     @SerializedName("hid")
@@ -67,5 +70,48 @@ public final class GatewayEventModel {
     public Map<String, String> getParameters() {
         return mParameters;
     }
+
+    protected GatewayEventModel(Parcel in) {
+        mHid = in.readString();
+        mName = in.readString();
+        mEncrypted = in.readByte() != 0x00;
+        int size = in.readInt();
+        mParameters = new HashMap<>(size);
+        for(int i = 0; i < size; i++){
+            String key = in.readString();
+            String value = in.readString();
+            mParameters.put(key,value);
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mHid);
+        dest.writeString(mName);
+        dest.writeByte((byte) (mEncrypted ? 0x01 : 0x00));
+        dest.writeInt(mParameters.size());
+        for(Map.Entry<String,String> entry : mParameters.entrySet()){
+            dest.writeString(entry.getKey());
+            dest.writeString(entry.getValue());
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<GatewayEventModel> CREATOR = new Parcelable.Creator<GatewayEventModel>() {
+        @Override
+        public GatewayEventModel createFromParcel(Parcel in) {
+            return new GatewayEventModel(in);
+        }
+
+        @Override
+        public GatewayEventModel[] newArray(int size) {
+            return new GatewayEventModel[size];
+        }
+    };
 }
 
