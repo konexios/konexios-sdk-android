@@ -3,6 +3,8 @@
 
 package com.arrow.acn.api.mqtt.azure.auth;
 
+import timber.log.Timber;
+
 /**
  * A signature that is used in the SAS token to authenticate the client.
  */
@@ -20,6 +22,7 @@ public final class Signature
      */
     public Signature(String resourceUri, long expiryTime, String deviceKey)
     {
+        Timber.v("Signature: ");
         // Codes_SRS_SIGNATURE_11_001: [The signature shall be computed from a composition of functions as such: encodeSignatureWebSafe(encodeSignatureUtf8(encodeSignatureBase64(encryptSignatureHmacSha256(buildRawSignature(scope, expiryTime))))).]
         byte[] rawSig = SignatureHelper.buildRawSignature(resourceUri,
                 expiryTime);

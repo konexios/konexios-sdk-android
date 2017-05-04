@@ -6,6 +6,8 @@ package com.arrow.acn.api.mqtt.azure;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import timber.log.Timber;
+
 /**
  * Configuration settings for an IoT Hub client. Validates all user-defined
  * settings.
@@ -48,6 +50,7 @@ public final class DeviceClientConfig
     public DeviceClientConfig(String iotHubHostname, String deviceId,
                               String deviceKey, String sharedAccessToken) throws URISyntaxException
     {
+        Timber.v("DeviceClientConfig: ");
         // Codes_SRS_DEVICECLIENTCONFIG_11_014: [If the IoT Hub hostname is
         // not valid URI, the constructor shall throw a URISyntaxException.]
         new URI(iotHubHostname);

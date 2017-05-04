@@ -5,6 +5,8 @@ package com.arrow.acn.api.mqtt.azure.auth;
 
 import com.arrow.acn.api.mqtt.azure.DeviceClientConfig;
 
+import timber.log.Timber;
+
 /** Grants device access to an IoT Hub for the specified amount of time. */
 public final class IotHubSasToken
 {
@@ -36,7 +38,7 @@ public final class IotHubSasToken
      */
     public IotHubSasToken(DeviceClientConfig config, long expiryTime)
     {
-
+        Timber.v("IotHubSasToken: ");
         // Codes_SRS_IOTHUBSASTOKEN_25_005: [**If device key is provided then the signature shall be correctly computed and set.**]**
         if (config.getDeviceKey() != null) {
             // Tests_SRS_IOTHUBSASTOKEN_11_002: [**The constructor shall save all input parameters to member variables.**]
