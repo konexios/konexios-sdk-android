@@ -42,11 +42,13 @@ public class ApiRequestSigner {
     private List<String> parameters;
 
     public ApiRequestSigner() {
+        Timber.v("ApiRequestSigner: ");
         this.parameters = new ArrayList<>();
         this.payload = "";
     }
 
     private static String bytesToHex(@NonNull byte[] bytes) {
+        Timber.v("bytesToHex: ");
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
@@ -81,6 +83,7 @@ public class ApiRequestSigner {
 
     @NonNull
     public ApiRequestSigner setApiKey(String apiKey) {
+        Timber.v("setApiKey: ");
         this.apiKey = apiKey;
         return this;
     }
@@ -91,6 +94,7 @@ public class ApiRequestSigner {
 
     @NonNull
     public ApiRequestSigner setSecretKey(String secretKey) {
+        Timber.v("setSecretKey: ");
         this.secretKey = secretKey;
         return this;
     }
@@ -103,6 +107,7 @@ public class ApiRequestSigner {
 
     @NonNull
     public String signV1() {
+        Timber.v("signV1: ");
         StringBuffer canonicalRequest = new StringBuffer(buildCanonicalRequest());
         canonicalRequest.append(hash(payload));
 
@@ -121,6 +126,7 @@ public class ApiRequestSigner {
 
     @NonNull
     public String encode(@NonNull String key, @NonNull String data) {
+        Timber.v("encode: ");
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -136,6 +142,7 @@ public class ApiRequestSigner {
     }
 
     private String buildCanonicalRequest() {
+        Timber.v("buildCanonicalRequest: ");
         StringBuffer buffer = new StringBuffer();
 
         // append method
@@ -156,6 +163,7 @@ public class ApiRequestSigner {
 
     @Nullable
     private String hash(@NonNull String value) {
+        Timber.v("hash: ");
         MessageDigest digest;
         String result = null;
         try {

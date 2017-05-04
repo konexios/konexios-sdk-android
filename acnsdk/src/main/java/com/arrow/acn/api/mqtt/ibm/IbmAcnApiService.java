@@ -22,6 +22,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 import timber.log.Timber;
 
+import static org.spongycastle.asn1.x500.style.RFC4519Style.l;
+
 /**
  * Created by osminin on 9/2/2016.
  */
@@ -38,6 +40,7 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
 
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
+        Timber.v("getPublisherTopic: %s, %s", deviceType, externalId);
         return String.format("iot-2/type/%s/id/%s/evt/telemetry/fmt/json", deviceType, externalId);
     }
 
@@ -59,19 +62,23 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
     @NonNull
     @Override
     protected String getHost() {
-        Timber.d("getHost");
-        return "ssl://" + this.mConfigResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
+        String host = "ssl://" + this.mConfigResponse.getIbm().getOrganicationId() + IOT_ORGANIZATION_SSL;
+        Timber.d("getHost: %s", host);
+        return host;
     }
 
     @NonNull
     @Override
     protected String getClientId() {
         ConfigResponse.Ibm ibm = this.mConfigResponse.getIbm();
-        return "g:" + ibm.getOrganicationId() + ":" + ibm.getGatewayType() + ":" + ibm.getGatewayId();
+        String res = "g:" + ibm.getOrganicationId() + ":" + ibm.getGatewayType() + ":" + ibm.getGatewayId();
+        Timber.v("getClientId: %s", res);
+        return res;
     }
 
     @Override
     public boolean hasBatchMode() {
+        Timber.v("hasBatchMode: ");
         return false;
     }
 }

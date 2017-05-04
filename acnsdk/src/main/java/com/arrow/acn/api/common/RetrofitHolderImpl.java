@@ -84,41 +84,49 @@ public class RetrofitHolderImpl implements RetrofitHolder {
 
 
     public RetrofitHolderImpl(Executor executor) {
+        Timber.v("RetrofitHolderImpl: ");
         mExecutor = executor;
     }
 
     @Override
     public void setDefaultApiKey(String apiKey) {
+        Timber.v("setDefaultApiKey: ");
         mApiKey = apiKey;
     }
 
     @Override
     public void setDefaultApiSecret(String apiSecret) {
+        Timber.v("setDefaultApiSecret: ");
         mApiSecret = apiSecret;
     }
 
     @Override
     public String getSecretKey() {
+        Timber.v("getSecretKey: ");
         return mRequestSigner.getSecretKey();
     }
 
     @Override
     public void setSecretKey(String secretKey) {
+        Timber.v("setSecretKey: ");
         mRequestSigner.setSecretKey(secretKey);
     }
 
     @Override
     public String getApiKey() {
+        Timber.v("getApiKey: ");
         return mRequestSigner.getApiKey();
     }
 
     @Override
     public void setApiKey(String apiKey) {
+        Timber.v("setApiKey: ");
         mRequestSigner.setApiKey(apiKey);
     }
 
     @Override
     public IotConnectAPIService getIotConnectAPIService(@NonNull String endpoint) {
+        Timber.v("getIotConnectAPIService: ");
         if (mRetrofit == null || !mRetrofit.baseUrl().toString().equals(endpoint)) {
             Retrofit.Builder builder = new Retrofit.Builder()
                     .baseUrl(endpoint)
@@ -135,10 +143,12 @@ public class RetrofitHolderImpl implements RetrofitHolder {
 
     @Override
     public ApiError convertToApiError(@NonNull Response<?> response) {
+        Timber.v("convertToApiError: ");
         return ErrorUtils.parseError(response, mRetrofit);
     }
 
     private String bodyToString(final RequestBody request) {
+        Timber.v("bodyToString: ");
         try {
             final RequestBody copy = request;
             final Buffer buffer = new Buffer();

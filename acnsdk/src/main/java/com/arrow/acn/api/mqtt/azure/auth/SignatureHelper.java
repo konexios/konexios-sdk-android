@@ -16,6 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import timber.log.Timber;
+
 /** Builds the authorization signature as a composition of functions. */
 public final class SignatureHelper
 {
@@ -38,6 +40,7 @@ public final class SignatureHelper
      */
     public static byte[] buildRawSignature(String resourceUri, long expiryTime)
     {
+        Timber.v("buildRawSignature: ");
         // Codes_SRS_SIGNATUREHELPER_11_001: [The function shall initialize the message being encoded as "<scope>\n<expiryTime>".]
         // Codes_SRS_SIGNATUREHELPER_11_002: [The function shall decode the message using the charset UTF-8.]
         return String.format(RAW_SIGNATURE_FORMAT, resourceUri, expiryTime)
@@ -53,6 +56,7 @@ public final class SignatureHelper
      */
     public static byte[] decodeDeviceKeyBase64(String deviceKey)
     {
+        Timber.v("decodeDeviceKeyBase64: ");
         // Codes_SRS_SIGNATUREHELPER_11_003: [The function shall decode the device key using Base64.]
         return Base64.decode(deviceKey.getBytes());
     }
@@ -68,6 +72,7 @@ public final class SignatureHelper
     public static byte[] encryptSignatureHmacSha256(byte[] sig,
                                                     byte[] deviceKey)
     {
+        Timber.v("encryptSignatureHmacSha256: ");
         String hmacSha256 = "HmacSHA256";
 
         // Codes_SRS_SIGNATUREHELPER_11_005: [The function shall use the device key as the secret for the algorithm.]
@@ -103,6 +108,7 @@ public final class SignatureHelper
      */
     public static byte[] encodeSignatureBase64(byte[] sig)
     {
+        Timber.v("encodeSignatureBase64: ");
         // Codes_SRS_SIGNATUREHELPER_11_006: [The function shall encode the signature using Base64.]
         return Base64.encode(sig);
     }
@@ -116,6 +122,7 @@ public final class SignatureHelper
      */
     public static String encodeSignatureUtf8(byte[] sig)
     {
+        Timber.v("encodeSignatureUtf8: ");
         // Codes_SRS_SIGNATUREHELPER_11_010: [The function shall encode the signature using charset UTF-8.]
         return new String(sig, SIGNATURE_CHARSET);
     }
@@ -133,6 +140,7 @@ public final class SignatureHelper
      */
     public static String encodeSignatureWebSafe(String sig)
     {
+        Timber.v("encodeSignatureWebSafe: ");
         String strSig = "";
         try
         {
