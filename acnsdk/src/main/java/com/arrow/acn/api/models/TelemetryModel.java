@@ -19,9 +19,55 @@ import android.support.annotation.NonNull;
  */
 
 public final class TelemetryModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TelemetryModel> CREATOR = new Parcelable.Creator<TelemetryModel>() {
+        @NonNull
+        @Override
+        public TelemetryModel createFromParcel(@NonNull Parcel in) {
+            return new TelemetryModel(in);
+        }
+
+        @NonNull
+        @Override
+        public TelemetryModel[] newArray(int size) {
+            return new TelemetryModel[size];
+        }
+    };
     private String telemetry;
     private String deviceType;
     private String deviceExternalId;
+
+    public TelemetryModel() {
+    }
+
+    protected TelemetryModel(@NonNull Parcel in) {
+        telemetry = in.readString();
+        deviceType = in.readString();
+        deviceExternalId = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TelemetryModel that = (TelemetryModel) o;
+
+        if (telemetry != null ? !telemetry.equals(that.telemetry) : that.telemetry != null)
+            return false;
+        if (deviceType != null ? !deviceType.equals(that.deviceType) : that.deviceType != null)
+            return false;
+        return deviceExternalId != null ? deviceExternalId.equals(that.deviceExternalId) : that.deviceExternalId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = telemetry != null ? telemetry.hashCode() : 0;
+        result = 31 * result + (deviceType != null ? deviceType.hashCode() : 0);
+        result = 31 * result + (deviceExternalId != null ? deviceExternalId.hashCode() : 0);
+        return result;
+    }
 
     public String getDeviceExternalId() {
         return deviceExternalId;
@@ -48,14 +94,6 @@ public final class TelemetryModel implements Parcelable {
         this.deviceType = deviceType;
     }
 
-    public TelemetryModel() {
-    }
-
-    protected TelemetryModel(@NonNull Parcel in) {
-        telemetry = in.readString();
-        deviceType = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -65,20 +103,6 @@ public final class TelemetryModel implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(telemetry);
         dest.writeString(deviceType);
+        dest.writeString(deviceExternalId);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TelemetryModel> CREATOR = new Parcelable.Creator<TelemetryModel>() {
-        @NonNull
-        @Override
-        public TelemetryModel createFromParcel(@NonNull Parcel in) {
-            return new TelemetryModel(in);
-        }
-
-        @NonNull
-        @Override
-        public TelemetryModel[] newArray(int size) {
-            return new TelemetryModel[size];
-        }
-    };
 }

@@ -36,51 +36,79 @@ public class DeviceEventModel implements Parcelable {
         }
     };
     @SerializedName("deviceActionTypeName")
-    private String mDeviceActionTypeName;
+    private String deviceActionTypeName;
     @SerializedName("criteria")
-    private String mCriteria;
+    private String criteria;
     @SerializedName("createdDate")
-    private String mCreatedDate;
+    private String createdDate;
     @SerializedName("status")
-    private String mStatus;
+    private String status;
 
     protected DeviceEventModel(@NonNull Parcel in) {
-        mDeviceActionTypeName = in.readString();
-        mCriteria = in.readString();
-        mCreatedDate = in.readString();
-        mStatus = in.readString();
+        deviceActionTypeName = in.readString();
+        criteria = in.readString();
+        createdDate = in.readString();
+        status = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DeviceEventModel that = (DeviceEventModel) o;
+
+        if (CREATOR != null ? !CREATOR.equals(that.CREATOR) : that.CREATOR != null) return false;
+        if (deviceActionTypeName != null ? !deviceActionTypeName.equals(that.deviceActionTypeName) : that.deviceActionTypeName != null)
+            return false;
+        if (criteria != null ? !criteria.equals(that.criteria) : that.criteria != null)
+            return false;
+        if (createdDate != null ? !createdDate.equals(that.createdDate) : that.createdDate != null)
+            return false;
+        return status != null ? status.equals(that.status) : that.status == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = CREATOR != null ? CREATOR.hashCode() : 0;
+        result = 31 * result + (deviceActionTypeName != null ? deviceActionTypeName.hashCode() : 0);
+        result = 31 * result + (criteria != null ? criteria.hashCode() : 0);
+        result = 31 * result + (createdDate != null ? createdDate.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
     }
 
     public String getDeviceActionTypeName() {
-        return mDeviceActionTypeName;
+        return deviceActionTypeName;
     }
 
     public void setDeviceActionTypeName(String deviceActionTypeName) {
-        mDeviceActionTypeName = deviceActionTypeName;
+        this.deviceActionTypeName = deviceActionTypeName;
     }
 
     public String getCriteria() {
-        return mCriteria;
+        return criteria;
     }
 
     public void setCriteria(String criteria) {
-        mCriteria = criteria;
+        this.criteria = criteria;
     }
 
     public String getCreatedDate() {
-        return mCreatedDate;
+        return createdDate;
     }
 
     public void setCreatedDate(String createdDate) {
-        mCreatedDate = createdDate;
+        this.createdDate = createdDate;
     }
 
     public String getStatus() {
-        return mStatus;
+        return status;
     }
 
     public void setStatus(String status) {
-        mStatus = status;
+        this.status = status;
     }
 
     @Override
@@ -90,14 +118,14 @@ public class DeviceEventModel implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mDeviceActionTypeName);
-        dest.writeString(mCriteria);
-        if (mCreatedDate == null) {
+        dest.writeString(deviceActionTypeName);
+        dest.writeString(criteria);
+        if (createdDate == null) {
             dest.writeByte((byte) (0x00));
         } else {
             dest.writeByte((byte) (0x01));
-            dest.writeString(mCreatedDate);
+            dest.writeString(createdDate);
         }
-        dest.writeString(mStatus);
+        dest.writeString(status);
     }
 }

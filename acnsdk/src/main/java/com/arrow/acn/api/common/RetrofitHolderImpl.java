@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -80,6 +81,7 @@ public class RetrofitHolderImpl implements RetrofitHolder {
                 }
             })
             .sslSocketFactory(new NoSSLv3SocketFactory())
+            .connectTimeout(20000, TimeUnit.MILLISECONDS)
             .build();
 
 

@@ -35,95 +35,95 @@ public final class GatewayResponse implements Parcelable {
         }
     };
     @SerializedName("hid")
-    private String mHid;
+    private String hid;
     @SerializedName("message")
-    private String mMessage;
+    private String message;
     @SerializedName("type")
-    private String mType;
+    private String type;
     @SerializedName("userHid")
-    private String mUserHid;
+    private String userHid;
     @SerializedName("gatewayHid")
-    private String mGatewayHid;
+    private String gatewayHid;
     @SerializedName("info")
-    private String mInfo;
+    private String info;
     @SerializedName("properties")
-    private String mProperties;
+    private String properties;
     @SerializedName("externalId")
-    private String mExternalId;
+    private String externalId;
 
     protected GatewayResponse(@NonNull Parcel in) {
-        mHid = in.readString();
-        mMessage = in.readString();
-        mType = in.readString();
-        mUserHid = in.readString();
-        mGatewayHid = in.readString();
-        mInfo = in.readString();
-        mProperties = in.readString();
-        mExternalId = in.readString();
+        hid = in.readString();
+        message = in.readString();
+        type = in.readString();
+        userHid = in.readString();
+        gatewayHid = in.readString();
+        info = in.readString();
+        properties = in.readString();
+        externalId = in.readString();
     }
 
     public String getExternalId() {
-        return mExternalId;
+        return externalId;
     }
 
     public void setExternalId(String externalId) {
-        mExternalId = externalId;
+        this.externalId = externalId;
     }
 
     public String getType() {
-        return mType;
+        return type;
     }
 
     public void setType(String type) {
-        mType = type;
+        this.type = type;
     }
 
     public String getUserHid() {
-        return mUserHid;
+        return userHid;
     }
 
     public void setUserHid(String userHid) {
-        mUserHid = userHid;
+        this.userHid = userHid;
     }
 
     public String getGatewayHid() {
-        return mGatewayHid;
+        return gatewayHid;
     }
 
     public void setGatewayHid(String gatewayHid) {
-        mGatewayHid = gatewayHid;
+        this.gatewayHid = gatewayHid;
     }
 
     public String getInfo() {
-        return mInfo;
+        return info;
     }
 
     public void setInfo(String info) {
-        mInfo = info;
+        this.info = info;
     }
 
     public String getProperties() {
-        return mProperties;
+        return properties;
     }
 
     public void setProperties(String properties) {
-        mProperties = properties;
+        this.properties = properties;
     }
 
     public String getHid() {
-        return mHid;
+        return hid;
     }
 
     public void setHid(String hid) {
-        mHid = hid;
+        this.hid = hid;
     }
 
     public String getMessage() {
-        return mMessage;
+        return message;
     }
 
     public void setMessage(String message) {
-        mMessage = message;
+        this.message = message;
     }
 
     @Override
@@ -133,13 +133,13 @@ public final class GatewayResponse implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mHid);
-        dest.writeString(mMessage);
-        dest.writeString(mType);
-        dest.writeString(mUserHid);
-        dest.writeString(mGatewayHid);
-        dest.writeString(mInfo);
-        dest.writeString(mProperties);
-        dest.writeString(mExternalId);
+        dest.writeString(hid);
+        dest.writeString(message);
+        dest.writeString(type);
+        dest.writeString(userHid);
+        dest.writeString(gatewayHid);
+        dest.writeString(info);
+        dest.writeString(properties);
+        dest.writeString(externalId);
     }
 }

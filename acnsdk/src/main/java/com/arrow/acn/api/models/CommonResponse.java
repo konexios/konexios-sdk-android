@@ -14,6 +14,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -23,18 +27,67 @@ import com.google.gson.annotations.SerializedName;
 
 public class CommonResponse implements Parcelable {
 
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<CommonResponse> CREATOR = new Parcelable.Creator<CommonResponse>() {
+        @NonNull
+        @Override
+        public CommonResponse createFromParcel(@NonNull Parcel in) {
+            return new CommonResponse(in);
+        }
+
+        @NonNull
+        @Override
+        public CommonResponse[] newArray(int size) {
+            return new CommonResponse[size];
+        }
+    };
     @SerializedName("hid")
     @Expose
     private String hid;
     @SerializedName("links")
     @Expose
-    private Links links;
+    private JsonElement links;
     @SerializedName("message")
     @Expose
     private String message;
     @SerializedName("pri")
     @Expose
     private String pri;
+
+    public CommonResponse() {
+    }
+
+    protected CommonResponse(@NonNull Parcel in) {
+        hid = in.readString();
+        JsonParser parser = new JsonParser();
+        links = parser.parse(in.readString()).getAsJsonObject();
+        message = in.readString();
+        pri = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CommonResponse response = (CommonResponse) o;
+
+        if (hid != null ? !hid.equals(response.hid) : response.hid != null) return false;
+        if (!getLinks().equals(response.getLinks())) return false;
+        if (message != null ? !message.equals(response.message) : response.message != null)
+            return false;
+        return pri != null ? pri.equals(response.pri) : response.pri == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hid != null ? hid.hashCode() : 0;
+        result = 31 * result + (links != null ? links.hashCode() : 0);
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (pri != null ? pri.hashCode() : 0);
+        return result;
+    }
 
     /**
      * @return The hid
@@ -53,14 +106,17 @@ public class CommonResponse implements Parcelable {
     /**
      * @return The links
      */
-    public Links getLinks() {
+    public JsonElement getLinks() {
+        if (links == null) {
+            links = new JsonObject();
+        }
         return links;
     }
 
     /**
      * @param links The links
      */
-    public void setLinks(Links links) {
+    public void setLinks(JsonElement links) {
         this.links = links;
     }
 
@@ -92,16 +148,6 @@ public class CommonResponse implements Parcelable {
         this.pri = pri;
     }
 
-    public CommonResponse() {
-    }
-
-    protected CommonResponse(@NonNull Parcel in) {
-        hid = in.readString();
-        links = (Links) in.readValue(Links.class.getClassLoader());
-        message = in.readString();
-        pri = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -110,23 +156,9 @@ public class CommonResponse implements Parcelable {
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(hid);
-        dest.writeValue(links);
+        String str = new Gson().toJson(getLinks());
+        dest.writeString(str);
         dest.writeString(message);
         dest.writeString(pri);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CommonResponse> CREATOR = new Parcelable.Creator<CommonResponse>() {
-        @NonNull
-        @Override
-        public CommonResponse createFromParcel(@NonNull Parcel in) {
-            return new CommonResponse(in);
-        }
-
-        @NonNull
-        @Override
-        public CommonResponse[] newArray(int size) {
-            return new CommonResponse[size];
-        }
-    };
 }
