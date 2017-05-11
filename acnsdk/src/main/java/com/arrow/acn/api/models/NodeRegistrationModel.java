@@ -10,6 +10,9 @@
 
 package com.arrow.acn.api.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -17,7 +20,19 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 10/11/2016.
  */
 
-public final class NodeRegistrationModel {
+public final class NodeRegistrationModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<NodeRegistrationModel> CREATOR = new Parcelable.Creator<NodeRegistrationModel>() {
+        @Override
+        public NodeRegistrationModel createFromParcel(Parcel in) {
+            return new NodeRegistrationModel(in);
+        }
+
+        @Override
+        public NodeRegistrationModel[] newArray(int size) {
+            return new NodeRegistrationModel[size];
+        }
+    };
     @SerializedName("description")
     @Expose
     private String description;
@@ -34,6 +49,18 @@ public final class NodeRegistrationModel {
     @Expose
     private String parentNodeHid;
 
+    public NodeRegistrationModel() {
+
+    }
+
+    protected NodeRegistrationModel(Parcel in) {
+        description = in.readString();
+        enabled = in.readByte() != 0x00;
+        name = in.readString();
+        nodeTypeHid = in.readString();
+        parentNodeHid = in.readString();
+    }
+
     /**
      * @return The description
      */
@@ -46,6 +73,33 @@ public final class NodeRegistrationModel {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeRegistrationModel that = (NodeRegistrationModel) o;
+
+        if (enabled != that.enabled) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null)
+            return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (nodeTypeHid != null ? !nodeTypeHid.equals(that.nodeTypeHid) : that.nodeTypeHid != null)
+            return false;
+        return parentNodeHid != null ? parentNodeHid.equals(that.parentNodeHid) : that.parentNodeHid == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = description != null ? description.hashCode() : 0;
+        result = 31 * result + (enabled ? 1 : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (nodeTypeHid != null ? nodeTypeHid.hashCode() : 0);
+        result = 31 * result + (parentNodeHid != null ? parentNodeHid.hashCode() : 0);
+        return result;
     }
 
     /**
@@ -104,4 +158,17 @@ public final class NodeRegistrationModel {
         this.parentNodeHid = parentNodeHid;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(description);
+        dest.writeByte((byte) (enabled ? 0x01 : 0x00));
+        dest.writeString(name);
+        dest.writeString(nodeTypeHid);
+        dest.writeString(parentNodeHid);
+    }
 }

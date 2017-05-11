@@ -36,6 +36,9 @@ public final class DeviceRegistrationResponse extends CommonResponse implements 
     @SerializedName("externalId")
     private String externalId;
 
+    public DeviceRegistrationResponse() {
+    }
+
     protected DeviceRegistrationResponse(@NonNull Parcel in) {
         super(in);
         externalId = in.readString();
@@ -50,6 +53,26 @@ public final class DeviceRegistrationResponse extends CommonResponse implements 
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        DeviceRegistrationResponse that = (DeviceRegistrationResponse) o;
+
+        return externalId != null ? externalId.equals(that.externalId) : that.externalId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (externalId != null ? externalId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+
     public int describeContents() {
         return 0;
     }

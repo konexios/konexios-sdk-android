@@ -14,6 +14,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -22,6 +26,20 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public final class NodeModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<NodeModel> CREATOR = new Parcelable.Creator<NodeModel>() {
+        @NonNull
+        @Override
+        public NodeModel createFromParcel(@NonNull Parcel in) {
+            return new NodeModel(in);
+        }
+
+        @NonNull
+        @Override
+        public NodeModel[] newArray(int size) {
+            return new NodeModel[size];
+        }
+    };
     @SerializedName("createdBy")
     @Expose
     private String createdBy;
@@ -45,7 +63,7 @@ public final class NodeModel implements Parcelable {
     private String lastModifiedString;
     @SerializedName("links")
     @Expose
-    private Links links;
+    private JsonElement links;
     @SerializedName("name")
     @Expose
     private String name;
@@ -58,6 +76,70 @@ public final class NodeModel implements Parcelable {
     @SerializedName("pri")
     @Expose
     private String pri;
+
+    public NodeModel() {
+    }
+    protected NodeModel(@NonNull Parcel in) {
+        createdBy = in.readString();
+        createdString = in.readString();
+        description = in.readString();
+        enabled = in.readByte() != 0x00;
+        hid = in.readString();
+        lastModifiedBy = in.readString();
+        lastModifiedString = in.readString();
+        JsonParser parser = new JsonParser();
+        links = parser.parse(in.readString()).getAsJsonObject();
+        name = in.readString();
+        nodeTypeHid = in.readString();
+        parentNodeHid = in.readString();
+        pri = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeModel nodeModel = (NodeModel) o;
+
+        if (enabled != nodeModel.enabled) return false;
+        if (createdBy != null ? !createdBy.equals(nodeModel.createdBy) : nodeModel.createdBy != null)
+            return false;
+        if (createdString != null ? !createdString.equals(nodeModel.createdString) : nodeModel.createdString != null)
+            return false;
+        if (description != null ? !description.equals(nodeModel.description) : nodeModel.description != null)
+            return false;
+        if (hid != null ? !hid.equals(nodeModel.hid) : nodeModel.hid != null) return false;
+        if (lastModifiedBy != null ? !lastModifiedBy.equals(nodeModel.lastModifiedBy) : nodeModel.lastModifiedBy != null)
+            return false;
+        if (lastModifiedString != null ? !lastModifiedString.equals(nodeModel.lastModifiedString) : nodeModel.lastModifiedString != null)
+            return false;
+        if (links != null ? !links.equals(nodeModel.links) : nodeModel.links != null) return false;
+        if (name != null ? !name.equals(nodeModel.name) : nodeModel.name != null) return false;
+        if (nodeTypeHid != null ? !nodeTypeHid.equals(nodeModel.nodeTypeHid) : nodeModel.nodeTypeHid != null)
+            return false;
+        if (parentNodeHid != null ? !parentNodeHid.equals(nodeModel.parentNodeHid) : nodeModel.parentNodeHid != null)
+            return false;
+        return pri != null ? pri.equals(nodeModel.pri) : nodeModel.pri == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = createdBy != null ? createdBy.hashCode() : 0;
+        result = 31 * result + (createdString != null ? createdString.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (enabled ? 1 : 0);
+        result = 31 * result + (hid != null ? hid.hashCode() : 0);
+        result = 31 * result + (lastModifiedBy != null ? lastModifiedBy.hashCode() : 0);
+        result = 31 * result + (lastModifiedString != null ? lastModifiedString.hashCode() : 0);
+        result = 31 * result + (links != null ? links.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (nodeTypeHid != null ? nodeTypeHid.hashCode() : 0);
+        result = 31 * result + (parentNodeHid != null ? parentNodeHid.hashCode() : 0);
+        result = 31 * result + (pri != null ? pri.hashCode() : 0);
+        return result;
+    }
 
     /**
      * @return The createdBy
@@ -160,14 +242,17 @@ public final class NodeModel implements Parcelable {
     /**
      * @return The links
      */
-    public Links getLinks() {
+    public JsonElement getLinks() {
+        if (links == null) {
+            links = new JsonObject();
+        }
         return links;
     }
 
     /**
      * @param links The links
      */
-    public void setLinks(Links links) {
+    public void setLinks(JsonElement links) {
         this.links = links;
     }
 
@@ -227,21 +312,6 @@ public final class NodeModel implements Parcelable {
         this.pri = pri;
     }
 
-    protected NodeModel(@NonNull Parcel in) {
-        createdBy = in.readString();
-        createdString = in.readString();
-        description = in.readString();
-        enabled = in.readByte() != 0x00;
-        hid = in.readString();
-        lastModifiedBy = in.readString();
-        lastModifiedString = in.readString();
-        links = (Links) in.readValue(Links.class.getClassLoader());
-        name = in.readString();
-        nodeTypeHid = in.readString();
-        parentNodeHid = in.readString();
-        pri = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -256,25 +326,12 @@ public final class NodeModel implements Parcelable {
         dest.writeString(hid);
         dest.writeString(lastModifiedBy);
         dest.writeString(lastModifiedString);
-        dest.writeValue(links);
+        Gson gson = new Gson();
+        String str = gson.toJson(getLinks());
+        dest.writeString(str);
         dest.writeString(name);
         dest.writeString(nodeTypeHid);
         dest.writeString(parentNodeHid);
         dest.writeString(pri);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<NodeModel> CREATOR = new Parcelable.Creator<NodeModel>() {
-        @NonNull
-        @Override
-        public NodeModel createFromParcel(@NonNull Parcel in) {
-            return new NodeModel(in);
-        }
-
-        @NonNull
-        @Override
-        public NodeModel[] newArray(int size) {
-            return new NodeModel[size];
-        }
-    };
 }

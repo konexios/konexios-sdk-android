@@ -20,92 +20,8 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 4/14/2016.
  */
 public final class AccountResponse implements Parcelable {
-    @SerializedName("hid")
-    private String mHid;
-    @SerializedName("message")
-    private String mMessage;
-    @SerializedName("name")
-    private String mName;
-    @SerializedName("email")
-    private String mEmail;
-    @SerializedName("code")
-    private String mCode;
-    @SerializedName("applicationHid")
-    private String mApplicationHid;
-
-    public String getApplicationHid() {
-        return mApplicationHid;
-    }
-
-    public void setApplicationHid(String applicationHid) {
-        mApplicationHid = applicationHid;
-    }
-
-    public String getCode() {
-        return mCode;
-    }
-
-    public void setCode(String code) {
-        mCode = code;
-    }
-
-    public String getHid() {
-        return mHid;
-    }
-
-    public void setHid(String hid) {
-        mHid = hid;
-    }
-
-    public String getMessage() {
-        return mMessage;
-    }
-
-    public void setMessage(String message) {
-        mMessage = message;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
-    }
-
-    public String getEmail() {
-        return mEmail;
-    }
-
-    public void setEmail(String email) {
-        mEmail = email;
-    }
-
-    protected AccountResponse(@NonNull Parcel in) {
-        mHid = in.readString();
-        mMessage = in.readString();
-        mName = in.readString();
-        mEmail = in.readString();
-        mCode = in.readString();
-        mApplicationHid = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mHid);
-        dest.writeString(mMessage);
-        dest.writeString(mName);
-        dest.writeString(mEmail);
-        dest.writeString(mCode);
-        dest.writeString(mApplicationHid);
-    }
-
     @SuppressWarnings("unused")
+
     public static final Parcelable.Creator<AccountResponse> CREATOR = new Parcelable.Creator<AccountResponse>() {
         @NonNull
         @Override
@@ -119,4 +35,119 @@ public final class AccountResponse implements Parcelable {
             return new AccountResponse[size];
         }
     };
+    @SerializedName("hid")
+    private String hid;
+    @SerializedName("message")
+    private String message;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("email")
+    private String email;
+    @SerializedName("code")
+    private String code;
+    @SerializedName("applicationHid")
+    private String applicationHid;
+
+    public AccountResponse() {
+    }
+
+    protected AccountResponse(@NonNull Parcel in) {
+        hid = in.readString();
+        message = in.readString();
+        name = in.readString();
+        email = in.readString();
+        code = in.readString();
+        applicationHid = in.readString();
+    }
+
+    public String getApplicationHid() {
+        return applicationHid;
+    }
+
+    public void setApplicationHid(String applicationHid) {
+        this.applicationHid = applicationHid;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getHid() {
+        return hid;
+    }
+
+    public void setHid(String hid) {
+        this.hid = hid;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(hid);
+        dest.writeString(message);
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeString(code);
+        dest.writeString(applicationHid);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccountResponse response = (AccountResponse) o;
+
+        if (hid != null ? !hid.equals(response.hid) : response.hid != null) return false;
+        if (message != null ? !message.equals(response.message) : response.message != null)
+            return false;
+        if (name != null ? !name.equals(response.name) : response.name != null) return false;
+        if (email != null ? !email.equals(response.email) : response.email != null) return false;
+        if (code != null ? !code.equals(response.code) : response.code != null) return false;
+        return applicationHid != null ? applicationHid.equals(response.applicationHid) : response.applicationHid == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hid != null ? hid.hashCode() : 0;
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (code != null ? code.hashCode() : 0);
+        result = 31 * result + (applicationHid != null ? applicationHid.hashCode() : 0);
+        return result;
+    }
 }

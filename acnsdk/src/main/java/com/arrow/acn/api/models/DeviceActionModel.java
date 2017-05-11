@@ -22,127 +22,6 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public final class DeviceActionModel implements Parcelable {
-    @SerializedName("criteria")
-    String mCriteria;
-    @SerializedName("description")
-    String mDescription;
-    @Nullable
-    @SerializedName("enabled")
-    Boolean mEnabled;
-    @Nullable
-    @SerializedName("expiration")
-    Integer mExpiration;
-    @Nullable
-    @SerializedName("index")
-    Integer mIndex;
-    @SerializedName("parameters")
-    ActionParametersModel mParameters;
-    @SerializedName("systemName")
-    String mSystemName;
-
-    public String getCriteria() {
-        return mCriteria;
-    }
-
-    public void setCriteria(String criteria) {
-        mCriteria = criteria;
-    }
-
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public void setDescription(String description) {
-        mDescription = description;
-    }
-
-    @Nullable
-    public Boolean getEnabled() {
-        return mEnabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        mEnabled = enabled;
-    }
-
-    @Nullable
-    public Integer getExpiration() {
-        return mExpiration;
-    }
-
-    public void setExpiration(Integer expiration) {
-        mExpiration = expiration;
-    }
-
-    @Nullable
-    public Integer getIndex() {
-        return mIndex;
-    }
-
-    public void setIndex(Integer index) {
-        mIndex = index;
-    }
-
-    public ActionParametersModel getParameters() {
-        return mParameters;
-    }
-
-    public void setParameters(ActionParametersModel parameters) {
-        mParameters = parameters;
-    }
-
-    public String getSystemName() {
-        return mSystemName;
-    }
-
-    public void setSystemName(String systemName) {
-        mSystemName = systemName;
-    }
-
-    protected DeviceActionModel(@NonNull Parcel in) {
-        mCriteria = in.readString();
-        mDescription = in.readString();
-        byte mEnabledVal = in.readByte();
-        mEnabled = mEnabledVal == 0x02 ? null : mEnabledVal != 0x00;
-        mExpiration = in.readByte() == 0x00 ? null : in.readInt();
-        mIndex = in.readByte() == 0x00 ? null : in.readInt();
-        mParameters = (ActionParametersModel) in.readValue(ActionParametersModel.class.getClassLoader());
-        mSystemName = in.readString();
-    }
-
-    public DeviceActionModel() {
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mCriteria);
-        dest.writeString(mDescription);
-        if (mEnabled == null) {
-            dest.writeByte((byte) (0x02));
-        } else {
-            dest.writeByte((byte) (mEnabled ? 0x01 : 0x00));
-        }
-        if (mExpiration == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(mExpiration);
-        }
-        if (mIndex == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(mIndex);
-        }
-        dest.writeValue(mParameters);
-        dest.writeString(mSystemName);
-    }
-
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<DeviceActionModel> CREATOR = new Parcelable.Creator<DeviceActionModel>() {
         @NonNull
@@ -157,4 +36,158 @@ public final class DeviceActionModel implements Parcelable {
             return new DeviceActionModel[size];
         }
     };
+    @SerializedName("criteria")
+    String criteria;
+    @SerializedName("description")
+    String description;
+    @Nullable
+    @SerializedName("enabled")
+    Boolean enabled;
+    @Nullable
+    @SerializedName("expiration")
+    Integer expiration;
+    @Nullable
+    @SerializedName("index")
+    Integer index;
+    @SerializedName("parameters")
+    ActionParametersModel parameters;
+    @SerializedName("systemName")
+    String systemName;
+
+    protected DeviceActionModel(@NonNull Parcel in) {
+        criteria = in.readString();
+        description = in.readString();
+        byte mEnabledVal = in.readByte();
+        enabled = mEnabledVal == 0x02 ? null : mEnabledVal != 0x00;
+        expiration = in.readByte() == 0x00 ? null : in.readInt();
+        index = in.readByte() == 0x00 ? null : in.readInt();
+        parameters = (ActionParametersModel) in.readValue(ActionParametersModel.class.getClassLoader());
+        systemName = in.readString();
+    }
+
+    public DeviceActionModel() {
+    }
+
+    public String getCriteria() {
+        return criteria;
+    }
+
+    public void setCriteria(String criteria) {
+        this.criteria = criteria;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Nullable
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Nullable
+    public Integer getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Integer expiration) {
+        this.expiration = expiration;
+    }
+
+    @Nullable
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
+
+    public ActionParametersModel getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(ActionParametersModel parameters) {
+        this.parameters = parameters;
+    }
+
+    public String getSystemName() {
+        return systemName;
+    }
+
+    public void setSystemName(String systemName) {
+        this.systemName = systemName;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DeviceActionModel that = (DeviceActionModel) o;
+
+        if (criteria != null ? !criteria.equals(that.criteria) : that.criteria != null)
+            return false;
+        if (description != null ? !description.equals(that.description) : that.description != null)
+            return false;
+        if (enabled != null ? !enabled.equals(that.enabled) : that.enabled != null) return false;
+        if (expiration != null ? !expiration.equals(that.expiration) : that.expiration != null)
+            return false;
+        if (index != null ? !index.equals(that.index) : that.index != null) return false;
+        if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null)
+            return false;
+        return systemName != null ? systemName.equals(that.systemName) : that.systemName == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = criteria != null ? criteria.hashCode() : 0;
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (enabled != null ? enabled.hashCode() : 0);
+        result = 31 * result + (expiration != null ? expiration.hashCode() : 0);
+        result = 31 * result + (index != null ? index.hashCode() : 0);
+        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        result = 31 * result + (systemName != null ? systemName.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(criteria);
+        dest.writeString(description);
+        if (enabled == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (enabled ? 0x01 : 0x00));
+        }
+        if (expiration == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(expiration);
+        }
+        if (index == null) {
+            dest.writeByte((byte) (0x00));
+
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(index);
+        }
+        dest.writeValue(parameters);
+        dest.writeString(systemName);
+    }
 }

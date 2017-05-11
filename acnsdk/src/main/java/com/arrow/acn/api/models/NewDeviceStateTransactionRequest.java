@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -52,11 +53,15 @@ public class NewDeviceStateTransactionRequest implements Parcelable {
     }
 
     protected NewDeviceStateTransactionRequest(Parcel in) {
-        states = (JsonElement) in.readValue(JsonElement.class.getClassLoader());
+        JsonParser parser = new JsonParser();
+        states = parser.parse(in.readString()).getAsJsonObject();
         timestamp = in.readString();
     }
 
     public JsonElement getStates() {
+        if (states == null) {
+            states = new JsonObject();
+        }
         return states;
     }
 
@@ -96,7 +101,9 @@ public class NewDeviceStateTransactionRequest implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(states);
+        Gson gson = new Gson();
+        String str = gson.toJson(getStates());
+        dest.writeString(str);
         dest.writeString(timestamp);
     }
 }

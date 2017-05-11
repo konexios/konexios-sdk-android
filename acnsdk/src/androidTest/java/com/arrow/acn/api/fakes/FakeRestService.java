@@ -132,7 +132,7 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<PagingResultModel<AuditLogModel>> getGatewayLogs(@Path("hid") String hid, @Query("createdDateFrom") String createdDateFrom, @Query("createdDateTo") String createdDateTo, @Query("userHids") String[] userHids, @Query("types") String[] types, @Query("sortField") String sortField, @Query("sortDirection") String sortDirection, @Query("_page") int page, @Query("_size") int size) {
+    public Call<PagingResultModel<AuditLogModel>> getGatewayLogs(@Path("hid") String hid, @Query("createdDateFrom") String createdDateFrom, @Query("createdDateTo") String createdDateTo, @Query("userHids") List<String> userHids, @Query("types") List<String> types, @Query("sortField") String sortField, @Query("sortDirection") String sortDirection, @Query("_page") int page, @Query("_size") int size) {
         return null;
     }
 
@@ -264,7 +264,7 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<PagingResultModel<AuditLogModel>> listDeviceAuditLogs(@Path("hid") String hid, @Query("createdDateFrom") String createdDateFrom, @Query("createdDateTo") String createdDateTo, @Query("userHids") String[] userHids, @Query("types") String[] types, @Query("sortField") String sortField, @Query("sortDirection") String sortDirection, @Query("_page") int page, @Query("_size") int size) {
+    public Call<PagingResultModel<AuditLogModel>> listDeviceAuditLogs(@Path("hid") String hid, @Query("createdDateFrom") String createdDateFrom, @Query("createdDateTo") String createdDateTo, @Query("userHids") List<String> userHids, @Query("types") List<String> types, @Query("sortField") String sortField, @Query("sortDirection") String sortDirection, @Query("_page") int page, @Query("_size") int size) {
         return null;
     }
 

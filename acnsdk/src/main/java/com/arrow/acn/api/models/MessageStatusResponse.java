@@ -76,4 +76,23 @@ public class MessageStatusResponse implements Parcelable {
         dest.writeString(message);
         dest.writeString(status);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MessageStatusResponse that = (MessageStatusResponse) o;
+
+        if (message != null ? !message.equals(that.message) : that.message != null) return false;
+        return status != null ? status.equals(that.status) : that.status == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = message != null ? message.hashCode() : 0;
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
+    }
 }

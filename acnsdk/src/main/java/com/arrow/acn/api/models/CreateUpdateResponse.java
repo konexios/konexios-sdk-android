@@ -20,10 +20,29 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 3/16/2016.
  */
 public final class CreateUpdateResponse implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<CreateUpdateResponse> CREATOR = new Parcelable.Creator<CreateUpdateResponse>() {
+        @NonNull
+        @Override
+        public CreateUpdateResponse createFromParcel(@NonNull Parcel in) {
+            return new CreateUpdateResponse(in);
+        }
+
+        @NonNull
+        @Override
+        public CreateUpdateResponse[] newArray(int size) {
+            return new CreateUpdateResponse[size];
+        }
+    };
     @SerializedName("id")
     private String id;
     @SerializedName("message")
     private String message;
+
+    protected CreateUpdateResponse(@NonNull Parcel in) {
+        id = in.readString();
+        message = in.readString();
+    }
 
     public String getId() {
         return id;
@@ -46,11 +65,6 @@ public final class CreateUpdateResponse implements Parcelable {
         return String.format("[%s | %s]", id, message);
     }
 
-    protected CreateUpdateResponse(@NonNull Parcel in) {
-        id = in.readString();
-        message = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -62,18 +76,22 @@ public final class CreateUpdateResponse implements Parcelable {
         dest.writeString(message);
     }
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CreateUpdateResponse> CREATOR = new Parcelable.Creator<CreateUpdateResponse>() {
-        @NonNull
-        @Override
-        public CreateUpdateResponse createFromParcel(@NonNull Parcel in) {
-            return new CreateUpdateResponse(in);
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        @NonNull
-        @Override
-        public CreateUpdateResponse[] newArray(int size) {
-            return new CreateUpdateResponse[size];
-        }
-    };
+        CreateUpdateResponse that = (CreateUpdateResponse) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        return message != null ? message.equals(that.message) : that.message == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        return result;
+    }
 }
