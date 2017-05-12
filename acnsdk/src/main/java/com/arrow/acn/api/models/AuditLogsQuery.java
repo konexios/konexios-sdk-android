@@ -42,6 +42,9 @@ public final class AuditLogsQuery implements Parcelable {
     private int page;
     private int size;
 
+    public AuditLogsQuery() {
+    }
+
     public AuditLogsQuery(String createdDateFrom, String createdDateTo, List<String> userHids, List<String> types, String sortField, String sortDirection, int page, int size) {
         this.createdDateFrom = createdDateFrom;
         this.createdDateTo = createdDateTo;

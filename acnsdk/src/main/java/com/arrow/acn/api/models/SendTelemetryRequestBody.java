@@ -22,18 +22,27 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 3/16/2016.
  */
 public final class SendTelemetryRequestBody implements Parcelable {
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<SendTelemetryRequestBody> CREATOR = new Parcelable.Creator<SendTelemetryRequestBody>() {
+        @NonNull
+        @Override
+        public SendTelemetryRequestBody createFromParcel(@NonNull Parcel in) {
+            return new SendTelemetryRequestBody(in);
+        }
+
+        @NonNull
+        @Override
+        public SendTelemetryRequestBody[] newArray(int size) {
+            return new SendTelemetryRequestBody[size];
+        }
+    };
     @SerializedName(Constants.DEVICE_ID_KEY)
     String mDeviceIdKey;
-
-    @Nullable
     @SerializedName("long_timestamp")
     Long mTimestamp;
-
-    @Nullable
     @SerializedName("double_longitude")
     Double mLongitude;
-
-    @Nullable
     @SerializedName("double_latitude")
     Double mLatitude;
 
@@ -52,6 +61,13 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mTimestamp = body.getTimestamp();
         mLongitude = body.getLongitude();
         mLatitude = body.getLatitude();
+    }
+
+    protected SendTelemetryRequestBody(@NonNull Parcel in) {
+        mDeviceIdKey = in.readString();
+        mTimestamp = in.readByte() == 0x00 ? null : in.readLong();
+        mLongitude = in.readByte() == 0x00 ? null : in.readDouble();
+        mLatitude = in.readByte() == 0x00 ? null : in.readDouble();
     }
 
     public String getDeviceIdKey() {
@@ -89,16 +105,35 @@ public final class SendTelemetryRequestBody implements Parcelable {
         mLatitude = latitude;
     }
 
-    protected SendTelemetryRequestBody(@NonNull Parcel in) {
-        mDeviceIdKey = in.readString();
-        mTimestamp = in.readByte() == 0x00 ? null : in.readLong();
-        mLongitude = in.readByte() == 0x00 ? null : in.readDouble();
-        mLatitude = in.readByte() == 0x00 ? null : in.readDouble();
-    }
-
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SendTelemetryRequestBody that = (SendTelemetryRequestBody) o;
+
+        if (mDeviceIdKey != null ? !mDeviceIdKey.equals(that.mDeviceIdKey) : that.mDeviceIdKey != null)
+            return false;
+        if (mTimestamp != null ? !mTimestamp.equals(that.mTimestamp) : that.mTimestamp != null)
+            return false;
+        if (mLongitude != null ? !mLongitude.equals(that.mLongitude) : that.mLongitude != null)
+            return false;
+        return mLatitude != null ? mLatitude.equals(that.mLatitude) : that.mLatitude == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mDeviceIdKey != null ? mDeviceIdKey.hashCode() : 0;
+        result = 31 * result + (mTimestamp != null ? mTimestamp.hashCode() : 0);
+        result = 31 * result + (mLongitude != null ? mLongitude.hashCode() : 0);
+        result = 31 * result + (mLatitude != null ? mLatitude.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -118,24 +153,10 @@ public final class SendTelemetryRequestBody implements Parcelable {
         }
         if (mLatitude == null) {
             dest.writeByte((byte) (0x00));
+
         } else {
             dest.writeByte((byte) (0x01));
             dest.writeDouble(mLatitude);
         }
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<SendTelemetryRequestBody> CREATOR = new Parcelable.Creator<SendTelemetryRequestBody>() {
-        @NonNull
-        @Override
-        public SendTelemetryRequestBody createFromParcel(@NonNull Parcel in) {
-            return new SendTelemetryRequestBody(in);
-        }
-
-        @NonNull
-        @Override
-        public SendTelemetryRequestBody[] newArray(int size) {
-            return new SendTelemetryRequestBody[size];
-        }
-    };
 }
