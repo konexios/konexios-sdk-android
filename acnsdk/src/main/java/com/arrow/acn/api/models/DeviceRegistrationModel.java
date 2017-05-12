@@ -28,17 +28,17 @@ import java.util.List;
 public class DeviceRegistrationModel implements Parcelable {
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CommonResponse> CREATOR = new Parcelable.Creator<CommonResponse>() {
+    public static final Parcelable.Creator<DeviceRegistrationModel> CREATOR = new Parcelable.Creator<DeviceRegistrationModel>() {
         @NonNull
         @Override
-        public CommonResponse createFromParcel(@NonNull Parcel in) {
-            return new CommonResponse(in);
+        public DeviceRegistrationModel createFromParcel(@NonNull Parcel in) {
+            return new DeviceRegistrationModel(in);
         }
 
         @NonNull
         @Override
-        public CommonResponse[] newArray(int size) {
-            return new CommonResponse[size];
+        public DeviceRegistrationModel[] newArray(int size) {
+            return new DeviceRegistrationModel[size];
         }
     };
     @SerializedName("enabled")

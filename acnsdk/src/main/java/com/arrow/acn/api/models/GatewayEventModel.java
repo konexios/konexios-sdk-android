@@ -67,6 +67,29 @@ public final class GatewayEventModel implements Parcelable {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GatewayEventModel that = (GatewayEventModel) o;
+
+        if (encrypted != that.encrypted) return false;
+        if (hid != null ? !hid.equals(that.hid) : that.hid != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return parameters != null ? parameters.equals(that.parameters) : that.parameters == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hid != null ? hid.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (encrypted ? 1 : 0);
+        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        return result;
+    }
+
     public String getHid() {
         return hid;
     }
@@ -93,6 +116,10 @@ public final class GatewayEventModel implements Parcelable {
 
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
     }
 
     @Override

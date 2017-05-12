@@ -43,6 +43,9 @@ public final class ActionResponseModel implements Parcelable {
     @SerializedName("data")
     List<DeviceActionModel> actionModels;
 
+    public ActionResponseModel() {
+    }
+
     protected ActionResponseModel(@NonNull Parcel in) {
         if (in.readByte() == 0x01) {
             actionModels = new ArrayList<>();

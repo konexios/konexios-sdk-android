@@ -124,5 +124,4 @@ public class PagingResultModel<T> {
     public void setTotalSize(Integer totalSize) {
         this.totalSize = totalSize;
     }
-
 }
