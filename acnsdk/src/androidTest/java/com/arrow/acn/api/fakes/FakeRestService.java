@@ -126,7 +126,7 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<GatewayResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command) {
+    public Call<CommonResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command) {
         return null;
     }
 

@@ -103,8 +103,9 @@ public interface IotConnectAPIService {
     Call<GatewayModel> findGateway(@Path("hid") String hid);
 
     @NonNull
+    @Deprecated
     @POST("/api/v1/kronos/gateways/{hid}/commands/device-command")
-    Call<GatewayResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
+    Call<CommonResponse> sendGatewayCommand(@Path("hid") String hid, @Body GatewayCommand command);
 
     @NonNull
     @GET("/api/v1/kronos/gateways/{hid}/logs")
