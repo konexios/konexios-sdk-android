@@ -22,11 +22,19 @@ import com.arrow.acn.api.rest.IotConnectAPIService;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import okhttp3.Dispatcher;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,47 +55,18 @@ public class RetrofitHolderImpl implements RetrofitHolder {
     private String mApiKey;
     private String mApiSecret;
     private final Executor mExecutor;
-    @NonNull
-    private OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .addInterceptor(new Interceptor() {
-                @Override
-                public okhttp3.Response intercept(@NonNull Chain chain) throws IOException {
-                    TimeZone tz = TimeZone.getTimeZone("UTC");
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS'Z'");
-                    df.setTimeZone(tz);
-                    String nowAsISO = df.format(new Date()).replace(" ", "T");
-
-                    String body = bodyToString(chain.request().body());
-                    if (TextUtils.isEmpty(mRequestSigner.getSecretKey()) &&
-                            !TextUtils.isEmpty(mApiSecret)) {
-                        mRequestSigner.setSecretKey(mApiSecret);
-                    }
-                    String apiKey = TextUtils.isEmpty(mRequestSigner.getApiKey()) ?
-                            mApiKey : mRequestSigner.getApiKey();
-                    String signature = mRequestSigner.method(chain.request().method())
-                            .canonicalUri(chain.request().url().uri().getPath())
-                            .setApiKey(apiKey).timestamp(nowAsISO).payload(body).signV1();
-                    Request request = chain.request().newBuilder()
-                            .addHeader("Accept", "application/json")
-                            .addHeader("Content-Type", "application/json")
-                            .addHeader(Constants.Api.X_ARROW_APIKEY, apiKey)
-                            .addHeader(Constants.Api.X_ARROW_DATE, nowAsISO)
-                            .addHeader(Constants.Api.X_ARROW_SIGNATURE, signature)
-                            .addHeader(Constants.Api.X_ARROW_VERSION, Constants.Api.X_ARROW_VERSION_1)
-                            .build();
-
-                    okhttp3.Response response = chain.proceed(request);
-                    return response;
-                }
-            })
-            .sslSocketFactory(new NoSSLv3SocketFactory())
-            .connectTimeout(20000, TimeUnit.MILLISECONDS)
-            .build();
+    final private OkHttpClient okHttpClient;
 
 
-    public RetrofitHolderImpl(Executor executor) {
+    public RetrofitHolderImpl(Executor executor, ExecutorService httpRequestsExecutor) {
         Timber.v("RetrofitHolderImpl: ");
         mExecutor = executor;
+        okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new RequestInterceptor())
+                .sslSocketFactory(new NoSSLv3SocketFactory())
+                .connectTimeout(20000, TimeUnit.MILLISECONDS)
+                .dispatcher(new Dispatcher(httpRequestsExecutor))
+                .build();
     }
 
     @Override
@@ -162,6 +141,39 @@ public class RetrofitHolderImpl implements RetrofitHolder {
         } catch (@NonNull final IOException e) {
             Timber.e(e);
             return "did not work";
+        }
+    }
+
+    private class RequestInterceptor implements Interceptor {
+
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS'Z'");
+            df.setTimeZone(tz);
+            String nowAsISO = df.format(new Date()).replace(" ", "T");
+
+            String body = bodyToString(chain.request().body());
+            if (TextUtils.isEmpty(mRequestSigner.getSecretKey()) &&
+                    !TextUtils.isEmpty(mApiSecret)) {
+                mRequestSigner.setSecretKey(mApiSecret);
+            }
+            String apiKey = TextUtils.isEmpty(mRequestSigner.getApiKey()) ?
+                    mApiKey : mRequestSigner.getApiKey();
+            String signature = mRequestSigner.method(chain.request().method())
+                    .canonicalUri(chain.request().url().uri().getPath())
+                    .setApiKey(apiKey).timestamp(nowAsISO).payload(body).signV1();
+            Request request = chain.request().newBuilder()
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader(Constants.Api.X_ARROW_APIKEY, apiKey)
+                    .addHeader(Constants.Api.X_ARROW_DATE, nowAsISO)
+                    .addHeader(Constants.Api.X_ARROW_SIGNATURE, signature)
+                    .addHeader(Constants.Api.X_ARROW_VERSION, Constants.Api.X_ARROW_VERSION_1)
+                    .build();
+
+            okhttp3.Response response = chain.proceed(request);
+            return response;
         }
     }
 }
