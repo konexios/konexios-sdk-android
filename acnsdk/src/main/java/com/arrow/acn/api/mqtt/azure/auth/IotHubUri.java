@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * A URI for a device to connect to an IoT Hub.
  */
@@ -50,6 +52,7 @@ public final class IotHubUri
     public IotHubUri(String iotHubHostname, String deviceId,
                      String iotHubMethodPath, Map<String, String> queryParams)
     {
+        Timber.v("IotHubUri: ");
         this.hostname = iotHubHostname;
 
         String rawPath = String.format(
@@ -196,6 +199,7 @@ public final class IotHubUri
     protected static void appendQueryParam(StringBuilder uriBuilder,
                                            String name, String value)
     {
+        Timber.v("appendQueryParam: ");
         try
         {
             String urlEncodedName = URLEncoder.encode(name,

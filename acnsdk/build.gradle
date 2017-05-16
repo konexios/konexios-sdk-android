@@ -25,6 +25,8 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_KEY', ApiKey
+            buildConfigField 'String', 'API_SECRET', ApiSecret
         }
         release {
             minifyEnabled true
@@ -60,6 +62,9 @@ dependencies {
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
 
     testCompile 'junit:junit:4.12'
+    androidTestCompile('uk.co.jemos.podam:podam:7.0.5.RELEASE', {
+        exclude group: 'javax.annotation', module: 'jsr250-api'
+    })
 }
 
 ext {

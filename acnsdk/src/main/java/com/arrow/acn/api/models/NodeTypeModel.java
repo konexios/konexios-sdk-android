@@ -14,6 +14,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -56,13 +60,16 @@ public class NodeTypeModel implements Parcelable {
     private String lastModifiedDate;
     @SerializedName("links")
     @Expose
-    private Links links;
+    private JsonElement links;
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("pri")
     @Expose
     private String pri;
+
+    public NodeTypeModel() {
+    }
 
     protected NodeTypeModel(@NonNull Parcel in) {
         createdBy = in.readString();
@@ -72,9 +79,50 @@ public class NodeTypeModel implements Parcelable {
         hid = in.readString();
         lastModifiedBy = in.readString();
         lastModifiedDate = in.readString();
-        links = (Links) in.readValue(Links.class.getClassLoader());
+        JsonParser parser = new JsonParser();
+        links = parser.parse(in.readString()).getAsJsonObject();
         name = in.readString();
         pri = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeTypeModel that = (NodeTypeModel) o;
+
+        if (enabled != that.enabled) return false;
+        if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null)
+            return false;
+        if (createdDate != null ? !createdDate.equals(that.createdDate) : that.createdDate != null)
+            return false;
+        if (description != null ? !description.equals(that.description) : that.description != null)
+            return false;
+        if (hid != null ? !hid.equals(that.hid) : that.hid != null) return false;
+        if (lastModifiedBy != null ? !lastModifiedBy.equals(that.lastModifiedBy) : that.lastModifiedBy != null)
+            return false;
+        if (lastModifiedDate != null ? !lastModifiedDate.equals(that.lastModifiedDate) : that.lastModifiedDate != null)
+            return false;
+        if (links != null ? !links.equals(that.links) : that.links != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return pri != null ? pri.equals(that.pri) : that.pri == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = createdBy != null ? createdBy.hashCode() : 0;
+        result = 31 * result + (createdDate != null ? createdDate.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (enabled ? 1 : 0);
+        result = 31 * result + (hid != null ? hid.hashCode() : 0);
+        result = 31 * result + (lastModifiedBy != null ? lastModifiedBy.hashCode() : 0);
+        result = 31 * result + (lastModifiedDate != null ? lastModifiedDate.hashCode() : 0);
+        result = 31 * result + (links != null ? links.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (pri != null ? pri.hashCode() : 0);
+        return result;
     }
 
     /**
@@ -178,14 +226,17 @@ public class NodeTypeModel implements Parcelable {
     /**
      * @return The links
      */
-    public Links getLinks() {
+    public JsonElement getLinks() {
+        if (links == null) {
+            links = new JsonObject();
+        }
         return links;
     }
 
     /**
      * @param links The links
      */
-    public void setLinks(Links links) {
+    public void setLinks(JsonElement links) {
         this.links = links;
     }
 
@@ -231,7 +282,8 @@ public class NodeTypeModel implements Parcelable {
         dest.writeString(hid);
         dest.writeString(lastModifiedBy);
         dest.writeString(lastModifiedDate);
-        dest.writeValue(links);
+        Gson gson = new Gson();
+        dest.writeString(gson.toJson(getLinks()));
         dest.writeString(name);
         dest.writeString(pri);
     }

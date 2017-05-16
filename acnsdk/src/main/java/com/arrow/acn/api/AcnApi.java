@@ -16,6 +16,9 @@ import android.support.annotation.Keep;
 import com.arrow.acn.api.common.RetrofitHolderImpl;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+
+import okhttp3.Dispatcher;
 
 /**
  * Created by osminin on 9/21/2016.
@@ -36,6 +39,7 @@ public final class AcnApi {
         private boolean isDebug;
 
         private Executor mCallbackExecutor;
+        private ExecutorService mHttpExecutorService;
 
         /**
          * sets endpoint server environment url and user credentials. Should be called before any other calls
@@ -75,8 +79,13 @@ public final class AcnApi {
             return this;
         }
 
+        public Builder setHttpExecutorService(ExecutorService service) {
+            mHttpExecutorService = service;
+            return this;
+        }
+
         public AcnApiService build() {
-            AcnApiImpl service = new AcnApiImpl(new RetrofitHolderImpl(mCallbackExecutor),
+            AcnApiImpl service = new AcnApiImpl(new RetrofitHolderImpl(mCallbackExecutor, mHttpExecutorService),
                     new SenderServiceFactoryImpl(), isDebug);
             service.setRestEndpoint(mEndpoint, mApiKey, mApiSecret);
             service.setMqttEndpoint(mMqttHost, mMqttPrefix);

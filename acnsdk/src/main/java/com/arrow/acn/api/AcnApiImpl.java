@@ -526,9 +526,9 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void sendCommandGateway(@NonNull String hid, @NonNull GatewayCommand command, @NonNull final GatewayCommandsListener listener) {
-        mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<GatewayResponse>() {
+        mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<GatewayResponse> call, @NonNull Response<GatewayResponse> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 Timber.d("sendGatewayCommand response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onGatewayCommandSent(response.body());
@@ -539,7 +539,7 @@ class AcnApiImpl implements AcnApiService {
             }
 
             @Override
-            public void onFailure(Call<GatewayResponse> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("sendGatewayCommand error");
                 listener.onGatewayCommandFailed(ErrorUtils.parseError(t));
             }

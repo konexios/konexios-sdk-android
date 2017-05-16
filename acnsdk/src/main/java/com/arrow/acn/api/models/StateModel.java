@@ -22,12 +22,34 @@ import com.google.gson.annotations.SerializedName;
 
 public class StateModel implements Parcelable {
 
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<StateModel> CREATOR = new Parcelable.Creator<StateModel>() {
+        @Override
+        public StateModel createFromParcel(Parcel in) {
+            return new StateModel(in);
+        }
+
+        @Override
+        public StateModel[] newArray(int size) {
+            return new StateModel[size];
+        }
+    };
     @SerializedName("value")
     @Expose
     private String value;
+
+    public StateModel() {
+    }
+
     @SerializedName("timestamp")
     @Expose
+
     private String timestamp;
+
+    protected StateModel(Parcel in) {
+        value = in.readString();
+        timestamp = in.readString();
+    }
 
     public String getValue() {
         return value;
@@ -45,15 +67,28 @@ public class StateModel implements Parcelable {
         this.timestamp = timestamp;
     }
 
-
-    protected StateModel(Parcel in) {
-        value = in.readString();
-        timestamp = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StateModel that = (StateModel) o;
+
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        return timestamp != null ? timestamp.equals(that.timestamp) : that.timestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -61,17 +96,4 @@ public class StateModel implements Parcelable {
         dest.writeString(value);
         dest.writeString(timestamp);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<StateModel> CREATOR = new Parcelable.Creator<StateModel>() {
-        @Override
-        public StateModel createFromParcel(Parcel in) {
-            return new StateModel(in);
-        }
-
-        @Override
-        public StateModel[] newArray(int size) {
-            return new StateModel[size];
-        }
-    };
 }

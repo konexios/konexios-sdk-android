@@ -11,13 +11,14 @@
 package com.arrow.acn.api.listeners;
 
 import com.arrow.acn.api.models.ApiError;
-import com.arrow.acn.api.models.GatewayResponse;
+import com.arrow.acn.api.models.CommonResponse;
 
 /**
  * Created by osminin on 10/7/2016.
  */
 
 public interface GatewayCommandsListener {
-    void onGatewayCommandSent(GatewayResponse response);
+    void onGatewayCommandSent(CommonResponse response);
+
     void onGatewayCommandFailed(ApiError error);
 }

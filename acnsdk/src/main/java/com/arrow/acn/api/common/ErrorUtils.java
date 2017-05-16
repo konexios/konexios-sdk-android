@@ -22,6 +22,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import timber.log.Timber;
 
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_MESSAGE;
@@ -34,6 +35,7 @@ import static com.arrow.acn.api.models.ApiError.NETWORK_ERROR_MESSAGE;
 
 public final class ErrorUtils {
     static ApiError parseError(@NonNull Response<?> response, Retrofit retrofit) {
+        Timber.v("parseError: ");
         Converter<ResponseBody, ApiError> converter = retrofit.responseBodyConverter(ApiError.class, new Annotation[0]);
         ApiError error;
         try {
@@ -48,6 +50,7 @@ public final class ErrorUtils {
     }
 
     public static ApiError parseError(Throwable t) {
+        Timber.v("parseError: ");
         ApiError error;
         if (t instanceof IOException) {
             error = new ApiError(NETWORK_ERROR_CODE, NETWORK_ERROR_MESSAGE);

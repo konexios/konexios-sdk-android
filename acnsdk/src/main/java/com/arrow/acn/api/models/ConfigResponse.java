@@ -20,323 +20,6 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 4/14/2016.
  */
 public final class ConfigResponse implements Parcelable {
-    @SerializedName("cloudPlatform")
-    private String mCloudPlatform;
-    @SerializedName("key")
-    private Key mKey;
-    @SerializedName("aws")
-    private Aws mAws;
-    @SerializedName("ibm")
-    private Ibm mIbm;
-    @SerializedName("azure")
-    private Azure mAzure;
-
-    public ConfigResponse() {
-    }
-
-    public Ibm getIbm() {
-        return mIbm;
-    }
-
-    public void setIbm(Ibm ibm) {
-        mIbm = ibm;
-    }
-
-    public CloudPlatform getCloudPlatform() {
-        return CloudPlatform.getPlatform(mCloudPlatform);
-    }
-
-    public void setCloudPlatform(String cloudPlatform) {
-        mCloudPlatform = cloudPlatform;
-    }
-
-    public Key getKey() {
-        return mKey;
-    }
-
-    public void setKey(Key key) {
-        mKey = key;
-    }
-
-    public Aws getAws() {
-        return mAws;
-    }
-
-    public void setAws(Aws aws) {
-        mAws = aws;
-    }
-
-    public Azure getAzure() {
-        return mAzure;
-    }
-
-    public void setAzure(Azure azure) {
-        mAzure = azure;
-    }
-
-    public static class Key implements Parcelable {
-        @SerializedName("apiKey")
-        private String mApiKey;
-        @SerializedName("secretKey")
-        private String mSecretKey;
-
-        public String getApiKey() {
-            return mApiKey;
-        }
-
-        public void setApiKey(String apiKey) {
-            mApiKey = apiKey;
-        }
-
-        public String getSecretKey() {
-            return mSecretKey;
-        }
-
-        public void setSecretKey(String secretKey) {
-            mSecretKey = secretKey;
-        }
-
-        public Key() {
-        }
-
-        protected Key(@NonNull Parcel in) {
-            mApiKey = in.readString();
-            mSecretKey = in.readString();
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(mApiKey);
-            dest.writeString(mSecretKey);
-        }
-
-        @SuppressWarnings("unused")
-        public static final Parcelable.Creator<Key> CREATOR = new Parcelable.Creator<Key>() {
-            @NonNull
-            @Override
-            public Key createFromParcel(@NonNull Parcel in) {
-                return new Key(in);
-            }
-
-            @NonNull
-            @Override
-            public Key[] newArray(int size) {
-                return new Key[size];
-            }
-        };
-    }
-
-    public static class Aws implements Parcelable {
-        @SerializedName("host")
-        private String mHost;
-        @SerializedName("port")
-        private String mPort;
-        @SerializedName("caCert")
-        private String mCaCert;
-        @SerializedName("clientCert")
-        private String mClientCert;
-        @SerializedName("privateKey")
-        private String mPrivateKey;
-
-        public String getHost() {
-            return mHost;
-        }
-
-        public void setHost(String host) {
-            mHost = host;
-        }
-
-        public String getPort() {
-            return mPort;
-        }
-
-        public void setPort(String port) {
-            mPort = port;
-        }
-
-        public String getCaCert() {
-            return mCaCert;
-        }
-
-        public void setCaCert(String caCert) {
-            mCaCert = caCert;
-        }
-
-        public String getClientCert() {
-            return mClientCert;
-        }
-
-        public void setClientCert(String clientCert) {
-            mClientCert = clientCert;
-        }
-
-        public String getPrivateKey() {
-            return mPrivateKey;
-        }
-
-        public void setPrivateKey(String privateKey) {
-            mPrivateKey = privateKey;
-        }
-
-        public Aws() {
-        }
-
-        protected Aws(@NonNull Parcel in) {
-            mHost = in.readString();
-            mPort = in.readString();
-            mCaCert = in.readString();
-            mClientCert = in.readString();
-            mPrivateKey = in.readString();
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(mHost);
-            dest.writeString(mPort);
-            dest.writeString(mCaCert);
-            dest.writeString(mClientCert);
-            dest.writeString(mPrivateKey);
-        }
-
-        @SuppressWarnings("unused")
-        public static final Parcelable.Creator<Aws> CREATOR = new Parcelable.Creator<Aws>() {
-            @NonNull
-            @Override
-            public Aws createFromParcel(@NonNull Parcel in) {
-                return new Aws(in);
-            }
-
-            @NonNull
-            @Override
-            public Aws[] newArray(int size) {
-                return new Aws[size];
-            }
-        };
-    }
-
-    public static class Ibm implements Parcelable {
-        @SerializedName("organizationId")
-        private String mOrganicationId;
-        @SerializedName("gatewayType")
-        private String mGatewayType;
-        @SerializedName("gatewayId")
-        private String mGatewayId;
-        @SerializedName("authMethod")
-        private String mAuthMethod;
-        @SerializedName("authToken")
-        private String mAuthToken;
-
-        public String getOrganicationId() {
-            return mOrganicationId;
-        }
-
-        public void setOrganicationId(String organicationId) {
-            mOrganicationId = organicationId;
-        }
-
-        public String getGatewayType() {
-            return mGatewayType;
-        }
-
-        public void setGatewayType(String gatewayType) {
-            mGatewayType = gatewayType;
-        }
-
-        public String getGatewayId() {
-            return mGatewayId;
-        }
-
-        public void setGatewayId(String gatewayId) {
-            mGatewayId = gatewayId;
-        }
-
-        public String getAuthMethod() {
-            return mAuthMethod;
-        }
-
-        public void setAuthMethod(String authMethod) {
-            mAuthMethod = authMethod;
-        }
-
-        public String getAuthToken() {
-            return mAuthToken;
-        }
-
-        public void setAuthToken(String authToken) {
-            mAuthToken = authToken;
-        }
-
-        public Ibm() {
-        }
-
-        protected Ibm(@NonNull Parcel in) {
-            mOrganicationId = in.readString();
-            mGatewayType = in.readString();
-            mGatewayId = in.readString();
-            mAuthMethod = in.readString();
-            mAuthToken = in.readString();
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(mOrganicationId);
-            dest.writeString(mGatewayType);
-            dest.writeString(mGatewayId);
-            dest.writeString(mAuthMethod);
-            dest.writeString(mAuthToken);
-        }
-
-        @SuppressWarnings("unused")
-        public static final Parcelable.Creator<Ibm> CREATOR = new Parcelable.Creator<Ibm>() {
-            @NonNull
-            @Override
-            public Ibm createFromParcel(@NonNull Parcel in) {
-                return new Ibm(in);
-            }
-
-            @NonNull
-            @Override
-            public Ibm[] newArray(int size) {
-                return new Ibm[size];
-            }
-        };
-    }
-
-    public ConfigResponse(@NonNull Parcel in) {
-        mCloudPlatform = in.readString();
-        mKey = (Key) in.readValue(Key.class.getClassLoader());
-        mAws = (Aws) in.readValue(Aws.class.getClassLoader());
-        mIbm = (Ibm) in.readValue(Ibm.class.getClassLoader());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mCloudPlatform);
-        dest.writeValue(mKey);
-        dest.writeValue(mAws);
-        dest.writeValue(mIbm);
-    }
-
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<ConfigResponse> CREATOR = new Parcelable.Creator<ConfigResponse>() {
         @NonNull
@@ -351,12 +34,485 @@ public final class ConfigResponse implements Parcelable {
             return new ConfigResponse[size];
         }
     };
+    @SerializedName("cloudPlatform")
+    private String cloudPlatform;
+    @SerializedName("key")
+    private Key key;
+    @SerializedName("aws")
+    private Aws aws;
+    @SerializedName("ibm")
+    private Ibm ibm;
+    @SerializedName("azure")
+    private Azure azure;
+
+    public ConfigResponse() {
+    }
+
+    public ConfigResponse(@NonNull Parcel in) {
+        cloudPlatform = in.readString();
+        key = (Key) in.readValue(Key.class.getClassLoader());
+        aws = (Aws) in.readValue(Aws.class.getClassLoader());
+        ibm = (Ibm) in.readValue(Ibm.class.getClassLoader());
+        azure = (Azure) in.readValue(Azure.class.getClassLoader());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ConfigResponse response = (ConfigResponse) o;
+
+        if (cloudPlatform != null ? !cloudPlatform.equals(response.cloudPlatform) : response.cloudPlatform != null)
+            return false;
+        if (key != null ? !key.equals(response.key) : response.key != null) return false;
+        if (aws != null ? !aws.equals(response.aws) : response.aws != null) return false;
+        if (ibm != null ? !ibm.equals(response.ibm) : response.ibm != null) return false;
+        return azure != null ? azure.equals(response.azure) : response.azure == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cloudPlatform != null ? cloudPlatform.hashCode() : 0;
+        result = 31 * result + (key != null ? key.hashCode() : 0);
+        result = 31 * result + (aws != null ? aws.hashCode() : 0);
+        result = 31 * result + (ibm != null ? ibm.hashCode() : 0);
+        result = 31 * result + (azure != null ? azure.hashCode() : 0);
+        return result;
+    }
+
+    public Ibm getIbm() {
+        return ibm;
+    }
+
+    public void setIbm(Ibm ibm) {
+        this.ibm = ibm;
+    }
+
+    public CloudPlatform getCloudPlatform() {
+        return CloudPlatform.getPlatform(cloudPlatform);
+    }
+
+    public void setCloudPlatform(String cloudPlatform) {
+        this.cloudPlatform = cloudPlatform;
+    }
+
+    public Key getKey() {
+        return key;
+    }
+
+    public void setKey(Key key) {
+        this.key = key;
+    }
+
+    public Aws getAws() {
+        return aws;
+    }
+
+    public void setAws(Aws aws) {
+        this.aws = aws;
+    }
+
+    public Azure getAzure() {
+        return azure;
+    }
+
+    public void setAzure(Azure azure) {
+        this.azure = azure;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(cloudPlatform);
+        dest.writeValue(key);
+        dest.writeValue(aws);
+        dest.writeValue(ibm);
+        dest.writeValue(azure);
+    }
+
+    public enum CloudPlatform {
+        NONE(""),
+        ARROW_CONNECT("ARROWCONNECT", "IotConnect"),
+        IBM("IBM"),
+        AWS("AWS"),
+        AZURE("AZURE");
+
+        private String[] mString;
+
+        CloudPlatform(String... str) {
+            mString = str;
+        }
+
+        public static CloudPlatform getPlatform(String str) {
+            CloudPlatform res = NONE;
+            for (CloudPlatform tmp : CloudPlatform.values()) {
+                for (String keys : tmp.getString())
+                    if (keys.equalsIgnoreCase(str)) {
+                        res = tmp;
+                    }
+            }
+            return res;
+        }
+
+        public String[] getString() {
+            return mString;
+        }
+
+        @Override
+        public String toString() {
+            return mString[0];
+        }
+    }
+
+    public static class Key implements Parcelable {
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<Key> CREATOR = new Parcelable.Creator<Key>() {
+            @NonNull
+            @Override
+            public Key createFromParcel(@NonNull Parcel in) {
+                return new Key(in);
+            }
+
+            @NonNull
+            @Override
+            public Key[] newArray(int size) {
+                return new Key[size];
+            }
+        };
+        @SerializedName("apiKey")
+        private String apiKey;
+        @SerializedName("secretKey")
+        private String secretKey;
+
+        public Key() {
+        }
+
+        protected Key(@NonNull Parcel in) {
+            apiKey = in.readString();
+            secretKey = in.readString();
+        }
+
+        public String getApiKey() {
+            return apiKey;
+        }
+
+        public void setApiKey(String apiKey) {
+            this.apiKey = apiKey;
+        }
+
+        public String getSecretKey() {
+            return secretKey;
+        }
+
+        public void setSecretKey(String secretKey) {
+            this.secretKey = secretKey;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Key key = (Key) o;
+
+            if (apiKey != null ? !apiKey.equals(key.apiKey) : key.apiKey != null) return false;
+            return secretKey != null ? secretKey.equals(key.secretKey) : key.secretKey == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = apiKey != null ? apiKey.hashCode() : 0;
+            result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
+            dest.writeString(apiKey);
+            dest.writeString(secretKey);
+        }
+    }
+
+    public static class Aws implements Parcelable {
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<Aws> CREATOR = new Parcelable.Creator<Aws>() {
+            @NonNull
+            @Override
+            public Aws createFromParcel(@NonNull Parcel in) {
+                return new Aws(in);
+            }
+
+            @NonNull
+            @Override
+            public Aws[] newArray(int size) {
+                return new Aws[size];
+            }
+        };
+        @SerializedName("host")
+        private String host;
+        @SerializedName("port")
+        private String port;
+        @SerializedName("caCert")
+        private String caCert;
+        @SerializedName("clientCert")
+        private String clientCert;
+        @SerializedName("privateKey")
+        private String privateKey;
+
+        public Aws() {
+
+        }
+
+        protected Aws(@NonNull Parcel in) {
+            host = in.readString();
+            port = in.readString();
+            caCert = in.readString();
+            clientCert = in.readString();
+            privateKey = in.readString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Aws aws = (Aws) o;
+
+            if (host != null ? !host.equals(aws.host) : aws.host != null) return false;
+            if (port != null ? !port.equals(aws.port) : aws.port != null) return false;
+            if (caCert != null ? !caCert.equals(aws.caCert) : aws.caCert != null) return false;
+            if (clientCert != null ? !clientCert.equals(aws.clientCert) : aws.clientCert != null)
+                return false;
+            return privateKey != null ? privateKey.equals(aws.privateKey) : aws.privateKey == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = host != null ? host.hashCode() : 0;
+            result = 31 * result + (port != null ? port.hashCode() : 0);
+            result = 31 * result + (caCert != null ? caCert.hashCode() : 0);
+            result = 31 * result + (clientCert != null ? clientCert.hashCode() : 0);
+            result = 31 * result + (privateKey != null ? privateKey.hashCode() : 0);
+            return result;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public String getPort() {
+            return port;
+        }
+
+        public void setPort(String port) {
+            this.port = port;
+        }
+
+        public String getCaCert() {
+            return caCert;
+        }
+
+        public void setCaCert(String caCert) {
+            this.caCert = caCert;
+        }
+
+        public String getClientCert() {
+            return clientCert;
+        }
+
+        public void setClientCert(String clientCert) {
+            this.clientCert = clientCert;
+        }
+
+        public String getPrivateKey() {
+            return privateKey;
+        }
+
+        public void setPrivateKey(String privateKey) {
+            this.privateKey = privateKey;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
+            dest.writeString(host);
+            dest.writeString(port);
+            dest.writeString(caCert);
+            dest.writeString(clientCert);
+            dest.writeString(privateKey);
+        }
+    }
+
+    public static class Ibm implements Parcelable {
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<Ibm> CREATOR = new Parcelable.Creator<Ibm>() {
+            @NonNull
+            @Override
+            public Ibm createFromParcel(@NonNull Parcel in) {
+                return new Ibm(in);
+            }
+
+            @NonNull
+            @Override
+            public Ibm[] newArray(int size) {
+                return new Ibm[size];
+            }
+        };
+        @SerializedName("organizationId")
+        private String organicationId;
+        @SerializedName("gatewayType")
+        private String gatewayType;
+        @SerializedName("gatewayId")
+        private String gatewayId;
+        @SerializedName("authMethod")
+        private String authMethod;
+        @SerializedName("authToken")
+        private String authToken;
+
+        public Ibm() {
+        }
+
+        protected Ibm(@NonNull Parcel in) {
+            organicationId = in.readString();
+            gatewayType = in.readString();
+            gatewayId = in.readString();
+            authMethod = in.readString();
+            authToken = in.readString();
+
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Ibm ibm = (Ibm) o;
+
+            if (organicationId != null ? !organicationId.equals(ibm.organicationId) : ibm.organicationId != null)
+                return false;
+            if (gatewayType != null ? !gatewayType.equals(ibm.gatewayType) : ibm.gatewayType != null)
+                return false;
+            if (gatewayId != null ? !gatewayId.equals(ibm.gatewayId) : ibm.gatewayId != null)
+                return false;
+            if (authMethod != null ? !authMethod.equals(ibm.authMethod) : ibm.authMethod != null)
+                return false;
+            return authToken != null ? authToken.equals(ibm.authToken) : ibm.authToken == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = organicationId != null ? organicationId.hashCode() : 0;
+            result = 31 * result + (gatewayType != null ? gatewayType.hashCode() : 0);
+            result = 31 * result + (gatewayId != null ? gatewayId.hashCode() : 0);
+            result = 31 * result + (authMethod != null ? authMethod.hashCode() : 0);
+            result = 31 * result + (authToken != null ? authToken.hashCode() : 0);
+            return result;
+        }
+
+        public String getOrganicationId() {
+            return organicationId;
+        }
+
+        public void setOrganicationId(String organicationId) {
+            this.organicationId = organicationId;
+        }
+
+        public String getGatewayType() {
+            return gatewayType;
+        }
+
+        public void setGatewayType(String gatewayType) {
+            this.gatewayType = gatewayType;
+        }
+
+        public String getGatewayId() {
+            return gatewayId;
+        }
+
+        public void setGatewayId(String gatewayId) {
+            this.gatewayId = gatewayId;
+        }
+
+        public String getAuthMethod() {
+            return authMethod;
+        }
+
+        public void setAuthMethod(String authMethod) {
+            this.authMethod = authMethod;
+        }
+
+        public String getAuthToken() {
+            return authToken;
+        }
+
+        public void setAuthToken(String authToken) {
+            this.authToken = authToken;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
+            dest.writeString(organicationId);
+            dest.writeString(gatewayType);
+            dest.writeString(gatewayId);
+            dest.writeString(authMethod);
+            dest.writeString(authToken);
+        }
+    }
 
     public static class Azure implements Parcelable {
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<Azure> CREATOR = new Parcelable.Creator<Azure>() {
+            @NonNull
+            @Override
+            public Azure createFromParcel(@NonNull Parcel in) {
+                return new Azure(in);
+            }
+
+            @NonNull
+            @Override
+            public Azure[] newArray(int size) {
+                return new Azure[size];
+            }
+        };
         @SerializedName("accessKey")
         private String accessKey;
         @SerializedName("host")
         private String host;
+
+        public Azure() {
+        }
+
+        protected Azure(@NonNull Parcel in) {
+            accessKey = in.readString();
+            host = in.readString();
+        }
 
         public String getAccessKey() {
             return accessKey;
@@ -374,71 +530,35 @@ public final class ConfigResponse implements Parcelable {
             this.host = host;
         }
 
-        public Azure() {
-        }
-
-        protected Azure(@NonNull Parcel in) {
-            accessKey = in.readString();
-            host = in.readString();
-        }
-
         @Override
         public int describeContents() {
             return 0;
         }
 
         @Override
-        public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(accessKey);
-            dest.writeString(host);
-        }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
 
-        @SuppressWarnings("unused")
-        public static final Parcelable.Creator<Azure> CREATOR = new Parcelable.Creator<Azure>() {
-            @NonNull
-            @Override
-            public Azure createFromParcel(@NonNull Parcel in) {
-                return new Azure(in);
-            }
+            Azure azure = (Azure) o;
 
-            @NonNull
-            @Override
-            public Azure[] newArray(int size) {
-                return new Azure[size];
-            }
-        };
-    }
+            if (accessKey != null ? !accessKey.equals(azure.accessKey) : azure.accessKey != null)
+                return false;
+            return host != null ? host.equals(azure.host) : azure.host == null;
 
-    public enum CloudPlatform {
-        NONE (""),
-        ARROW_CONNECT ("ARROWCONNECT", "IotConnect"),
-        IBM ("IBM"),
-        AWS ("AWS"),
-        AZURE ("AZURE");
-
-        CloudPlatform(String ... str) {
-            mString = str;
-        }
-        private String[] mString;
-
-        public String[] getString() {
-            return mString;
-        }
-
-        public static CloudPlatform getPlatform(String str) {
-            CloudPlatform res = NONE;
-            for (CloudPlatform tmp : CloudPlatform.values()) {
-                for (String keys : tmp.getString())
-                if (keys.equalsIgnoreCase(str)) {
-                    res = tmp;
-                }
-            }
-            return res;
         }
 
         @Override
-        public String toString() {
-            return mString[0];
+        public int hashCode() {
+            int result = accessKey != null ? accessKey.hashCode() : 0;
+            result = 31 * result + (host != null ? host.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
+            dest.writeString(accessKey);
+            dest.writeString(host);
         }
     }
 }

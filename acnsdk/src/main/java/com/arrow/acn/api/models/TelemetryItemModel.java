@@ -10,14 +10,33 @@
 
 package com.arrow.acn.api.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class TelemetryItemModel {
+public class TelemetryItemModel implements Parcelable {
 
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TelemetryItemModel> CREATOR = new Parcelable.Creator<TelemetryItemModel>() {
+        @Override
+        public TelemetryItemModel createFromParcel(Parcel in) {
+            return new TelemetryItemModel(in);
+        }
+
+        @Override
+        public TelemetryItemModel[] newArray(int size) {
+            return new TelemetryItemModel[size];
+        }
+    };
     @SerializedName("links")
     @Expose
-    private Links links;
+    private JsonElement links;
     @SerializedName("deviceHid")
     @Expose
     private String deviceHid;
@@ -34,11 +53,27 @@ public class TelemetryItemModel {
     @Expose
     private Float floatValue;
 
-    public Links getLinks() {
+    protected TelemetryItemModel(Parcel in) {
+        JsonParser parser = new JsonParser();
+        links = parser.parse(in.readString()).getAsJsonObject();
+        deviceHid = in.readString();
+        name = in.readString();
+        type = in.readString();
+        timestamp = in.readString();
+        floatValue = in.readByte() == 0x00 ? null : in.readFloat();
+    }
+
+    public TelemetryItemModel() {
+    }
+
+    public JsonElement getLinks() {
+        if (links == null) {
+            links = new JsonObject();
+        }
         return links;
     }
 
-    public void setLinks(Links links) {
+    public void setLinks(JsonElement links) {
         this.links = links;
     }
 
@@ -82,4 +117,52 @@ public class TelemetryItemModel {
         this.floatValue = floatValue;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TelemetryItemModel that = (TelemetryItemModel) o;
+
+        if (!getLinks().equals(that.getLinks())) return false;
+        if (deviceHid != null ? !deviceHid.equals(that.deviceHid) : that.deviceHid != null)
+            return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null)
+            return false;
+        return floatValue != null ? floatValue.equals(that.floatValue) : that.floatValue == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = links != null ? links.hashCode() : 0;
+        result = 31 * result + (deviceHid != null ? deviceHid.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
+        result = 31 * result + (floatValue != null ? floatValue.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(new Gson().toJson(getLinks()));
+        dest.writeString(deviceHid);
+        dest.writeString(name);
+        dest.writeString(type);
+        dest.writeString(timestamp);
+        if (floatValue == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeFloat(floatValue);
+        }
+    }
 }

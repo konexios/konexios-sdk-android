@@ -22,6 +22,20 @@ import com.google.gson.annotations.SerializedName;
  */
 
 final public class DeviceTypeTelemetryModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
+        @NonNull
+        @Override
+        public DeviceTypeTelemetryModel createFromParcel(@NonNull Parcel in) {
+            return new DeviceTypeTelemetryModel(in);
+        }
+
+        @NonNull
+        @Override
+        public DeviceTypeTelemetryModel[] newArray(int size) {
+            return new DeviceTypeTelemetryModel[size];
+        }
+    };
     @SerializedName("controllable")
     @Expose
     private boolean controllable;
@@ -34,6 +48,17 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     @SerializedName("type")
     @Expose
     private String type;
+
+    public DeviceTypeTelemetryModel() {
+
+    }
+
+    protected DeviceTypeTelemetryModel(@NonNull Parcel in) {
+        controllable = in.readByte() != 0x00;
+        description = in.readString();
+        name = in.readString();
+        type = in.readString();
+    }
 
     /**
      * @return The controllable
@@ -91,12 +116,28 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
         this.type = type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    protected DeviceTypeTelemetryModel(@NonNull Parcel in) {
-        controllable = in.readByte() != 0x00;
-        description = in.readString();
-        name = in.readString();
-        type = in.readString();
+        DeviceTypeTelemetryModel that = (DeviceTypeTelemetryModel) o;
+
+        if (controllable != that.controllable) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null)
+            return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return type != null ? type.equals(that.type) : that.type == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (controllable ? 1 : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -111,19 +152,4 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
         dest.writeString(name);
         dest.writeString(type);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<DeviceTypeTelemetryModel> CREATOR = new Parcelable.Creator<DeviceTypeTelemetryModel>() {
-        @NonNull
-        @Override
-        public DeviceTypeTelemetryModel createFromParcel(@NonNull Parcel in) {
-            return new DeviceTypeTelemetryModel(in);
-        }
-
-        @NonNull
-        @Override
-        public DeviceTypeTelemetryModel[] newArray(int size) {
-            return new DeviceTypeTelemetryModel[size];
-        }
-    };
 }

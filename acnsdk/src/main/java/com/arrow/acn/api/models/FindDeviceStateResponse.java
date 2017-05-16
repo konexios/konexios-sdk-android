@@ -16,6 +16,7 @@ import android.os.Parcelable;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -49,7 +50,7 @@ public class FindDeviceStateResponse implements Parcelable {
     private String hid;
     @SerializedName("links")
     @Expose
-    private Links links;
+    private JsonElement links;
     @SerializedName("pri")
     @Expose
     private String pri;
@@ -57,16 +58,47 @@ public class FindDeviceStateResponse implements Parcelable {
     @Expose
     private JsonElement states;
 
+    public FindDeviceStateResponse() {
+    }
+
     protected FindDeviceStateResponse(Parcel in) {
         deviceHid = in.readString();
         hid = in.readString();
-        links = (Links) in.readValue(Links.class.getClassLoader());
         pri = in.readString();
-        states = (JsonElement) in.readValue(JsonElement.class.getClassLoader());
+        JsonParser parser = new JsonParser();
+        links = parser.parse(in.readString()).getAsJsonObject();
+        states = parser.parse(in.readString()).getAsJsonObject();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FindDeviceStateResponse that = (FindDeviceStateResponse) o;
+
+        if (deviceHid != null ? !deviceHid.equals(that.deviceHid) : that.deviceHid != null)
+            return false;
+        if (hid != null ? !hid.equals(that.hid) : that.hid != null) return false;
+        if (!getLinks().equals(that.links)) return false;
+        if (pri != null ? !pri.equals(that.pri) : that.pri != null) return false;
+        return getStates().equals(that.getStates());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = deviceHid != null ? deviceHid.hashCode() : 0;
+        result = 31 * result + (hid != null ? hid.hashCode() : 0);
+        result = 31 * result + (links != null ? links.hashCode() : 0);
+        result = 31 * result + (pri != null ? pri.hashCode() : 0);
+        result = 31 * result + (states != null ? states.hashCode() : 0);
+        return result;
     }
 
     public String getDeviceHid() {
         return deviceHid;
+
     }
 
     public void setDeviceHid(String deviceHid) {
@@ -81,11 +113,14 @@ public class FindDeviceStateResponse implements Parcelable {
         this.hid = hid;
     }
 
-    public Links getLinks() {
+    public JsonElement getLinks() {
+        if (links == null) {
+            links = new JsonObject();
+        }
         return links;
     }
 
-    public void setLinks(Links links) {
+    public void setLinks(JsonElement links) {
         this.links = links;
     }
 
@@ -98,6 +133,9 @@ public class FindDeviceStateResponse implements Parcelable {
     }
 
     public JsonElement getStates() {
+        if (states == null) {
+            states = new JsonObject();
+        }
         return states;
     }
 
@@ -131,8 +169,11 @@ public class FindDeviceStateResponse implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(deviceHid);
         dest.writeString(hid);
-        dest.writeValue(links);
         dest.writeString(pri);
-        dest.writeValue(states);
+        Gson gson = new Gson();
+        String str = gson.toJson(getLinks());
+        dest.writeString(str);
+        str = gson.toJson(getStates());
+        dest.writeString(str);
     }
 }

@@ -103,16 +103,17 @@ public interface IotConnectAPIService {
     Call<GatewayModel> findGateway(@Path("hid") String hid);
 
     @NonNull
+    @Deprecated
     @POST("/api/v1/kronos/gateways/{hid}/commands/device-command")
-    Call<GatewayResponse> sendGatewayCommand(@Path("hid") String hid, GatewayCommand command);
+    Call<CommonResponse> sendGatewayCommand(@Path("hid") String hid, @Body GatewayCommand command);
 
     @NonNull
     @GET("/api/v1/kronos/gateways/{hid}/logs")
     Call<PagingResultModel<AuditLogModel>> getGatewayLogs(@Path("hid") String hid,
                                            @Query("createdDateFrom") String createdDateFrom,
                                            @Query("createdDateTo") String createdDateTo,
-                                           @Query("userHids") String[] userHids,
-                                           @Query("types") String[] types,
+                                           @Query("userHids") List<String> userHids,
+                                           @Query("types") List<String> types,
                                            @Query("sortField") String sortField,
                                            @Query("sortDirection") String sortDirection,
                                            @Query("_page") int page,
@@ -241,8 +242,8 @@ public interface IotConnectAPIService {
     Call<PagingResultModel<AuditLogModel>> listDeviceAuditLogs(@Path("hid") String hid,
                                                                @Query("createdDateFrom") String createdDateFrom,
                                                                @Query("createdDateTo") String createdDateTo,
-                                                               @Query("userHids") String[] userHids,
-                                                               @Query("types") String[] types,
+                                                               @Query("userHids") List<String> userHids,
+                                                               @Query("types") List<String> types,
                                                                @Query("sortField") String sortField,
                                                                @Query("sortDirection") String sortDirection,
                                                                @Query("_page") int page,

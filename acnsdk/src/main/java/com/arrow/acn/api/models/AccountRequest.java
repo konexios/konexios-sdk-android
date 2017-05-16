@@ -20,70 +20,6 @@ import com.google.gson.annotations.SerializedName;
  * Created by osminin on 4/14/2016.
  */
 public final class AccountRequest implements Parcelable {
-    @SerializedName("name")
-    private String mName;
-    @SerializedName("email")
-    private String mEmail;
-    @SerializedName("password")
-    private String mPassword;
-    @SerializedName("code")
-    private String mCode;
-
-    public String getCode() {
-        return mCode;
-    }
-
-    public void setCode(String code) {
-        mCode = code;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
-    }
-
-    public String getEmail() {
-        return mEmail;
-    }
-
-    public void setEmail(String email) {
-        mEmail = email;
-    }
-
-    public String getPassword() {
-        return mPassword;
-    }
-
-    public void setPassword(String password) {
-        mPassword = password;
-    }
-
-    protected AccountRequest(@NonNull Parcel in) {
-        mName = in.readString();
-        mEmail = in.readString();
-        mPassword = in.readString();
-        mCode = in.readString();
-    }
-
-    public AccountRequest() {
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mName);
-        dest.writeString(mEmail);
-        dest.writeString(mPassword);
-        dest.writeString(mCode);
-    }
-
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<AccountRequest> CREATOR = new Parcelable.Creator<AccountRequest>() {
         @NonNull
@@ -98,4 +34,91 @@ public final class AccountRequest implements Parcelable {
             return new AccountRequest[size];
         }
     };
+    @SerializedName("name")
+    private String name;
+    @SerializedName("email")
+    private String email;
+    @SerializedName("password")
+    private String password;
+    @SerializedName("code")
+    private String code;
+
+    protected AccountRequest(@NonNull Parcel in) {
+        name = in.readString();
+        email = in.readString();
+        password = in.readString();
+        code = in.readString();
+    }
+
+    public AccountRequest() {
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(code);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccountRequest that = (AccountRequest) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
+        if (password != null ? !password.equals(that.password) : that.password != null)
+            return false;
+        return code != null ? code.equals(that.code) : that.code == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (code != null ? code.hashCode() : 0);
+        return result;
+    }
 }

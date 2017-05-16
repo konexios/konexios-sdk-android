@@ -38,7 +38,6 @@ public final class App extends Application {
     public void onCreate() {
         super.onCreate();
         mAcnApiService = new AcnApi.Builder()
-                //TODO: replace DEFAULT_API_KEY and DEFAULT_API_SECRET with valid keys
                 .setRestEndpoint(BASE_IOT_CONNECT_URL_DEV, DEFAULT_API_KEY, DEFAULT_API_SECRET)
                 .setMqttEndpoint(MQTT_CONNECT_URL_DEV, MQTT_CLIENT_PREFIX_DEV)
                 .setDebug(true)

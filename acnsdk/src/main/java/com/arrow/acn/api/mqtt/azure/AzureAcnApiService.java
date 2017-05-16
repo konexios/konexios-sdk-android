@@ -44,6 +44,7 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
 
     public AzureAcnApiService(String gatewayUid, String accessKey, String host) {
         super(gatewayUid);
+        Timber.d("AzureAcnApiService: ");
         mAccessKey = accessKey;
         mHost = host;
     }
@@ -51,12 +52,14 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     @NonNull
     @Override
     protected String getPublisherTopic(String deviceType, String externalId) {
+        Timber.v("getPublisherTopic: ");
         return "devices/" + mGatewayId + "/messages/events/";
     }
 
     @NonNull
     @Override
     protected String getHost() {
+        Timber.v("getHost: ");
         return sslPrefix + mHost + sslPortSuffix;
     }
 
@@ -67,6 +70,7 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
 
     @Override
     protected MqttConnectOptions getMqttOptions() {
+        Timber.v("getMqttOptions: ");
         MqttConnectOptions options = super.getMqttOptions();
         try {
             DeviceClientConfig config = new DeviceClientConfig(mHost, mGatewayId, mAccessKey, null);
@@ -89,13 +93,16 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
 
     @Override
     protected String getClientId() {
+        Timber.v("getClientId: ");
         return mGatewayId;
     }
 
     @NonNull
     @Override
     protected String getSubscribeTopic() {
-        return "devices/" + mGatewayId + "/messages/devicebound/#";
+        String res = "devices/" + mGatewayId + "/messages/devicebound/#";
+        Timber.v("getSubscribeTopic: %s", res);
+        return res;
     }
 
     private void reportError(@NonNull Exception e) {
