@@ -21,86 +21,8 @@ import java.util.Map;
 /**
  * Created by osminin on 4/29/2016.
  */
-public final class GatewayEventModel implements Parcelable{
+public final class GatewayEventModel implements Parcelable {
     public static final String DEVICE_HID_KEY = "deviceHid";
-
-    @SerializedName("hid")
-    private String mHid;
-    @SerializedName("name")
-    private String mName;
-    @SerializedName("encrypted")
-    private boolean mEncrypted = false;
-    @SerializedName("parameters")
-    private Map<String, String> mParameters = new HashMap<>();
-
-    public GatewayEventModel() {
-    }
-
-    public GatewayEventModel(String hid, String name, boolean encrypted, Map<String, String> parameters) {
-        this.mHid = hid;
-        this.mName = name;
-        this.mEncrypted = encrypted;
-        this.mParameters = parameters;
-    }
-
-    public String getHid() {
-        return mHid;
-    }
-
-    public void setHid(String hid) {
-        this.mHid = hid;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        this.mName = name;
-    }
-
-    public boolean isEncrypted() {
-        return mEncrypted;
-    }
-
-    public void setEncrypted(boolean encrypted) {
-        this.mEncrypted = encrypted;
-    }
-
-    public Map<String, String> getParameters() {
-        return mParameters;
-    }
-
-    protected GatewayEventModel(Parcel in) {
-        mHid = in.readString();
-        mName = in.readString();
-        mEncrypted = in.readByte() != 0x00;
-        int size = in.readInt();
-        mParameters = new HashMap<>(size);
-        for(int i = 0; i < size; i++){
-            String key = in.readString();
-            String value = in.readString();
-            mParameters.put(key,value);
-        }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mHid);
-        dest.writeString(mName);
-        dest.writeByte((byte) (mEncrypted ? 0x01 : 0x00));
-        dest.writeInt(mParameters.size());
-        for(Map.Entry<String,String> entry : mParameters.entrySet()){
-            dest.writeString(entry.getKey());
-            dest.writeString(entry.getValue());
-        }
-    }
-
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<GatewayEventModel> CREATOR = new Parcelable.Creator<GatewayEventModel>() {
         @Override
@@ -113,5 +35,108 @@ public final class GatewayEventModel implements Parcelable{
             return new GatewayEventModel[size];
         }
     };
+    @SerializedName("hid")
+    private String hid;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("encrypted")
+    private boolean encrypted = false;
+    @SerializedName("parameters")
+    private Map<String, String> parameters = new HashMap<>();
+
+    public GatewayEventModel() {
+    }
+
+    public GatewayEventModel(String hid, String name, boolean encrypted, Map<String, String> parameters) {
+        this.hid = hid;
+        this.name = name;
+        this.encrypted = encrypted;
+        this.parameters = parameters;
+    }
+
+    protected GatewayEventModel(Parcel in) {
+        hid = in.readString();
+        name = in.readString();
+        encrypted = in.readByte() != 0x00;
+        int size = in.readInt();
+        parameters = new HashMap<>(size);
+        for (int i = 0; i < size; i++) {
+            String key = in.readString();
+            String value = in.readString();
+            parameters.put(key, value);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GatewayEventModel that = (GatewayEventModel) o;
+
+        if (encrypted != that.encrypted) return false;
+        if (hid != null ? !hid.equals(that.hid) : that.hid != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return parameters != null ? parameters.equals(that.parameters) : that.parameters == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hid != null ? hid.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (encrypted ? 1 : 0);
+        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        return result;
+    }
+
+    public String getHid() {
+        return hid;
+    }
+
+    public void setHid(String hid) {
+        this.hid = hid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
+    }
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(hid);
+        dest.writeString(name);
+        dest.writeByte((byte) (encrypted ? 0x01 : 0x00));
+        dest.writeInt(parameters.size());
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            dest.writeString(entry.getKey());
+            dest.writeString(entry.getValue());
+        }
+    }
 }
 

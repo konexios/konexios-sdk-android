@@ -187,6 +187,7 @@ public interface AcnApiService {
 
     void checkinGateway(String hid, String gatewayUid, CheckinGatewayListener listener);
 
+    @Deprecated
     void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
 
     void getDevicesList(String gatewayHid, ListResultListener<DeviceModel> listener);

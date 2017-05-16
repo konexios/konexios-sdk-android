@@ -15,7 +15,10 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -24,6 +27,20 @@ import java.util.List;
 
 public class DeviceRegistrationModel implements Parcelable {
 
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<DeviceRegistrationModel> CREATOR = new Parcelable.Creator<DeviceRegistrationModel>() {
+        @NonNull
+        @Override
+        public DeviceRegistrationModel createFromParcel(@NonNull Parcel in) {
+            return new DeviceRegistrationModel(in);
+        }
+
+        @NonNull
+        @Override
+        public DeviceRegistrationModel[] newArray(int size) {
+            return new DeviceRegistrationModel[size];
+        }
+    };
     @SerializedName("enabled")
     @Expose
     private boolean enabled;
@@ -32,7 +49,7 @@ public class DeviceRegistrationModel implements Parcelable {
     private String gatewayHid;
     @SerializedName("info")
     @Expose
-    private JsonObject info;
+    private JsonElement info;
     @SerializedName("name")
     @Expose
     private String name;
@@ -41,11 +58,11 @@ public class DeviceRegistrationModel implements Parcelable {
     private String nodeHid;
     @SerializedName("properties")
     @Expose
-    private JsonObject properties;
+    private JsonElement properties;
     @Nullable
     @SerializedName("tags")
     @Expose
-    private List<String> tags = new ArrayList<String>();
+    private List<String> tags = new ArrayList<>();
     @SerializedName("type")
     @Expose
     private String type;
@@ -56,199 +73,19 @@ public class DeviceRegistrationModel implements Parcelable {
     @Expose
     private String userHid;
 
-    /**
-     *
-     * @return
-     * The enabled
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     *
-     * @param enabled
-     * The enabled
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    /**
-     *
-     * @return
-     * The gatewayHid
-     */
-    public String getGatewayHid() {
-        return gatewayHid;
-    }
-
-    /**
-     *
-     * @param gatewayHid
-     * The gatewayHid
-     */
-    public void setGatewayHid(String gatewayHid) {
-        this.gatewayHid = gatewayHid;
-    }
-
-    /**
-     *
-     * @return
-     * The info
-     */
-    public JsonObject getInfo() {
-        return info;
-    }
-
-    /**
-     *
-     * @param info
-     * The info
-     */
-    public void setInfo(JsonObject info) {
-        this.info = info;
-    }
-
-    /**
-     *
-     * @return
-     * The name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     *
-     * @param name
-     * The name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     *
-     * @return
-     * The nodeHid
-     */
-    public String getNodeHid() {
-        return nodeHid;
-    }
-
-    /**
-     *
-     * @param nodeHid
-     * The nodeHid
-     */
-    public void setNodeHid(String nodeHid) {
-        this.nodeHid = nodeHid;
-    }
-
-    /**
-     *
-     * @return
-     * The properties
-     */
-    public JsonObject getProperties() {
-        return properties;
-    }
-
-    /**
-     *
-     * @param properties
-     * The properties
-     */
-    public void setProperties(JsonObject properties) {
-        this.properties = properties;
-    }
-
-    /**
-     *
-     * @return
-     * The tags
-     */
-    @Nullable
-    public List<String> getTags() {
-        return tags;
-    }
-
-    /**
-     *
-     * @param tags
-     * The tags
-     */
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    /**
-     *
-     * @return
-     * The type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     *
-     * @param type
-     * The type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    /**
-     *
-     * @return
-     * The uid
-     */
-    public String getUid() {
-        return uid;
-    }
-
-    /**
-     *
-     * @param uid
-     * The uid
-     */
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    /**
-     *
-     * @return
-     * The userHid
-     */
-    public String getUserHid() {
-        return userHid;
-    }
-
-    /**
-     *
-     * @param userHid
-     * The userHid
-     */
-    public void setUserHid(String userHid) {
-        this.userHid = userHid;
-    }
-
     public DeviceRegistrationModel() {
     }
 
     protected DeviceRegistrationModel(@NonNull Parcel in) {
         enabled = in.readByte() != 0x00;
         gatewayHid = in.readString();
-        info = (JsonObject) in.readValue(JsonObject.class.getClassLoader());
+        JsonParser parser = new JsonParser();
+        info = parser.parse(in.readString()).getAsJsonObject();
         name = in.readString();
         nodeHid = in.readString();
-        properties = (JsonObject) in.readValue(JsonObject.class.getClassLoader());
+        properties = parser.parse(in.readString()).getAsJsonObject();
         if (in.readByte() == 0x01) {
-            tags = new ArrayList<String>();
+            tags = new ArrayList<>();
             in.readList(tags, String.class.getClassLoader());
         } else {
             tags = null;
@@ -258,7 +95,191 @@ public class DeviceRegistrationModel implements Parcelable {
         userHid = in.readString();
     }
 
+    /**
+     * @return The enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled The enabled
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
+     * @return The gatewayHid
+     */
+    public String getGatewayHid() {
+        return gatewayHid;
+    }
+
+    /**
+     * @param gatewayHid The gatewayHid
+     */
+    public void setGatewayHid(String gatewayHid) {
+        this.gatewayHid = gatewayHid;
+    }
+
+    /**
+     * @return The info
+     */
+    public JsonElement getInfo() {
+        if (info == null) {
+            info = new JsonObject();
+        }
+        return info;
+    }
+
+    /**
+     * @param info The info
+     */
+    public void setInfo(JsonElement info) {
+        this.info = info;
+    }
+
+    /**
+     * @return The name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name The name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return The nodeHid
+     */
+    public String getNodeHid() {
+        return nodeHid;
+    }
+
+    /**
+     * @param nodeHid The nodeHid
+     */
+    public void setNodeHid(String nodeHid) {
+        this.nodeHid = nodeHid;
+    }
+
+    /**
+     * @return The properties
+     */
+    public JsonElement getProperties() {
+        if (properties == null) {
+            properties = new JsonObject();
+        }
+        return properties;
+    }
+
+    /**
+     * @param properties The properties
+     */
+    public void setProperties(JsonElement properties) {
+        this.properties = properties;
+    }
+
+    /**
+     * @return The tags
+     */
+    @Nullable
+    public List<String> getTags() {
+        return tags;
+    }
+
+    /**
+     * @param tags The tags
+     */
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    /**
+     * @return The type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type The type
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @return The uid
+     */
+    public String getUid() {
+        return uid;
+    }
+
+    /**
+     * @param uid The uid
+     */
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    /**
+     * @return The userHid
+     */
+    public String getUserHid() {
+        return userHid;
+    }
+
+    /**
+     * @param userHid The userHid
+     */
+    public void setUserHid(String userHid) {
+        this.userHid = userHid;
+    }
+
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DeviceRegistrationModel that = (DeviceRegistrationModel) o;
+
+        if (enabled != that.enabled) return false;
+        if (gatewayHid != null ? !gatewayHid.equals(that.gatewayHid) : that.gatewayHid != null)
+            return false;
+        if (!getInfo().equals(that.getInfo())) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (nodeHid != null ? !nodeHid.equals(that.nodeHid) : that.nodeHid != null) return false;
+        if (!getProperties().equals(that.getProperties())) return false;
+        if (tags != null ? !tags.equals(that.tags) : that.tags != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (uid != null ? !uid.equals(that.uid) : that.uid != null) return false;
+        return userHid != null ? userHid.equals(that.userHid) : that.userHid == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (enabled ? 1 : 0);
+        result = 31 * result + (gatewayHid != null ? gatewayHid.hashCode() : 0);
+        result = 31 * result + (info != null ? info.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (nodeHid != null ? nodeHid.hashCode() : 0);
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (uid != null ? uid.hashCode() : 0);
+        result = 31 * result + (userHid != null ? userHid.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+
     public int describeContents() {
         return 0;
     }
@@ -267,10 +288,13 @@ public class DeviceRegistrationModel implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
         dest.writeString(gatewayHid);
-        dest.writeValue(info);
+        Gson gson = new Gson();
+        String str = gson.toJson(getInfo());
+        dest.writeString(str);
         dest.writeString(name);
         dest.writeString(nodeHid);
-        dest.writeValue(properties);
+        str = gson.toJson(getProperties());
+        dest.writeString(str);
         if (tags == null) {
             dest.writeByte((byte) (0x00));
         } else {
@@ -281,19 +305,4 @@ public class DeviceRegistrationModel implements Parcelable {
         dest.writeString(uid);
         dest.writeString(userHid);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CommonResponse> CREATOR = new Parcelable.Creator<CommonResponse>() {
-        @NonNull
-        @Override
-        public CommonResponse createFromParcel(@NonNull Parcel in) {
-            return new CommonResponse(in);
-        }
-
-        @NonNull
-        @Override
-        public CommonResponse[] newArray(int size) {
-            return new CommonResponse[size];
-        }
-    };
 }

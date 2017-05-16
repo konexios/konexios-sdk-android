@@ -29,6 +29,7 @@ public final class AwsAcnApiService extends AbstractMqttAcnApiService {
 
     public AwsAcnApiService(String gatewayId, ConfigResponse configResponse) {
         super(gatewayId, configResponse);
+        Timber.v("AwsAcnApiService: ");
     }
 
     @Override

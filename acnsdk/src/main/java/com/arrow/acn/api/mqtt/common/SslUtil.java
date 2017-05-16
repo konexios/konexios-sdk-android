@@ -76,11 +76,13 @@ public final class SslUtil {
     }
 
     public static Certificate loadCertificate(String certContent) throws CertificateException {
+        Timber.v("loadCertificate: ");
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return cf.generateCertificate(new ByteArrayInputStream(certContent.getBytes()));
     }
 
     public static KeyPair loadKeys(String keyContent) throws IOException {
+        Timber.v("loadKeys: ");
         PEMParser parser = new PEMParser(new StringReader(keyContent));
         PEMKeyPair pemKeyPair = (PEMKeyPair) parser.readObject();
         JcaPEMKeyConverter keyConverter = new JcaPEMKeyConverter();
@@ -91,6 +93,7 @@ public final class SslUtil {
 
     public static TrustManagerFactory getTrustManagerFactory(Certificate caCert) throws KeyStoreException,
             CertificateException, NoSuchAlgorithmException, IOException {
+        Timber.v("getTrustManagerFactory: ");
         KeyStore caKs = KeyStore.getInstance(KeyStore.getDefaultType());
         caKs.load(null, null);
         caKs.setCertificateEntry("ca-certificate", caCert);
@@ -102,6 +105,7 @@ public final class SslUtil {
     public static KeyManagerFactory getKeyManagerFactory(Certificate clientCertificate, KeyPair clientPrivateKey)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException,
             IOException, UnrecoverableKeyException {
+        Timber.v("getKeyManagerFactory: ");
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
         ks.setCertificateEntry("certificate", clientCertificate);

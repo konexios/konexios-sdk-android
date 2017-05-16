@@ -51,7 +51,6 @@ public final class GatewayModel implements Parcelable {
     private String sdkVersion;
 
     protected GatewayModel(@NonNull Parcel in) {
-
         uid = in.readString();
         name = in.readString();
         type = (GatewayType) in.readValue(GatewayType.class.getClassLoader());
@@ -60,9 +59,45 @@ public final class GatewayModel implements Parcelable {
         softwareName = in.readString();
         softwareVersion = in.readString();
         sdkVersion = in.readString();
+        applicationHid = in.readString();
+    }
+    public GatewayModel() {
     }
 
-    public GatewayModel() {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GatewayModel that = (GatewayModel) o;
+
+        if (uid != null ? !uid.equals(that.uid) : that.uid != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (type != that.type) return false;
+        if (userHid != null ? !userHid.equals(that.userHid) : that.userHid != null) return false;
+        if (osName != null ? !osName.equals(that.osName) : that.osName != null) return false;
+        if (softwareName != null ? !softwareName.equals(that.softwareName) : that.softwareName != null)
+            return false;
+        if (softwareVersion != null ? !softwareVersion.equals(that.softwareVersion) : that.softwareVersion != null)
+            return false;
+        if (applicationHid != null ? !applicationHid.equals(that.applicationHid) : that.applicationHid != null)
+            return false;
+        return sdkVersion != null ? sdkVersion.equals(that.sdkVersion) : that.sdkVersion == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uid != null ? uid.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (userHid != null ? userHid.hashCode() : 0);
+        result = 31 * result + (osName != null ? osName.hashCode() : 0);
+        result = 31 * result + (softwareName != null ? softwareName.hashCode() : 0);
+        result = 31 * result + (softwareVersion != null ? softwareVersion.hashCode() : 0);
+        result = 31 * result + (applicationHid != null ? applicationHid.hashCode() : 0);
+        result = 31 * result + (sdkVersion != null ? sdkVersion.hashCode() : 0);
+        return result;
     }
 
     public String getApplicationHid() {
@@ -152,5 +187,6 @@ public final class GatewayModel implements Parcelable {
         dest.writeString(softwareName);
         dest.writeString(softwareVersion);
         dest.writeString(sdkVersion);
+        dest.writeString(applicationHid);
     }
 }

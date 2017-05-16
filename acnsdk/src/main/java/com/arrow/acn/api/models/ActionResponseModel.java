@@ -25,43 +25,6 @@ import java.util.List;
  */
 
 public final class ActionResponseModel implements Parcelable {
-    @Nullable
-    @SerializedName("data")
-    List<DeviceActionModel> mActions;
-
-    @Nullable
-    public List<DeviceActionModel> getActions() {
-        return mActions;
-    }
-
-    public void setActions(List<DeviceActionModel> actions) {
-        mActions = actions;
-    }
-
-    protected ActionResponseModel(@NonNull Parcel in) {
-        if (in.readByte() == 0x01) {
-            mActions = new ArrayList<>();
-            in.readList(mActions, DeviceActionModel.class.getClassLoader());
-        } else {
-            mActions = null;
-        }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        if (mActions == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(mActions);
-        }
-    }
-
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<ActionResponseModel> CREATOR = new Parcelable.Creator<ActionResponseModel>() {
         @NonNull
@@ -76,4 +39,60 @@ public final class ActionResponseModel implements Parcelable {
             return new ActionResponseModel[size];
         }
     };
+    @Nullable
+    @SerializedName("data")
+    List<DeviceActionModel> actionModels;
+
+    public ActionResponseModel() {
+    }
+
+    protected ActionResponseModel(@NonNull Parcel in) {
+        if (in.readByte() == 0x01) {
+            actionModels = new ArrayList<>();
+            in.readList(actionModels, DeviceActionModel.class.getClassLoader());
+        } else {
+            actionModels = null;
+        }
+
+    }
+
+    @Nullable
+    public List<DeviceActionModel> getActions() {
+        return actionModels;
+    }
+
+    public void setActions(List<DeviceActionModel> actions) {
+        this.actionModels = actions;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ActionResponseModel that = (ActionResponseModel) o;
+
+        return actionModels != null ? actionModels.equals(that.actionModels) : that.actionModels == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return actionModels != null ? actionModels.hashCode() : 0;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        if (actionModels == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(actionModels);
+        }
+    }
 }

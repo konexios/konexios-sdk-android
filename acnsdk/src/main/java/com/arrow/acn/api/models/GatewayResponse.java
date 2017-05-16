@@ -19,7 +19,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by osminin on 4/15/2016.
  */
-public final class GatewayResponse implements Parcelable {
+public final class GatewayResponse extends CommonResponse implements Parcelable {
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<GatewayResponse> CREATOR = new Parcelable.Creator<GatewayResponse>() {
         @NonNull
@@ -34,96 +34,20 @@ public final class GatewayResponse implements Parcelable {
             return new GatewayResponse[size];
         }
     };
-    @SerializedName("hid")
-    private String mHid;
-    @SerializedName("message")
-    private String mMessage;
-    @SerializedName("type")
-    private String mType;
-    @SerializedName("userHid")
-    private String mUserHid;
-    @SerializedName("gatewayHid")
-    private String mGatewayHid;
-    @SerializedName("info")
-    private String mInfo;
-    @SerializedName("properties")
-    private String mProperties;
     @SerializedName("externalId")
-    private String mExternalId;
+    private String externalId;
 
     protected GatewayResponse(@NonNull Parcel in) {
-        mHid = in.readString();
-        mMessage = in.readString();
-        mType = in.readString();
-        mUserHid = in.readString();
-        mGatewayHid = in.readString();
-        mInfo = in.readString();
-        mProperties = in.readString();
-        mExternalId = in.readString();
+        super(in);
+        externalId = in.readString();
     }
 
     public String getExternalId() {
-        return mExternalId;
+        return externalId;
     }
 
     public void setExternalId(String externalId) {
-        mExternalId = externalId;
-    }
-
-    public String getType() {
-        return mType;
-    }
-
-    public void setType(String type) {
-        mType = type;
-    }
-
-    public String getUserHid() {
-        return mUserHid;
-    }
-
-    public void setUserHid(String userHid) {
-        mUserHid = userHid;
-    }
-
-    public String getGatewayHid() {
-        return mGatewayHid;
-    }
-
-    public void setGatewayHid(String gatewayHid) {
-        mGatewayHid = gatewayHid;
-    }
-
-    public String getInfo() {
-        return mInfo;
-    }
-
-    public void setInfo(String info) {
-        mInfo = info;
-    }
-
-    public String getProperties() {
-        return mProperties;
-    }
-
-    public void setProperties(String properties) {
-        mProperties = properties;
-    }
-
-    public String getHid() {
-        return mHid;
-    }
-
-    public void setHid(String hid) {
-        mHid = hid;
-    }
-
-    public String getMessage() {
-        return mMessage;
-    }
-
-    public void setMessage(String message) {
-        mMessage = message;
+        this.externalId = externalId;
     }
 
     @Override
@@ -133,13 +57,7 @@ public final class GatewayResponse implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(mHid);
-        dest.writeString(mMessage);
-        dest.writeString(mType);
-        dest.writeString(mUserHid);
-        dest.writeString(mGatewayHid);
-        dest.writeString(mInfo);
-        dest.writeString(mProperties);
-        dest.writeString(mExternalId);
+        super.writeToParcel(dest, flags);
+        dest.writeString(externalId);
     }
 }
