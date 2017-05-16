@@ -57,6 +57,8 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
+import static android.R.attr.enabled;
+
 /**
  * Created by osminin on 3/15/2016.
  */
@@ -167,10 +169,6 @@ public interface IotConnectAPIService {
     Call<ListResultModel<TelemetryItemModel>> getLastTelemetry(@Path("deviceHid") String deviceHid);
 
     @NonNull
-    @GET("/api/kronos/device/{deviceHid}/stats")
-    Call<TelemetryStatsModel> getTelemetryStats(@Path("deviceHid") String deviceHid);
-
-    @NonNull
     @PUT("/api/v1/core/events/{hid}/received")
     Call<ResponseBody> putReceived(@Path("hid") String hid);
 
@@ -193,15 +191,15 @@ public interface IotConnectAPIService {
 
     @NonNull
     @POST("/api/v1/kronos/devices/{hid}/actions")
-    Call<ResponseBody> postAction(@Path("hid") String hid, @Body DeviceActionModel action);
+    Call<CommonResponse> postAction(@Path("hid") String hid, @Body DeviceActionModel action);
 
     @NonNull
     @PUT("/api/v1/kronos/devices/{hid}/actions/{index}")
-    Call<ResponseBody> updateAction(@Path("hid") String hid, @Path("index") int index,
+    Call<CommonResponse> updateAction(@Path("hid") String hid, @Path("index") int index,
                                     @Body DeviceActionModel action);
     @NonNull
     @DELETE("/api/v1/kronos/devices/{hid}/actions/{index}")
-    Call<ResponseBody> deleteAction(@Path("hid") String hid, @Path("index") int index);
+    Call<CommonResponse> deleteAction(@Path("hid") String hid, @Path("index") int index);
 
     //Device api
     @NonNull
@@ -222,6 +220,10 @@ public interface IotConnectAPIService {
                                                 @Query("uid") String uid,
                                                 @Query("type") String type,
                                                 @Query("gatewayHid") String gatewayHid,
+                                                @Query("createdBefore") String createdBefore,
+                                                @Query("createdAfter") String createdAfter,
+                                                @Query("updatedBefore") String updatedBefore,
+                                                @Query("updatedAfter") String updatedAfter,
                                                 @Query("enabled") String enabled,
                                                 @Query("_page") int page,
                                                 @Query("_size") int size);
@@ -270,7 +272,7 @@ public interface IotConnectAPIService {
 
     @NonNull
     @POST("/api/v1/kronos/nodes/types")
-    Call<CommonResponse> createNewNodeType(NodeTypeRegistrationModel model);
+    Call<CommonResponse> createNewNodeType(@Body NodeTypeRegistrationModel model);
 
     @NonNull
     @PUT("/api/v1/kronos/nodes/types/{hid}")
