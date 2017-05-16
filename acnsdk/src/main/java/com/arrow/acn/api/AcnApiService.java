@@ -45,6 +45,7 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.ErrorBodyModel;
+import com.arrow.acn.api.models.FindDevicesRequest;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
@@ -156,8 +157,7 @@ public interface AcnApiService {
      */
     void registerDevice(DeviceRegistrationModel req, RegisterDeviceListener listener);
 
-    void findAllDevices(String userHid, String uid, String type, String gatewayHid, String enabled,
-                        int page, int size, PagingResultListener<DeviceModel> listener);
+    void findAllDevices(FindDevicesRequest request, PagingResultListener<DeviceModel> listener);
 
     void getDeviceHistoricalEvents(HistoricalEventsRequest request, PagingResultListener<DeviceEventModel> listener);
 

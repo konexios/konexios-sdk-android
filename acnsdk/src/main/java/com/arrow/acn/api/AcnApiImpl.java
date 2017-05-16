@@ -54,6 +54,7 @@ import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
+import com.arrow.acn.api.models.FindDevicesRequest;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
@@ -272,19 +273,19 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void postDeviceAction(@NonNull String deviceHid, @NonNull DeviceActionModel action, @NonNull final PostDeviceActionListener listener) {
-        mRestService.postAction(deviceHid, action).enqueue(new Callback<ResponseBody>() {
+        mRestService.postAction(deviceHid, action).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 Timber.d("getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.postActionSucceed();
+                    listener.postActionSucceed(response.body());
                 } else {
                     listener.postActionFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 listener.postActionFailed(ErrorUtils.parseError(t));
             }
         });
@@ -292,19 +293,19 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void updateDeviceAction(@NonNull String deviceHid, int index, @NonNull DeviceActionModel model, @NonNull final UpdateDeviceActionListener listener) {
-        mRestService.updateAction(deviceHid, index, model).enqueue(new Callback<ResponseBody>() {
+        mRestService.updateAction(deviceHid, index, model).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 Timber.d("getActionTypes response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onDeviceActionUpdated();
+                    listener.onDeviceActionUpdated(response.body());
                 } else {
                     listener.onDeviceActionUpdateFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 listener.onDeviceActionUpdateFailed(ErrorUtils.parseError(t));
             }
         });
@@ -646,12 +647,12 @@ class AcnApiImpl implements AcnApiService {
 
     @Override
     public void deleteDeviceAction(@NonNull String deviceHid, int index, @NonNull final DeleteDeviceActionListener listener) {
-        mRestService.deleteAction(deviceHid, index).enqueue(new Callback<ResponseBody>() {
+        mRestService.deleteAction(deviceHid, index).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
                 Timber.d("deleteAction response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onDeviceActionDeleted();
+                    listener.onDeviceActionDeleted(response.body());
                 } else {
                     Timber.e("deleteAction error");
                     listener.onDeviceActionDeleteFailed(mRetrofitHolder.convertToApiError(response));
@@ -659,7 +660,7 @@ class AcnApiImpl implements AcnApiService {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("deleteAction error");
                 listener.onDeviceActionDeleteFailed(ErrorUtils.parseError(t));
             }
@@ -667,9 +668,17 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void findAllDevices(String userHid, String uid, String type, String gatewayHid,
-                               String enabled, int page, int size, @NonNull final PagingResultListener<DeviceModel> listener) {
-        mRestService.findAllDevices(userHid, uid, type, gatewayHid, enabled, page, size).
+    public void findAllDevices(FindDevicesRequest request, @NonNull final PagingResultListener<DeviceModel> listener) {
+        mRestService.findAllDevices(request.getUserHid(),
+                request.getUid(),
+                request.getType(),
+                request.getGatewayHid(),
+                request.getCreatedBefore(),
+                request.getCreatedAfter(),
+                request.getUpdatedBefore(),
+                request.getUpdatedAfter(),
+                request.getEnabled(),
+                request.get_page(), request.get_size()).
                 enqueue(new Callback<PagingResultModel<DeviceModel>>() {
                     @Override
                     public void onResponse(Call<PagingResultModel<DeviceModel>> call, @NonNull Response<PagingResultModel<DeviceModel>> response) {
