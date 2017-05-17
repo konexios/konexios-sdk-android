@@ -169,11 +169,11 @@ public interface AcnApiService {
 
     //Core-event api
 
-    void registerReceivedEvent(String eventHid);
+    void registerReceivedEvent(String eventHid, CommonRequestListener listener);
 
-    void eventHandlingSucceed(String eventHid);
+    void eventHandlingSucceed(String eventHid, CommonRequestListener listener);
 
-    void eventHandlingFailed(String eventHid);
+    void eventHandlingFailed(String eventHid, CommonRequestListener listener);
 
     //Gateways api
 
