@@ -177,19 +177,19 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<ResponseBody> putReceived(@Path("hid") String hid) {
+    public Call<CommonResponse> putReceived(@Path("hid") String hid) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<ResponseBody> putSucceeded(@Path("hid") String hid) {
+    public Call<CommonResponse> putSucceeded(@Path("hid") String hid) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<ResponseBody> putFailed(@Path("hid") String hid) {
+    public Call<CommonResponse> putFailed(@Path("hid") String hid) {
         return null;
     }
 

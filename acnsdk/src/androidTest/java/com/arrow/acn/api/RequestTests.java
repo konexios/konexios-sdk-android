@@ -28,6 +28,7 @@ import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.GetGatewaysListener;
 import com.arrow.acn.api.listeners.ListNodeTypesListener;
 import com.arrow.acn.api.listeners.ListResultListener;
+import com.arrow.acn.api.listeners.MessageStatusListener;
 import com.arrow.acn.api.listeners.PagingResultListener;
 import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
@@ -49,6 +50,7 @@ import com.arrow.acn.api.models.DeviceRegistrationModel;
 import com.arrow.acn.api.models.DeviceRegistrationResponse;
 import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
+import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.FindDevicesRequest;
 import com.arrow.acn.api.models.FindTelemetryRequest;
@@ -58,6 +60,8 @@ import com.arrow.acn.api.models.GatewayResponse;
 import com.arrow.acn.api.models.GatewayType;
 import com.arrow.acn.api.models.HistoricalEventsRequest;
 import com.arrow.acn.api.models.ListResultModel;
+import com.arrow.acn.api.models.MessageStatusResponse;
+import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
@@ -108,7 +112,8 @@ public class RequestTests {
     public static final String GATEWAY_UID = "Uid" + new Random(System.currentTimeMillis()).nextInt();
 
     public static final String DEVICE_UID = "deviceUid" + new Random(System.currentTimeMillis()).nextInt();
-    public static final String DEVICE_HID = "36cf857d2c71548f5f4725caf44d15ed51365006";
+    //public static final String DEVICE_HID = "36cf857d2c71548f5f4725caf44d15ed51365006";
+    public static final String DEVICE_HID = "211f793a3bfd00244b28f1c519c19bf702e356e6";
 
     public static final String NODE_TYPE_HID = "43e4b5577e5e3e7200d0c77729b191e4b86480f3";
 
@@ -118,6 +123,10 @@ public class RequestTests {
     public static final String ACTION_HID = "36cf857d2c71548f5f4725caf44d15ed51365006";
 
     public static final String DEVICE_TYPE_HID = "74322e8f42552503de97ec11fffd3f3641e0983f";
+
+    public static final String DEVICE_STATE_HID = "265f6cfe9526826867db6e0653ed56db5914d858";
+
+    public static final String EVENT_HID = "f74892dbffddd323887277b65c1a1b6a5b7d8257";
 
     private AcnApiService mService;
 
@@ -532,21 +541,6 @@ public class RequestTests {
     }
 
     @Test
-    public void putReceivedEvent() throws Exception {
-        //TODO:
-    }
-
-    @Test
-    public void putSucceededEvent() throws Exception {
-        //TODO;
-    }
-
-    @Test
-    public void putFailedEvent() throws Exception {
-        //TODO:
-    }
-
-    @Test
     public void getActionTypes() throws Exception {
         mService.getDeviceActionTypes(new ListResultListener<DeviceActionTypeModel>() {
             @Override
@@ -700,7 +694,7 @@ public class RequestTests {
         AuditLogsQuery query = new AuditLogsQuery();
         query.setSize(200);
         query.setPage(0);
-        query.setUserHids(Arrays.asList(new String[] {USER_HID}));
+        query.setUserHids(Arrays.asList(new String[]{USER_HID}));
         mService.getDeviceAuditLogs(DEVICE_HID, query, new PagingResultListener<AuditLogModel>() {
             @Override
             public void onRequestSuccess(PagingResultModel<AuditLogModel> list) {
@@ -879,7 +873,7 @@ public class RequestTests {
     }
 
     //TODO:
-    @Test
+    //@Test
     public void findDeviceState() throws Exception {
         mService.findDeviceState(DEVICE_HID, new FindDeviceStateListener() {
             @Override
@@ -893,4 +887,135 @@ public class RequestTests {
             }
         });
     }
+
+    @Test
+    public void updateDeviceStateTransaction() throws Exception {
+        NewDeviceStateTransactionRequest request = new NewDeviceStateTransactionRequest();
+        long currentTime = System.currentTimeMillis();
+        request.setTimestamp(getFormattedDateTime(currentTime));
+        request.setStates(new JsonObject());
+        mService.updateDeviceStateTransaction(DEVICE_HID, request, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void createNewDeviceStateTransaction() throws Exception {
+        NewDeviceStateTransactionRequest request = new NewDeviceStateTransactionRequest();
+        long currentTime = System.currentTimeMillis();
+        request.setTimestamp(getFormattedDateTime(currentTime));
+        request.addState("someKey", "someValue");
+        mService.createNewDeviceStateTransaction(DEVICE_HID, request, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void deviceStateTransactionSucceeded() throws Exception {
+        mService.deviceStateTransactionSucceeded(DEVICE_HID, DEVICE_STATE_HID, new MessageStatusListener() {
+            @Override
+            public void onResponse(MessageStatusResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void deviceStateTransactionReceived() throws Exception {
+        mService.deviceStateTransactionReceived(DEVICE_HID, DEVICE_STATE_HID, new MessageStatusListener() {
+            @Override
+            public void onResponse(MessageStatusResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void deviceStateTransactionFailed() throws Exception {
+        ErrorBodyModel model = new ErrorBodyModel();
+        model.setError("testError");
+        mService.deviceStateTransactionFailed(DEVICE_HID, DEVICE_STATE_HID, model, new MessageStatusListener() {
+            @Override
+            public void onResponse(MessageStatusResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void putReceivedEvent() throws Exception {
+        mService.registerReceivedEvent(EVENT_HID, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void putSucceededEvent() throws Exception {
+        mService.eventHandlingSucceed(EVENT_HID, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void putFailedEvent() throws Exception {
+        mService.eventHandlingFailed(EVENT_HID, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
 }

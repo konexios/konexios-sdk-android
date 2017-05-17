@@ -170,15 +170,15 @@ public interface IotConnectAPIService {
 
     @NonNull
     @PUT("/api/v1/core/events/{hid}/received")
-    Call<ResponseBody> putReceived(@Path("hid") String hid);
+    Call<CommonResponse> putReceived(@Path("hid") String hid);
 
     @NonNull
     @PUT("/api/v1/core/events/{hid}/succeeded")
-    Call<ResponseBody> putSucceeded(@Path("hid") String hid);
+    Call<CommonResponse> putSucceeded(@Path("hid") String hid);
 
     @NonNull
     @PUT("/api/v1/core/events/{hid}/failed")
-    Call<ResponseBody> putFailed(@Path("hid") String hid);
+    Call<CommonResponse> putFailed(@Path("hid") String hid);
 
     //device-action api
     @NonNull

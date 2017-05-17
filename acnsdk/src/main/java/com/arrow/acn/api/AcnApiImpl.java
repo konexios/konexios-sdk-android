@@ -363,46 +363,67 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void registerReceivedEvent(@NonNull String eventHid) {
-        mRestService.putReceived(eventHid).enqueue(new Callback<ResponseBody>() {
+    public void registerReceivedEvent(String eventHid, final CommonRequestListener listener) {
+        mRestService.putReceived(eventHid).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 Timber.d("registerReceivedEvent response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("heartBeat error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("registerReceivedEvent error");
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
 
     @Override
-    public void eventHandlingSucceed(@NonNull String eventHid) {
-        mRestService.putSucceeded(eventHid).enqueue(new Callback<ResponseBody>() {
+    public void eventHandlingSucceed(@NonNull String eventHid, final CommonRequestListener listener) {
+        mRestService.putSucceeded(eventHid).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 Timber.d("eventHandlingSucceed response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("heartBeat error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("eventHandlingSucceed error");
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
 
     @Override
-    public void eventHandlingFailed(@NonNull String eventHid) {
-        mRestService.putFailed(eventHid).enqueue(new Callback<ResponseBody>() {
+    public void eventHandlingFailed(@NonNull String eventHid, final CommonRequestListener listener) {
+        mRestService.putFailed(eventHid).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 Timber.d("eventHandlingSucceed response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("heartBeat error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("eventHandlingSucceed error");
+                listener.onRequestError(ErrorUtils.parseError(t));
             }
         });
     }
