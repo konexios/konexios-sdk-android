@@ -2,7 +2,7 @@
 Arrow Connect SDK for Android
 
 ### Add AcnSDK to Project ###
-Download [the latest JAR][2] or grab via Maven:
+grab via Maven:
 ```xml
 <dependency> 
     <groupId>com.arrow.acn.api</groupId>
