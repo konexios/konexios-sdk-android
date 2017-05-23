@@ -34,6 +34,7 @@ import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.DeviceTypeTelemetryModel;
 import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
+import com.arrow.acn.api.models.FindDevicesRequest;
 import com.arrow.acn.api.models.FindTelemetryRequest;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayEventModel;
@@ -251,6 +252,7 @@ public class ParcelableTest {
                 DeviceRegistrationResponse.class,
                 DeviceTypeTelemetryModel.class,
                 ErrorBodyModel.class,
+                FindDevicesRequest.class,
                 FindDeviceStateResponse.class,
                 FindTelemetryRequest.class,
                 GatewayCommand.class,

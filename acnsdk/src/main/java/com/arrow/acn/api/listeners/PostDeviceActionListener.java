@@ -11,12 +11,14 @@
 package com.arrow.acn.api.listeners;
 
 import com.arrow.acn.api.models.ApiError;
+import com.arrow.acn.api.models.CommonResponse;
 
 /**
  * Created by osminin on 9/22/2016.
  */
 
 public interface PostDeviceActionListener {
-    void postActionSucceed();
+    void postActionSucceed(CommonResponse response);
+
     void postActionFailed(ApiError error);
 }

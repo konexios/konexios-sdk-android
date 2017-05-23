@@ -11,13 +11,14 @@
 package com.arrow.acn.api.listeners;
 
 import com.arrow.acn.api.models.ApiError;
+import com.arrow.acn.api.models.CommonResponse;
 
 /**
  * Created by osminin on 10.10.2016.
  */
 
 public interface DeleteDeviceActionListener {
-    void onDeviceActionDeleted();
+    void onDeviceActionDeleted(CommonResponse response);
 
     void onDeviceActionDeleteFailed(ApiError error);
 }
