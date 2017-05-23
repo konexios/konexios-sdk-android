@@ -40,7 +40,6 @@ import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
-import com.arrow.acn.api.models.TelemetryStatsModel;
 import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import org.junit.Assert;
@@ -53,8 +52,6 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by osminin on 4/4/2017.
@@ -180,25 +177,19 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<TelemetryStatsModel> getTelemetryStats(@Path("deviceHid") String deviceHid) {
+    public Call<CommonResponse> putReceived(@Path("hid") String hid) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<ResponseBody> putReceived(@Path("hid") String hid) {
+    public Call<CommonResponse> putSucceeded(@Path("hid") String hid) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<ResponseBody> putSucceeded(@Path("hid") String hid) {
-        return null;
-    }
-
-    @NonNull
-    @Override
-    public Call<ResponseBody> putFailed(@Path("hid") String hid) {
+    public Call<CommonResponse> putFailed(@Path("hid") String hid) {
         return null;
     }
 
@@ -216,19 +207,19 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<ResponseBody> postAction(@Path("hid") String hid, @Body DeviceActionModel action) {
+    public Call<CommonResponse> postAction(@Path("hid") String hid, @Body DeviceActionModel action) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<ResponseBody> updateAction(@Path("hid") String hid, @Path("index") int index, @Body DeviceActionModel action) {
+    public Call<CommonResponse> updateAction(@Path("hid") String hid, @Path("index") int index, @Body DeviceActionModel action) {
         return null;
     }
 
     @NonNull
     @Override
-    public Call<ResponseBody> deleteAction(@Path("hid") String hid, @Path("index") int index) {
+    public Call<CommonResponse> deleteAction(@Path("hid") String hid, @Path("index") int index) {
         return null;
     }
 
@@ -240,7 +231,7 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
-    public Call<PagingResultModel<DeviceModel>> findAllDevices(@Query("userHid") String userHid, @Query("uid") String uid, @Query("type") String type, @Query("gatewayHid") String gatewayHid, @Query("enabled") String enabled, @Query("_page") int page, @Query("_size") int size) {
+    public Call<PagingResultModel<DeviceModel>> findAllDevices(@Query("userHid") String userHid, @Query("uid") String uid, @Query("type") String type, @Query("gatewayHid") String gatewayHid, @Query("createdBefore") String createdBefore, @Query("createdAfter") String createdAfter, @Query("updatedBefore") String updatedBefore, @Query("updatedAfter") String updatedAfter, @Query("enabled") String enabled, @Query("_page") int page, @Query("_size") int size) {
         return null;
     }
 
