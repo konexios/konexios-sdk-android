@@ -167,6 +167,8 @@ public interface AcnApiService {
 
     void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 
+    void sendDeviceError(String deviceHid, ErrorBodyModel error, CommonRequestListener listener);
+
     //Core-event api
 
     void registerReceivedEvent(String eventHid, CommonRequestListener listener);
@@ -186,6 +188,8 @@ public interface AcnApiService {
     void updateGateway(String hid, GatewayModel gatewayModel, GatewayUpdateListener listener);
 
     void checkinGateway(String hid, String gatewayUid, CheckinGatewayListener listener);
+
+    void sendGatewayError(String hid, ErrorBodyModel error, CommonRequestListener listener);
 
     @Deprecated
     void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
