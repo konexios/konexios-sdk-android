@@ -547,6 +547,29 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
+    public void sendGatewayError(String hid, ErrorBodyModel error, final CommonRequestListener listener) {
+        mRestService.sendGatewayError(hid, error).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("sendGatewayError response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("sendGatewayError error");
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
+                    listener.onRequestError(error);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("sendGatewayError error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
     public void sendCommandGateway(@NonNull String hid, @NonNull GatewayCommand command, @NonNull final GatewayCommandsListener listener) {
         mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<CommonResponse>() {
             @Override
@@ -783,6 +806,28 @@ class AcnApiImpl implements AcnApiService {
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
                 Timber.e("getDeviceAuditLogs error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void sendDeviceError(String deviceHid, ErrorBodyModel error, final CommonRequestListener listener) {
+        mRestService.sendDeviceError(deviceHid, error).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("sendDeviceError response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("sendDeviceError error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("sendDeviceError error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });

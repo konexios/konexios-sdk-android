@@ -1018,4 +1018,37 @@ public class RequestTests {
         });
     }
 
+    @Test
+    public void sendGatewayError() throws Exception {
+        ErrorBodyModel error = new ErrorBodyModel();
+        error.setError("Some error");
+        mService.sendGatewayError(GATEWAY_HID, error, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
+
+    @Test
+    public void sendDeviceError() throws Exception {
+        ErrorBodyModel error = new ErrorBodyModel();
+        error.setError("Some error");
+        mService.sendDeviceError(DEVICE_HID, error, new CommonRequestListener() {
+            @Override
+            public void onRequestSuccess(CommonResponse response) {
+                assertNotNull(response);
+            }
+
+            @Override
+            public void onRequestError(ApiError error) {
+                assertNull(error);
+            }
+        });
+    }
 }
