@@ -19,5 +19,6 @@ import com.arrow.acn.api.models.CommonResponse;
 
 public interface CommonRequestListener {
     void onRequestSuccess(CommonResponse response);
+
     void onRequestError(ApiError error);
 }
