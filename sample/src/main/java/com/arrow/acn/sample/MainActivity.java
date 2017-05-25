@@ -34,6 +34,7 @@ import com.arrow.acn.api.listeners.FindDeviceStateListener;
 import com.arrow.acn.api.listeners.GatewayRegisterListener;
 import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.models.AccountResponse;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.models.ConfigResponse;
@@ -69,7 +70,7 @@ import static android.hardware.Sensor.TYPE_STEP_COUNTER;
 
 
 public class MainActivity extends AppCompatActivity implements InternalSensorsView,
-        TelemetrySender, ConnectionListener {
+        TelemetrySender, ConnectionListener, TelemetryRequestListener {
     public final static String KEY_GATEWAY_ID = "gateway-id";
     public final static String SOFTWARE_NAME = "JMyIotGateway";
     public final static int MAJOR = 0;
@@ -272,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
 
     @Override
     public void sendTelemetry(TelemetryModel model) {
-        mTelemetrySendService.sendSingleTelemetry(model);
+        mTelemetrySendService.sendSingleTelemetry(model, this);
     }
 
     @Override
@@ -361,5 +362,15 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
     @Override
     public void onConnectionError(@NonNull ApiError error) {
         FirebaseCrash.logcat(Log.ERROR, TAG, error.getMessage());
+    }
+
+    @Override
+    public void onTelemetrySendSuccess() {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "onTelemetrySendSuccess");
+    }
+
+    @Override
+    public void onTelemetrySendError(ApiError error) {
+        FirebaseCrash.logcat(Log.DEBUG, TAG, "onTelemetrySendError");
     }
 }

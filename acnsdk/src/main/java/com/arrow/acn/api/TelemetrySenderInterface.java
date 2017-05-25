@@ -13,6 +13,7 @@ package com.arrow.acn.api;
 import android.support.annotation.Keep;
 
 import com.arrow.acn.api.listeners.ConnectionListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.models.TelemetryModel;
 
 import java.util.List;
@@ -27,9 +28,9 @@ public interface TelemetrySenderInterface {
 
     void disconnect();
 
-    void sendSingleTelemetry(TelemetryModel telemetry);
+    void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener);
 
-    void sendBatchTelemetry(List<TelemetryModel> telemetry);
+    void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener);
 
     boolean hasBatchMode();
 
