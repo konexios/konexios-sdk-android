@@ -12,11 +12,14 @@ package com.arrow.acn.sample;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -27,10 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.arrow.acn.api.AcnApi;
 import com.arrow.acn.api.AcnApiService;
 import com.arrow.acn.api.listeners.ConnectionListener;
-import com.arrow.acn.api.listeners.FindDeviceStateListener;
 import com.arrow.acn.api.listeners.GatewayRegisterListener;
 import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
@@ -39,7 +40,6 @@ import com.arrow.acn.api.models.AccountResponse;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.models.DeviceRegistrationModel;
-import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
 import com.arrow.acn.api.models.GatewayType;
@@ -71,6 +71,7 @@ import static android.hardware.Sensor.TYPE_STEP_COUNTER;
 
 public class MainActivity extends AppCompatActivity implements InternalSensorsView,
         TelemetrySender, ConnectionListener, TelemetryRequestListener {
+    public static final int REQUEST_READ_PHONE_STATE = 100;
     public final static String KEY_GATEWAY_ID = "gateway-id";
     public final static String SOFTWARE_NAME = "JMyIotGateway";
     public final static int MAJOR = 0;
@@ -206,8 +207,16 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
             @Override
             public void onGatewayConfigReceived(ConfigResponse response) {
                 mTelemetrySendService.connect(MainActivity.this);
-                //allow user to start collecting telemetry from internal sensors
-                mDeviceSwitch.setEnabled(true);
+                int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this,
+                        android.Manifest.permission.READ_PHONE_STATE);
+
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_PHONE_STATE},
+                            REQUEST_READ_PHONE_STATE);
+                } else {
+                    //allow user to start collecting telemetry from internal sensors
+                    mDeviceSwitch.setEnabled(true);
+                }
             }
 
             @Override
@@ -216,6 +225,21 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
                         ", message: " + error.getMessage());
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_PHONE_STATE:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    //allow user to start collecting telemetry from internal sensors
+                    mDeviceSwitch.setEnabled(true);
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Override
