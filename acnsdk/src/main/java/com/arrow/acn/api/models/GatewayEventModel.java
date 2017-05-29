@@ -43,15 +43,22 @@ public final class GatewayEventModel implements Parcelable {
     private boolean encrypted = false;
     @SerializedName("parameters")
     private Map<String, String> parameters = new HashMap<>();
+    @SerializedName("signature")
+    private String signature;
+    @SerializedName("signatureVersion")
+    private String signatureVersion;
 
     public GatewayEventModel() {
     }
 
-    public GatewayEventModel(String hid, String name, boolean encrypted, Map<String, String> parameters) {
+    public GatewayEventModel(String hid, String name, boolean encrypted, Map<String, String> parameters,
+                             String signature, String signatureVersion) {
         this.hid = hid;
         this.name = name;
         this.encrypted = encrypted;
         this.parameters = parameters;
+        this.signature = signature;
+        this.signatureVersion = signatureVersion;
     }
 
     protected GatewayEventModel(Parcel in) {
@@ -65,6 +72,8 @@ public final class GatewayEventModel implements Parcelable {
             String value = in.readString();
             parameters.put(key, value);
         }
+        signature = in.readString();
+        signatureVersion = in.readString();
     }
 
     @Override
@@ -77,6 +86,10 @@ public final class GatewayEventModel implements Parcelable {
         if (encrypted != that.encrypted) return false;
         if (hid != null ? !hid.equals(that.hid) : that.hid != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (signature != null ? !signature.equals(that.signature) : that.signature != null)
+            return false;
+        if (signatureVersion != null ? !signatureVersion.equals(that.signatureVersion) : that.signatureVersion != null)
+            return false;
         return parameters != null ? parameters.equals(that.parameters) : that.parameters == null;
 
     }
@@ -87,6 +100,8 @@ public final class GatewayEventModel implements Parcelable {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (encrypted ? 1 : 0);
         result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        result = 31 * result + (signature != null ? signature.hashCode() : 0);
+        result = 31 * result + (signatureVersion != null ? signatureVersion.hashCode() : 0);
         return result;
     }
 
@@ -122,6 +137,22 @@ public final class GatewayEventModel implements Parcelable {
         this.parameters = parameters;
     }
 
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getSignatureVersion() {
+        return signatureVersion;
+    }
+
+    public void setSignatureVersion(String signatureVersion) {
+        this.signatureVersion = signatureVersion;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -137,6 +168,8 @@ public final class GatewayEventModel implements Parcelable {
             dest.writeString(entry.getKey());
             dest.writeString(entry.getValue());
         }
+        dest.writeString(signature);
+        dest.writeString(signatureVersion);
     }
 }
 

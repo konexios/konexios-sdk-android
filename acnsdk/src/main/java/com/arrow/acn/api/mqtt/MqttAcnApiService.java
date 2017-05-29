@@ -17,6 +17,7 @@ import android.text.TextUtils;
 
 import com.arrow.acn.api.common.RetrofitHolder;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
+import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -32,8 +33,9 @@ public final class MqttAcnApiService extends AbstractMqttAcnApiService {
     private final RetrofitHolder mRetrofitHolder;
 
     public MqttAcnApiService(String host, String mqttPrefix, String gatewayId,
-                             RetrofitHolder retrofitHolder, ServerCommandsListener listener) {
-        super(gatewayId, listener);
+                             RetrofitHolder retrofitHolder, ServerCommandsListener listener,
+                             IotConnectAPIService restService) {
+        super(gatewayId, listener, restService);
         mHost = host;
         mMqttPrefix = mqttPrefix;
         mRetrofitHolder = retrofitHolder;

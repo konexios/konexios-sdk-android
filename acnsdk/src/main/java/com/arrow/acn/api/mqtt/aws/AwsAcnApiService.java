@@ -12,9 +12,11 @@ package com.arrow.acn.api.mqtt.aws;
 
 import android.support.annotation.Keep;
 
+import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.common.SslUtil;
+import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -27,8 +29,11 @@ import timber.log.Timber;
 @Keep
 public final class AwsAcnApiService extends AbstractMqttAcnApiService {
 
-    public AwsAcnApiService(String gatewayId, ConfigResponse configResponse) {
-        super(gatewayId, configResponse);
+    public AwsAcnApiService(String gatewayId,
+                            ConfigResponse configResponse,
+                            ServerCommandsListener listener,
+                            IotConnectAPIService restService) {
+        super(gatewayId, configResponse, listener, restService);
         Timber.v("AwsAcnApiService: ");
     }
 
