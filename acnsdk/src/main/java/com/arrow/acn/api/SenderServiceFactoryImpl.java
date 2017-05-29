@@ -32,26 +32,21 @@ import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.IBM;
 @Keep
 final class SenderServiceFactoryImpl implements SenderServiceFactory {
     @Override
-    public TelemetrySenderInterface createTelemetrySender(RetrofitHolder retrofitHolder,
-                                                          ConfigResponse configResponse,
-                                                          String gatewayUid,
-                                                          String gatewayId,
-                                                          String mqttHost,
-                                                          String mqttPrefix,
-                                                          ServerCommandsListener serverCommandsListener) {
+    public TelemetrySenderInterface createTelemetrySender(SenderServiceArgsProvider provider) {
         TelemetrySenderInterface service = null;
-        ConfigResponse.CloudPlatform platform = configResponse.getCloudPlatform();
+        ConfigResponse.CloudPlatform platform = provider.getConfigResponse().getCloudPlatform();
         if (ARROW_CONNECT == platform) {
-            service = new MqttAcnApiService(mqttHost, mqttPrefix, gatewayId,
-                    retrofitHolder, serverCommandsListener);
+            service = new MqttAcnApiService(provider.getMqttHost(), provider.getMqttPrefix(), provider.getGatewayId(),
+                    provider.getRetrofitHolder(), provider.getServerCommandsListener(),
+                    provider.getIotConnectApiService());
         } else if (IBM == platform) {
-            service = new IbmAcnApiService(gatewayId, configResponse);
+            service = new IbmAcnApiService(provider.getGatewayId(), provider.getConfigResponse());
         } else if (AWS == platform) {
-            service = new AwsAcnApiService(gatewayId, configResponse);
+            service = new AwsAcnApiService(provider.getGatewayId(), provider.getConfigResponse());
         } else if (AZURE == platform) {
-            service = new AzureAcnApiService(gatewayUid,
-                    configResponse.getAzure().getAccessKey(),
-                    configResponse.getAzure().getHost());
+            service = new AzureAcnApiService(provider.getGatewayUid(),
+                    provider.getConfigResponse().getAzure().getAccessKey(),
+                    provider.getConfigResponse().getAzure().getHost());
         }
         return service;
     }
