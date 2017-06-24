@@ -18,9 +18,11 @@ import com.arrow.acn.api.AbstractTelemetrySenderService;
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.models.GatewayEventModel;
 import com.arrow.acn.api.models.TelemetryModel;
+import com.arrow.acn.api.rest.RestApiAcnApiService;
 import com.google.gson.Gson;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -50,17 +52,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     private final static int DEFAULT_KEEP_ALIVE_INTERVAL_SECS = 60;
     private static final int MAX_INFLIGHT_COUNT = 10;
     private static final int QOS = 0;
-    private final IMqttActionListener mMqttTelemetryCallback = new IMqttActionListener() {
-        @Override
-        public void onSuccess(@NonNull IMqttToken asyncActionToken) {
-            Timber.v("data sent to cloud: " + asyncActionToken.getResponse().toString());
-        }
-
-        @Override
-        public void onFailure(@NonNull IMqttToken asyncActionToken, Throwable exception) {
-            Timber.e(exception);
-        }
-    };
+    private final CallbackHandler mMqttTelemetryCallback = new CallbackHandler();
     protected String mGatewayId;
     protected ConfigResponse mConfigResponse;
     private ServerCommandsListener mServerCommandsListener;
@@ -142,26 +134,27 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     }
 
     @Override
-    public void sendSingleTelemetry(@NonNull TelemetryModel telemetry) {
+    public void sendSingleTelemetry(@NonNull TelemetryModel telemetry, TelemetryRequestListener listener) {
         String json = telemetry.getTelemetry();
         MqttMessage message = new MqttMessage(json.getBytes());
         String topic = getPublisherTopic(telemetry.getDeviceType(), telemetry.getDeviceExternalId());
-        sendMqttMessage(topic, message);
+        sendMqttMessage(topic, message, listener);
     }
 
     @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener) {
         String payload = formatBatchPayload(telemetry);
         String topic = "krs.tel.bat.gts." + mGatewayId;
         MqttMessage message = new MqttMessage(payload.toString().getBytes());
-        sendMqttMessage(topic, message);
+        sendMqttMessage(topic, message, listener);
     }
 
-    private void sendMqttMessage(String topic, MqttMessage message) {
+    private void sendMqttMessage(String topic, MqttMessage message, TelemetryRequestListener listener) {
         if (mMqttClient != null && mMqttClient.isConnected()
                 && mMqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_COUNT) {
             try {
-                mMqttClient.publish(topic, message).setActionCallback(mMqttTelemetryCallback);
+                mMqttClient.publish(topic, message)
+                        .setActionCallback(mMqttTelemetryCallback.setListener(listener));
             } catch (MqttException e) {
                 Timber.e(e);
             }
@@ -209,5 +202,32 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     @Override
     public boolean isConnected() {
         return mMqttClient != null && mMqttClient.isConnected();
+    }
+
+    private class CallbackHandler implements IMqttActionListener {
+        TelemetryRequestListener mListener;
+
+        CallbackHandler setListener(TelemetryRequestListener listener) {
+            CallbackHandler callbackHandler;
+            //comparing references
+            if (listener == mListener) {
+                callbackHandler = this;
+            } else {
+                callbackHandler = new CallbackHandler();
+            }
+            callbackHandler.mListener = listener;
+            return callbackHandler;
+        }
+        @Override
+        public void onSuccess(IMqttToken asyncActionToken) {
+            Timber.v("data sent to cloud: " + asyncActionToken.getResponse().toString());
+            mListener.onTelemetrySendSuccess();
+        }
+
+        @Override
+        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+            Timber.e(exception);
+            mListener.onTelemetrySendError(ErrorUtils.parseError(exception));
+        }
     }
 }

@@ -36,6 +36,7 @@ import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryCountListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
@@ -170,13 +171,13 @@ class AcnApiImpl implements AcnApiService {
     }
 
     @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry) {
-        mSenderService.sendSingleTelemetry(telemetry);
+    public void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener) {
+        mSenderService.sendSingleTelemetry(telemetry, listener);
     }
 
     @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
-        mSenderService.sendBatchTelemetry(telemetry);
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener) {
+        mSenderService.sendBatchTelemetry(telemetry, listener);
     }
 
     protected void onGatewayResponse(@NonNull GatewayResponse response) {

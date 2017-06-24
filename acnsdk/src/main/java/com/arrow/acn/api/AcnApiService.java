@@ -33,6 +33,7 @@ import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryCountListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AuditLogModel;
@@ -91,14 +92,14 @@ public interface AcnApiService {
      *
      * @param telemetry - telemetry model object
      */
-    void sendSingleTelemetry(TelemetryModel telemetry);
+    void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener);
 
     /**
      * sends a scope of bundles with telemetry data
      *
      * @param telemetry - list of telemetries
      */
-    void sendBatchTelemetry(List<TelemetryModel> telemetry);
+    void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener);
 
     void findTelemetryByApplicationHid(FindTelemetryRequest request,
                                        PagingResultListener<TelemetryItemModel> listener);
