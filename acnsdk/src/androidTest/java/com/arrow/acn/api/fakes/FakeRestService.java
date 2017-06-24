@@ -133,6 +133,11 @@ public final class FakeRestService implements IotConnectAPIService {
         return null;
     }
 
+    @Override
+    public Call<CommonResponse> sendGatewayError(@Path("hid") String gatewayHid, @Body ErrorBodyModel error) {
+        return null;
+    }
+
     @NonNull
     @Override
     public Call<ResponseBody> sendTelemetry(@Body RequestBody body) {
@@ -172,6 +177,11 @@ public final class FakeRestService implements IotConnectAPIService {
     @NonNull
     @Override
     public Call<ListResultModel<TelemetryItemModel>> getLastTelemetry(@Path("deviceHid") String deviceHid) {
+        return null;
+    }
+
+    @Override
+    public Call<CommonResponse> sendDeviceError(@Path("hid") String deviceHid, @Body ErrorBodyModel error) {
         return null;
     }
 

@@ -121,6 +121,10 @@ public interface IotConnectAPIService {
                                            @Query("_page") int page,
                                            @Query("_size") int size);
 
+    @POST("/api/v1/kronos/gateways/{hid}/errors")
+    Call<CommonResponse> sendGatewayError(@Path("hid") String gatewayHid,
+                                          @Body ErrorBodyModel error);
+
     //telemetry api
     @NonNull
     @POST("/api/v1/kronos/telemetries")
@@ -167,6 +171,10 @@ public interface IotConnectAPIService {
     @NonNull
     @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/latest")
     Call<ListResultModel<TelemetryItemModel>> getLastTelemetry(@Path("deviceHid") String deviceHid);
+
+    @POST("/api/v1/kronos/devices/{hid}/errors")
+    Call<CommonResponse> sendDeviceError(@Path("hid") String deviceHid,
+                                         @Body ErrorBodyModel error);
 
     @NonNull
     @PUT("/api/v1/core/events/{hid}/received")
