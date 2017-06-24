@@ -14,6 +14,7 @@ import com.arrow.acn.api.TelemetrySenderInterface;
 import com.arrow.acn.api.common.RetrofitHolder;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.models.TelemetryModel;
@@ -104,12 +105,12 @@ public final class FakeTelemetrySender implements TelemetrySenderInterface {
     }
 
     @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry) {
+    public void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener) {
 
     }
 
     @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener) {
 
     }
 
