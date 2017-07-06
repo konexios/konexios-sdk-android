@@ -78,7 +78,6 @@ import com.arrow.acn.api.rest.IotConnectAPIService;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -91,10 +90,10 @@ import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
  */
 
 @Keep
-class AcnApiImpl implements AcnApiService {
+final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     private final RetrofitHolder mRetrofitHolder;
     private final SenderServiceFactory mSenderServiceFactory;
-    protected String mGatewayId;
+    private String mGatewayId;
     private String mGatewayUid;
     private IotConnectAPIService mRestService;
     private TelemetrySenderInterface mSenderService;
@@ -148,13 +147,7 @@ class AcnApiImpl implements AcnApiService {
         }
         ConfigResponse.CloudPlatform cloud = mConfigResponse.getCloudPlatform();
         Timber.d("connect() cloudPlatform: " + cloud);
-        mSenderService = mSenderServiceFactory.createTelemetrySender(mRetrofitHolder,
-                mConfigResponse,
-                mGatewayUid,
-                mGatewayId,
-                mMqttHost,
-                mMqttPrefix,
-                mServerCommandsListener);
+        mSenderService = mSenderServiceFactory.createTelemetrySender(this);
         if (mSenderService == null) {
             Timber.e("connect() invalid cloud platform: " + cloud);
             ApiError error = new ApiError(COMMON_ERROR_CODE, "invalid cloud platform: " + cloud);
@@ -1308,4 +1301,43 @@ class AcnApiImpl implements AcnApiService {
     }
 
 
+    @Override
+    public RetrofitHolder getRetrofitHolder() {
+        return mRetrofitHolder;
+    }
+
+    @Override
+    public ConfigResponse getConfigResponse() {
+        return mConfigResponse;
+    }
+
+    @Override
+    public ServerCommandsListener getServerCommandsListener() {
+        return mServerCommandsListener;
+    }
+
+    @Override
+    public String getGatewayUid() {
+        return mGatewayUid;
+    }
+
+    @Override
+    public String getGatewayId() {
+        return mGatewayId;
+    }
+
+    @Override
+    public String getMqttHost() {
+        return mMqttHost;
+    }
+
+    @Override
+    public String getMqttPrefix() {
+        return mMqttPrefix;
+    }
+
+    @Override
+    public IotConnectAPIService getIotConnectApiService() {
+        return mRestService;
+    }
 }

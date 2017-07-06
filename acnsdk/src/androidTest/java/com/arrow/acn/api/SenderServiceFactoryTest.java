@@ -10,14 +10,17 @@
 
 package com.arrow.acn.api;
 
+import com.arrow.acn.api.common.RetrofitHolder;
 import com.arrow.acn.api.fakes.FakeRestService;
 import com.arrow.acn.api.fakes.FakeRetrofitHolder;
+import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.MqttAcnApiService;
 import com.arrow.acn.api.mqtt.aws.AwsAcnApiService;
 import com.arrow.acn.api.mqtt.azure.AzureAcnApiService;
 import com.arrow.acn.api.mqtt.ibm.IbmAcnApiService;
+import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,8 +59,7 @@ public final class SenderServiceFactoryTest {
         String cloud = "ArrowConnect";
         final ConfigResponse response = new ConfigResponse();
         response.setCloudPlatform(cloud);
-        TelemetrySenderInterface sender = mFactory.createTelemetrySender(new FakeRetrofitHolder(new FakeRestService()),
-                response, GATEWAY_UID, GATEWAY_HID, MQTT_HOST, MQTT_PREFIX, null);
+        TelemetrySenderInterface sender = getTelemetrySenderInterface(response);
         assertNotNull(sender);
         assertThat(sender, instanceOf(MqttAcnApiService.class));
         assertThat(sender, instanceOf(AbstractMqttAcnApiService.class));
@@ -77,8 +79,7 @@ public final class SenderServiceFactoryTest {
         final ConfigResponse response = new ConfigResponse();
         response.setCloudPlatform(cloud);
         response.setIbm(ibm);
-        TelemetrySenderInterface sender = mFactory.createTelemetrySender(new FakeRetrofitHolder(new FakeRestService()),
-                response, GATEWAY_UID, GATEWAY_HID, MQTT_HOST, MQTT_PREFIX, null);
+        TelemetrySenderInterface sender = getTelemetrySenderInterface(response);
         assertNotNull(sender);
         assertThat(sender, instanceOf(IbmAcnApiService.class));
         assertThat(sender, instanceOf(AbstractMqttAcnApiService.class));
@@ -98,8 +99,7 @@ public final class SenderServiceFactoryTest {
         final ConfigResponse response = new ConfigResponse();
         response.setCloudPlatform(cloud);
         response.setAws(aws);
-        TelemetrySenderInterface sender = mFactory.createTelemetrySender(new FakeRetrofitHolder(new FakeRestService()),
-                response, GATEWAY_UID, GATEWAY_HID, MQTT_HOST, MQTT_PREFIX, null);
+        TelemetrySenderInterface sender = getTelemetrySenderInterface(response);
         assertNotNull(sender);
         assertThat(sender, instanceOf(AwsAcnApiService.class));
         assertThat(sender, instanceOf(AbstractMqttAcnApiService.class));
@@ -116,12 +116,56 @@ public final class SenderServiceFactoryTest {
         final ConfigResponse response = new ConfigResponse();
         response.setCloudPlatform(cloud);
         response.setAzure(azure);
-        TelemetrySenderInterface sender = mFactory.createTelemetrySender(new FakeRetrofitHolder(new FakeRestService()),
-                response, GATEWAY_UID, GATEWAY_HID, MQTT_HOST, MQTT_PREFIX, null);
+        TelemetrySenderInterface sender = getTelemetrySenderInterface(response);
         assertNotNull(sender);
         assertThat(sender, instanceOf(AzureAcnApiService.class));
         assertThat(sender, instanceOf(AbstractMqttAcnApiService.class));
         assertThat(sender, instanceOf(AbstractTelemetrySenderService.class));
         assertThat(sender, instanceOf(TelemetrySenderInterface.class));
+    }
+
+    private TelemetrySenderInterface getTelemetrySenderInterface(final ConfigResponse response) {
+        TelemetrySenderInterface sender = mFactory.createTelemetrySender(new SenderServiceArgsProvider() {
+            @Override
+            public RetrofitHolder getRetrofitHolder() {
+                return new FakeRetrofitHolder(new FakeRestService());
+            }
+
+            @Override
+            public ConfigResponse getConfigResponse() {
+                return response;
+            }
+
+            @Override
+            public ServerCommandsListener getServerCommandsListener() {
+                return null;
+            }
+
+            @Override
+            public String getGatewayUid() {
+                return GATEWAY_UID;
+            }
+
+            @Override
+            public String getGatewayId() {
+                return GATEWAY_HID;
+            }
+
+            @Override
+            public String getMqttHost() {
+                return MQTT_HOST;
+            }
+
+            @Override
+            public String getMqttPrefix() {
+                return MQTT_PREFIX;
+            }
+
+            @Override
+            public IotConnectAPIService getIotConnectApiService() {
+                return new FakeRestService();
+            }
+        });
+        return sender;
     }
 }

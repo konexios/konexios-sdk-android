@@ -13,16 +13,19 @@ package com.arrow.acn.api.mqtt;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.arrow.acn.api.AbstractTelemetrySenderService;
 import com.arrow.acn.api.common.ErrorUtils;
+import com.arrow.acn.api.common.GatewayPayloadSigner;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryRequestListener;
+import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.models.GatewayEventModel;
 import com.arrow.acn.api.models.TelemetryModel;
-import com.arrow.acn.api.rest.RestApiAcnApiService;
+import com.arrow.acn.api.rest.IotConnectAPIService;
 import com.google.gson.Gson;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -37,7 +40,10 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Callback;
 import timber.log.Timber;
 
 /**
@@ -56,27 +62,9 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     protected String mGatewayId;
     protected ConfigResponse mConfigResponse;
     private ServerCommandsListener mServerCommandsListener;
+    private IotConnectAPIService mRestService;
     @NonNull
     private Gson mGson = new Gson();
-    private final MqttCallback mMqttIncomingMessageListener = new MqttCallback() {
-        @Override
-        public void connectionLost(Throwable cause) {
-            Timber.e("connectionLost");
-        }
-
-        @Override
-        public void messageArrived(String topic, @NonNull MqttMessage message) throws Exception {
-            Timber.v("IMqttMessageListener messageArrived");
-            String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
-            GatewayEventModel model = mGson.fromJson(payload, GatewayEventModel.class);
-            mServerCommandsListener.onServerCommand(model);
-        }
-
-        @Override
-        public void deliveryComplete(IMqttDeliveryToken token) {
-            Timber.v("deliveryComplete");
-        }
-    };
     private ConnectionListener mExternalConnListener;
     @Nullable
     private MqttAsyncClient mMqttClient;
@@ -102,19 +90,57 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
             exception.printStackTrace();
         }
     };
+    private Callback<CommonResponse> restCallback = new Callback<CommonResponse>() {
+        @Override
+        public void onResponse(Call<CommonResponse> call, retrofit2.Response<CommonResponse> response) {
+            Timber.v("onResponse: code: %s", response.code());
+        }
 
-    public AbstractMqttAcnApiService(String gatewayId, ServerCommandsListener serverCommandsListener) {
+        @Override
+        public void onFailure(Call<CommonResponse> call, Throwable t) {
+            Timber.e("onFailure: ");
+        }
+    };
+    private final MqttCallback mMqttIncomingMessageListener = new MqttCallback() {
+        @Override
+        public void connectionLost(Throwable cause) {
+            Timber.e("connectionLost");
+        }
+
+        @Override
+        public void messageArrived(String topic, @NonNull MqttMessage message) throws Exception {
+            Timber.v("IMqttMessageListener messageArrived");
+            String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+            GatewayEventModel model = mGson.fromJson(payload, GatewayEventModel.class);
+            if (verifySignature(model)) {
+                mServerCommandsListener.onServerCommand(model);
+            } else {
+                mRestService.putFailed(model.getHid()).enqueue(restCallback);
+            }
+        }
+
+        @Override
+        public void deliveryComplete(IMqttDeliveryToken token) {
+            Timber.v("deliveryComplete");
+        }
+    };
+
+    public AbstractMqttAcnApiService(String gatewayId,
+                                     ServerCommandsListener serverCommandsListener,
+                                     IotConnectAPIService restService) {
         mServerCommandsListener = serverCommandsListener;
         mGatewayId = gatewayId;
+        mRestService = restService;
     }
 
-    public AbstractMqttAcnApiService(String gatewayId, ConfigResponse configResponse) {
+    public AbstractMqttAcnApiService(String gatewayId,
+                                     ConfigResponse configResponse,
+                                     ServerCommandsListener listener,
+                                     IotConnectAPIService restService) {
         mGatewayId = gatewayId;
         mConfigResponse = configResponse;
-    }
-
-    public AbstractMqttAcnApiService(String gatewayId) {
-        mGatewayId = gatewayId;
+        mServerCommandsListener = listener;
+        mRestService = restService;
     }
 
     @Override
@@ -204,6 +230,25 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
         return mMqttClient != null && mMqttClient.isConnected();
     }
 
+    private boolean verifySignature(GatewayEventModel model) {
+        boolean res;
+        if (TextUtils.isEmpty(model.getSignature())) {
+            res = true;
+        } else {
+            GatewayPayloadSigner signer = GatewayPayloadSigner.create(mConfigResponse.getKey().getSecretKey())
+                    .withApiKey(mConfigResponse.getKey().getApiKey())
+                    .withEncrypted(model.isEncrypted())
+                    .withName(model.getName())
+                    .withHid(model.getHid());
+            for (Map.Entry<String, String> entry : model.getParameters().entrySet()) {
+                signer.withParameter(entry.getKey(), entry.getValue());
+            }
+            String signature = signer.signV1();
+            res = signature.equals(model.getSignature());
+        }
+        return res;
+    }
+
     private class CallbackHandler implements IMqttActionListener {
         TelemetryRequestListener mListener;
 
@@ -218,6 +263,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
             callbackHandler.mListener = listener;
             return callbackHandler;
         }
+
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
             Timber.v("data sent to cloud: " + asyncActionToken.getResponse().toString());
