@@ -36,6 +36,7 @@ import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryCountListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
@@ -163,13 +164,13 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     }
 
     @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry) {
-        mSenderService.sendSingleTelemetry(telemetry);
+    public void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener) {
+        mSenderService.sendSingleTelemetry(telemetry, listener);
     }
 
     @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
-        mSenderService.sendBatchTelemetry(telemetry);
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener) {
+        mSenderService.sendBatchTelemetry(telemetry, listener);
     }
 
     protected void onGatewayResponse(@NonNull GatewayResponse response) {
@@ -540,6 +541,29 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     }
 
     @Override
+    public void sendGatewayError(String hid, ErrorBodyModel error, final CommonRequestListener listener) {
+        mRestService.sendGatewayError(hid, error).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("sendGatewayError response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("sendGatewayError error");
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
+                    listener.onRequestError(error);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("sendGatewayError error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
     public void sendCommandGateway(@NonNull String hid, @NonNull GatewayCommand command, @NonNull final GatewayCommandsListener listener) {
         mRestService.sendGatewayCommand(hid, command).enqueue(new Callback<CommonResponse>() {
             @Override
@@ -776,6 +800,28 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
             @Override
             public void onFailure(Call<PagingResultModel<AuditLogModel>> call, Throwable t) {
                 Timber.e("getDeviceAuditLogs error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void sendDeviceError(String deviceHid, ErrorBodyModel error, final CommonRequestListener listener) {
+        mRestService.sendDeviceError(deviceHid, error).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("sendDeviceError response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("sendDeviceError error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("sendDeviceError error");
                 listener.onRequestError(ErrorUtils.parseError(t));
             }
         });

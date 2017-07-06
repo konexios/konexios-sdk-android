@@ -40,13 +40,16 @@ final class SenderServiceFactoryImpl implements SenderServiceFactory {
                     provider.getRetrofitHolder(), provider.getServerCommandsListener(),
                     provider.getIotConnectApiService());
         } else if (IBM == platform) {
-            service = new IbmAcnApiService(provider.getGatewayId(), provider.getConfigResponse());
+            service = new IbmAcnApiService(provider.getGatewayId(), provider.getConfigResponse(),
+                    provider.getServerCommandsListener(), provider.getIotConnectApiService());
         } else if (AWS == platform) {
-            service = new AwsAcnApiService(provider.getGatewayId(), provider.getConfigResponse());
+            service = new AwsAcnApiService(provider.getGatewayId(), provider.getConfigResponse(),
+                    provider.getServerCommandsListener(), provider.getIotConnectApiService());
         } else if (AZURE == platform) {
             service = new AzureAcnApiService(provider.getGatewayUid(),
                     provider.getConfigResponse().getAzure().getAccessKey(),
-                    provider.getConfigResponse().getAzure().getHost());
+                    provider.getConfigResponse().getAzure().getHost(),
+                    provider.getServerCommandsListener(), provider.getIotConnectApiService());
         }
         return service;
     }
