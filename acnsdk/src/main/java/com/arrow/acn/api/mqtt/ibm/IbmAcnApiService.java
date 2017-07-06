@@ -14,9 +14,11 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.common.NoSSLv3SocketFactory;
+import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -34,8 +36,11 @@ public final class IbmAcnApiService extends AbstractMqttAcnApiService {
     private static final String IOT_ORGANIZATION_SSL = ".messaging.internetofthings.ibmcloud.com:8883";
     private static final String IOT_DEVICE_USERNAME = "use-token-auth";
 
-    public IbmAcnApiService(String gatewayId, ConfigResponse configResponse) {
-        super(gatewayId, configResponse);
+    public IbmAcnApiService(String gatewayId,
+                            ConfigResponse configResponse,
+                            ServerCommandsListener listener,
+                            IotConnectAPIService restService) {
+        super(gatewayId, configResponse, listener, restService);
     }
 
     @Override

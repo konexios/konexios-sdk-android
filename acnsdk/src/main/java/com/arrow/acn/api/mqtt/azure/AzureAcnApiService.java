@@ -13,9 +13,11 @@ package com.arrow.acn.api.mqtt.azure;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
+import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.mqtt.AbstractMqttAcnApiService;
 import com.arrow.acn.api.mqtt.azure.auth.IotHubSasToken;
 import com.arrow.acn.api.mqtt.azure.transport.TransportUtils;
+import com.arrow.acn.api.rest.IotConnectAPIService;
 
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -42,8 +44,12 @@ public final class AzureAcnApiService extends AbstractMqttAcnApiService {
     private final String mAccessKey;
     private final String mHost;
 
-    public AzureAcnApiService(String gatewayUid, String accessKey, String host) {
-        super(gatewayUid);
+    public AzureAcnApiService(String gatewayUid,
+                              String accessKey,
+                              String host,
+                              ServerCommandsListener listener,
+                              IotConnectAPIService restService) {
+        super(gatewayUid, listener, restService);
         Timber.d("AzureAcnApiService: ");
         mAccessKey = accessKey;
         mHost = host;
