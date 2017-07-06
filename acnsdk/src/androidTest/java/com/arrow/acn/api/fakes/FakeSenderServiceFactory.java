@@ -10,6 +10,7 @@
 
 package com.arrow.acn.api.fakes;
 
+import com.arrow.acn.api.SenderServiceArgsProvider;
 import com.arrow.acn.api.SenderServiceFactory;
 import com.arrow.acn.api.TelemetrySenderInterface;
 import com.arrow.acn.api.common.RetrofitHolder;
@@ -23,13 +24,14 @@ import com.arrow.acn.api.models.ConfigResponse;
 public final class FakeSenderServiceFactory implements SenderServiceFactory {
 
     @Override
-    public TelemetrySenderInterface createTelemetrySender(RetrofitHolder retrofitHolder,
-                                                          ConfigResponse configResponse,
-                                                          String gatewayUid, String gatewayId,
-                                                          String mqttHost, String mqttPrefix,
-                                                          ServerCommandsListener serverCommandsListener) {
-        TelemetrySenderInterface sender = new FakeTelemetrySender(retrofitHolder, configResponse, gatewayUid, gatewayId,
-                mqttHost, mqttPrefix, serverCommandsListener);
+    public TelemetrySenderInterface createTelemetrySender(SenderServiceArgsProvider provider) {
+        TelemetrySenderInterface sender = new FakeTelemetrySender(provider.getRetrofitHolder(),
+                provider.getConfigResponse(),
+                provider.getGatewayUid(),
+                provider.getGatewayId(),
+                provider.getMqttHost(),
+                provider.getMqttPrefix(),
+                provider.getServerCommandsListener());
         return sender;
     }
 }
