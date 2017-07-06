@@ -33,6 +33,7 @@ import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryCountListener;
+import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AuditLogModel;
@@ -91,14 +92,14 @@ public interface AcnApiService {
      *
      * @param telemetry - telemetry model object
      */
-    void sendSingleTelemetry(TelemetryModel telemetry);
+    void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener);
 
     /**
      * sends a scope of bundles with telemetry data
      *
      * @param telemetry - list of telemetries
      */
-    void sendBatchTelemetry(List<TelemetryModel> telemetry);
+    void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener);
 
     void findTelemetryByApplicationHid(FindTelemetryRequest request,
                                        PagingResultListener<TelemetryItemModel> listener);
@@ -167,6 +168,8 @@ public interface AcnApiService {
 
     void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 
+    void sendDeviceError(String deviceHid, ErrorBodyModel error, CommonRequestListener listener);
+
     //Core-event api
 
     void registerReceivedEvent(String eventHid, CommonRequestListener listener);
@@ -186,6 +189,8 @@ public interface AcnApiService {
     void updateGateway(String hid, GatewayModel gatewayModel, GatewayUpdateListener listener);
 
     void checkinGateway(String hid, String gatewayUid, CheckinGatewayListener listener);
+
+    void sendGatewayError(String hid, ErrorBodyModel error, CommonRequestListener listener);
 
     @Deprecated
     void sendCommandGateway(String hid, GatewayCommand command, GatewayCommandsListener listener);
