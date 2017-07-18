@@ -226,7 +226,8 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getDeviceActionTypes(@NonNull final ListResultListener<DeviceActionTypeModel> listener) {
-        mRestService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
+        Call<ListResultModel<DeviceActionTypeModel>> call =  mRestService.getActionTypes();
+        call.enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, @NonNull Response<ListResultModel<DeviceActionTypeModel>> response) {
                 Timber.d("getActionTypes response");

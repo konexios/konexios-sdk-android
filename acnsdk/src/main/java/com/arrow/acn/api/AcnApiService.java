@@ -101,17 +101,47 @@ public interface AcnApiService {
      */
     void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener);
 
+    /**
+     * Finds and returns the list of telemetry by application hid
+     * @param request FindTelemetryRequest with application hid, fromTimestamp and toTimestamp should
+     *                have "yyyy-MM-dd'T'HH:mm:ss'Z'" format
+     * @param listener listener interface implementation, should be not null
+     */
     void findTelemetryByApplicationHid(FindTelemetryRequest request,
                                        PagingResultListener<TelemetryItemModel> listener);
 
+    /**
+     * Finds and returns the list of telemetry by device hid
+     * @param request FindTelemetryRequest with device hid, fromTimestamp and toTimestamp should
+     *                have "yyyy-MM-dd'T'HH:mm:ss'Z'" format
+     * @param listener listener interface implementation, should be not null
+     */
     void findTelemetryByDeviceHid(FindTelemetryRequest request,
                                   PagingResultListener<TelemetryItemModel> listener);
 
+    /**
+     * Finds and returns the list of telemetry by node hid
+     * @param request FindTelemetryRequest with node hid, fromTimestamp and toTimestamp should
+     *                have "yyyy-MM-dd'T'HH:mm:ss'Z'" format
+     * @param listener listener interface implementation, should be not null
+     */
     void findTelemetryByNodeHid(FindTelemetryRequest request,
                                 PagingResultListener<TelemetryItemModel> listener);
 
+    /**
+     * returns the list of last sent telemetry
+     * @param deviceHid device Hid
+     * @param listener listener interface implementation, should be not null
+     */
     void getLastTelemetry(String deviceHid, ListResultListener<TelemetryItemModel> listener);
 
+    /**
+     *  returns count of sent telemetries for the period from 'fromTimestamp' to 'toTimestamp'
+     * @param request should contain device hid, fromTimestamp and toTimestamp should have
+     *                "yyyy-MM-dd'T'HH:mm:ss'Z'" format, telemetryName like 'light' or some other. To
+     *                get all sent telemetry use '*' as telemetryName
+     * @param listener listener interface implementation, should be not null
+     */
     void getTelemetryItemsCount(TelemetryCountRequest request, TelemetryCountListener listener);
 
     /**
@@ -138,36 +168,96 @@ public interface AcnApiService {
 
     //Action api
 
+    /**
+     *  Returns a list of available action types
+     * @param listener listener interface implementation, should be not null
+     */
     void getDeviceActionTypes(ListResultListener<DeviceActionTypeModel> listener);
 
+    /**
+     * Returns the list existing device actions for a specific device type
+     * @param deviceHid hid of device
+     * @param listener listener interface implementation, should be not null
+     */
     void getDeviceActions(String deviceHid, ListResultListener<DeviceActionModel> listener);
 
+    /**
+     * Creates a new device action for a specific device type
+     * @param deviceHid hid of device
+     * @param action action model
+     * @param listener listener interface implementation, should be not null
+     */
     void postDeviceAction(String deviceHid, DeviceActionModel action, PostDeviceActionListener listener);
 
+    /**
+     * Updates an existing device action for a specific device type
+     * @param deviceHid hid of device
+     * @param index index of action to be updated
+     * @param model action model
+     * @param listener listener interface implementation, should be not null
+     */
     void updateDeviceAction(String deviceHid, int index, DeviceActionModel model, UpdateDeviceActionListener listener);
 
+    /**
+     * Delete a device action from a specific device type
+     * @param deviceHid hid of device
+     * @param index index of action to be deleted
+     * @param listener listener interface implementation, should be not null
+     */
     void deleteDeviceAction(String deviceHid, int index, DeleteDeviceActionListener listener);
 
     //Device api
 
     /**
      * register new device
-     *
      * @param req      - device data
      * @param listener - listener to get the result
      */
     void registerDevice(DeviceRegistrationModel req, RegisterDeviceListener listener);
 
+    /**
+     *
+     * @param request
+     * @param listener
+     */
     void findAllDevices(FindDevicesRequest request, PagingResultListener<DeviceModel> listener);
 
+    /**
+     *
+     * @param request
+     * @param listener
+     */
     void getDeviceHistoricalEvents(HistoricalEventsRequest request, PagingResultListener<DeviceEventModel> listener);
 
+    /**
+     *
+     * @param deviceHid
+     * @param listener
+     */
     void findDeviceByHid(String deviceHid, FindDeviceListener listener);
 
+    /**
+     *
+     * @param deviceHid
+     * @param device
+     * @param listener
+     */
     void updateDevice(String deviceHid, DeviceRegistrationModel device, CommonRequestListener listener);
 
+    /**
+     *
+     * @param deviceHid
+     * @param query
+     * @param listener
+     */
     void getDeviceAuditLogs(String deviceHid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
 
+    /**
+     *
+     * @param deviceHid
+     * @param error
+     * @param listener
+     */
     void sendDeviceError(String deviceHid, ErrorBodyModel error, CommonRequestListener listener);
 
     //Core-event api
