@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 import okhttp3.Dispatcher;
 
 /**
- * Created by osminin on 9/21/2016.
+ *  Main entry point for AcnApiService creation
  */
 
 @Keep
@@ -69,16 +69,28 @@ public final class AcnApi {
             return this;
         }
 
+        /**
+         *  enables debug mode
+         * @param debug - true if you need debug information like logs, false otherwise
+         */
         public Builder setDebug(boolean debug) {
             isDebug = debug;
             return this;
         }
 
+        /**
+         *  sets the Executor which will be used for executing callbacks
+         * @param executor - Executor
+         */
         public Builder setCallbackExecutor(Executor executor) {
             mCallbackExecutor = executor;
             return this;
         }
 
+        /**
+         *  sets the Executor which will be used for performing http requests
+         * @param service - ExecutorService
+         */
         public Builder setHttpExecutorService(ExecutorService service) {
             mHttpExecutorService = service;
             return this;
