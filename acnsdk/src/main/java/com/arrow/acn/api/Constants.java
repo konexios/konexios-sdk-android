@@ -12,10 +12,6 @@ package com.arrow.acn.api;
 
 import okhttp3.MediaType;
 
-/**
- * Created by osminin on 9/20/2016.
- */
-
 public final class Constants {
     public interface Api {
         String X_ARROW_APIKEY = "x-arrow-apikey";

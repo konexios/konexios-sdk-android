@@ -12,10 +12,6 @@ package com.arrow.acn.api;
 
 import android.support.annotation.Keep;
 
-/**
- * Created by osminin on 4/5/2017.
- */
-
 @Keep
 public interface SenderServiceFactory {
     TelemetrySenderInterface createTelemetrySender(SenderServiceArgsProvider bundle);

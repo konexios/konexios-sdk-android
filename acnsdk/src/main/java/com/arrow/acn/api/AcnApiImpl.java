@@ -86,7 +86,7 @@ import timber.log.Timber;
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 
 /**
- * Created by osminin on 6/17/2016.
+ * Implementation of public api methods
  */
 
 @Keep

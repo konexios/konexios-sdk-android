@@ -485,7 +485,7 @@ public interface AcnApiService {
     /**
      * Create new device state update transaction
      * @param hid - device state hid
-     * @param request - updated device state 
+     * @param request - updated device state
      * @param listener - listener interface implementation, should be not null
      */
     void updateDeviceStateTransaction(String hid,
