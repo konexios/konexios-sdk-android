@@ -18,19 +18,15 @@ import com.arrow.acn.api.rest.IotConnectAPIService;
 
 import retrofit2.Response;
 
-/**
- * Created by osminin on 4/4/2017.
- */
-
 @Keep
 public interface RetrofitHolder {
     void setDefaultApiKey(String apiKey);
 
     void setDefaultApiSecret(String apiSecret);
 
-    void setSecretKey(String secretKey);
-
     String getSecretKey();
+
+    void setSecretKey(String secretKey);
 
     String getApiKey();
 

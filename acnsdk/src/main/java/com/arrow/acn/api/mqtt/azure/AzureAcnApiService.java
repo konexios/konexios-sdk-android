@@ -29,7 +29,7 @@ import java.net.URLEncoder;
 import timber.log.Timber;
 
 /**
- * Created by osminin on 2/2/2017.
+ * azure telemetry sender
  */
 
 @Keep

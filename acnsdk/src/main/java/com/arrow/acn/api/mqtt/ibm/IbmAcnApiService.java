@@ -27,7 +27,7 @@ import timber.log.Timber;
 import static org.spongycastle.asn1.x500.style.RFC4519Style.l;
 
 /**
- * Created by osminin on 9/2/2016.
+ * ibm telemetry sender
  */
 
 @Keep

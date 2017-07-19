@@ -23,7 +23,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import timber.log.Timber;
 
 /**
- * Created by osminin on 6/20/2016.
+ * aws telemetry sender
  */
 
 @Keep
