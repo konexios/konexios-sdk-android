@@ -35,6 +35,9 @@ public final class AccountResponse implements Parcelable {
             return new AccountResponse[size];
         }
     };
+    /**
+     * account hid
+     */
     @SerializedName("hid")
     private String hid;
     @SerializedName("message")
@@ -45,6 +48,9 @@ public final class AccountResponse implements Parcelable {
     private String email;
     @SerializedName("code")
     private String code;
+    /**
+     * application hid
+     */
     @SerializedName("applicationHid")
     private String applicationHid;
 

@@ -34,8 +34,14 @@ public final class ConfigResponse implements Parcelable {
             return new ConfigResponse[size];
         }
     };
+    /**
+     * String representing the platform type like IotConnect, Azure, etc
+     */
     @SerializedName("cloudPlatform")
     private String cloudPlatform;
+    /**
+     * keys for pure mqtt platform
+     */
     @SerializedName("key")
     private Key key;
     @SerializedName("aws")
