@@ -18,10 +18,6 @@ import com.arrow.acn.api.models.TelemetryModel;
 
 import java.util.List;
 
-/**
- * Created by osminin on 10/26/2016.
- */
-
 @Keep
 public interface TelemetrySenderInterface {
     void connect(ConnectionListener listener);

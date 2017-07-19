@@ -18,10 +18,8 @@ import com.arrow.acn.api.common.RetrofitHolderImpl;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
-import okhttp3.Dispatcher;
-
 /**
- *  Main entry point for AcnApiService creation
+ * Main entry point for AcnApiService creation
  */
 
 @Keep
@@ -70,7 +68,8 @@ public final class AcnApi {
         }
 
         /**
-         *  enables debug mode
+         * enables debug mode
+         *
          * @param debug - true if you need debug information like logs, false otherwise
          */
         public Builder setDebug(boolean debug) {
@@ -79,7 +78,8 @@ public final class AcnApi {
         }
 
         /**
-         *  sets the Executor which will be used for executing callbacks
+         * sets the Executor which will be used for executing callbacks
+         *
          * @param executor - Executor
          */
         public Builder setCallbackExecutor(Executor executor) {
@@ -88,7 +88,8 @@ public final class AcnApi {
         }
 
         /**
-         *  sets the Executor which will be used for performing http requests
+         * sets the Executor which will be used for performing http requests
+         *
          * @param service - ExecutorService
          */
         public Builder setHttpExecutorService(ExecutorService service) {

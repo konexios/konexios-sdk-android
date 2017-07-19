@@ -12,8 +12,6 @@ package com.arrow.acn.api;
 
 import android.support.annotation.Keep;
 
-import com.arrow.acn.api.common.RetrofitHolder;
-import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.mqtt.MqttAcnApiService;
 import com.arrow.acn.api.mqtt.aws.AwsAcnApiService;
@@ -24,10 +22,6 @@ import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.ARROW_CONNEC
 import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.AWS;
 import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.AZURE;
 import static com.arrow.acn.api.models.ConfigResponse.CloudPlatform.IBM;
-
-/**
- * Created by osminin on 4/5/2017.
- */
 
 @Keep
 final class SenderServiceFactoryImpl implements SenderServiceFactory {
