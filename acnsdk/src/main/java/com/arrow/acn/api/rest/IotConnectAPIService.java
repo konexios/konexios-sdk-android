@@ -42,7 +42,6 @@ import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
-import com.arrow.acn.api.models.TelemetryStatsModel;
 
 import java.util.List;
 
@@ -57,10 +56,8 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-import static android.R.attr.enabled;
-
 /**
- * Created by osminin on 3/15/2016.
+ * main retrofit service
  */
 
 @Keep
@@ -112,14 +109,14 @@ public interface IotConnectAPIService {
     @NonNull
     @GET("/api/v1/kronos/gateways/{hid}/logs")
     Call<PagingResultModel<AuditLogModel>> getGatewayLogs(@Path("hid") String hid,
-                                           @Query("createdDateFrom") String createdDateFrom,
-                                           @Query("createdDateTo") String createdDateTo,
-                                           @Query("userHids") List<String> userHids,
-                                           @Query("types") List<String> types,
-                                           @Query("sortField") String sortField,
-                                           @Query("sortDirection") String sortDirection,
-                                           @Query("_page") int page,
-                                           @Query("_size") int size);
+                                                          @Query("createdDateFrom") String createdDateFrom,
+                                                          @Query("createdDateTo") String createdDateTo,
+                                                          @Query("userHids") List<String> userHids,
+                                                          @Query("types") List<String> types,
+                                                          @Query("sortField") String sortField,
+                                                          @Query("sortDirection") String sortDirection,
+                                                          @Query("_page") int page,
+                                                          @Query("_size") int size);
 
     @POST("/api/v1/kronos/gateways/{hid}/errors")
     Call<CommonResponse> sendGatewayError(@Path("hid") String gatewayHid,
@@ -164,9 +161,9 @@ public interface IotConnectAPIService {
     @NonNull
     @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/count")
     Call<TelemetryCountResponse> getTelemetryItemsCount(@Path("deviceHid") String deviceHid,
-                                                       @Query("telemetryName") String telemetryName,
-                                                       @Query("fromTimestamp") String fromTimestamp,
-                                                       @Query("toTimestamp") String toTimestamp);
+                                                        @Query("telemetryName") String telemetryName,
+                                                        @Query("fromTimestamp") String fromTimestamp,
+                                                        @Query("toTimestamp") String toTimestamp);
 
     @NonNull
     @GET("/api/v1/kronos/telemetries/devices/{deviceHid}/latest")
@@ -204,7 +201,8 @@ public interface IotConnectAPIService {
     @NonNull
     @PUT("/api/v1/kronos/devices/{hid}/actions/{index}")
     Call<CommonResponse> updateAction(@Path("hid") String hid, @Path("index") int index,
-                                    @Body DeviceActionModel action);
+                                      @Body DeviceActionModel action);
+
     @NonNull
     @DELETE("/api/v1/kronos/devices/{hid}/actions/{index}")
     Call<CommonResponse> deleteAction(@Path("hid") String hid, @Path("index") int index);
@@ -225,16 +223,17 @@ public interface IotConnectAPIService {
     @NonNull
     @GET("/api/v1/kronos/devices")
     Call<PagingResultModel<DeviceModel>> findAllDevices(@Query("userHid") String userHid,
-                                                @Query("uid") String uid,
-                                                @Query("type") String type,
-                                                @Query("gatewayHid") String gatewayHid,
-                                                @Query("createdBefore") String createdBefore,
-                                                @Query("createdAfter") String createdAfter,
-                                                @Query("updatedBefore") String updatedBefore,
-                                                @Query("updatedAfter") String updatedAfter,
-                                                @Query("enabled") String enabled,
-                                                @Query("_page") int page,
-                                                @Query("_size") int size);
+                                                        @Query("uid") String uid,
+                                                        @Query("type") String type,
+                                                        @Query("gatewayHid") String gatewayHid,
+                                                        @Query("createdBefore") String createdBefore,
+                                                        @Query("createdAfter") String createdAfter,
+                                                        @Query("updatedBefore") String updatedBefore,
+                                                        @Query("updatedAfter") String updatedAfter,
+                                                        @Query("enabled") String enabled,
+                                                        @Query("_page") int page,
+                                                        @Query("_size") int size);
+
     @NonNull
     @POST("/api/v1/kronos/devices")
     Call<DeviceRegistrationResponse> createOrUpdateDevice(@Body DeviceRegistrationModel deviceRequest);
@@ -270,7 +269,7 @@ public interface IotConnectAPIService {
 
     @NonNull
     @PUT("/api/v1/kronos/nodes/{hid}")
-    Call<CommonResponse>  updateExistingNode(@Path("hid") String nodeHid, @Body NodeRegistrationModel model);
+    Call<CommonResponse> updateExistingNode(@Path("hid") String nodeHid, @Body NodeRegistrationModel model);
 
     //node - type api
 
@@ -284,7 +283,7 @@ public interface IotConnectAPIService {
 
     @NonNull
     @PUT("/api/v1/kronos/nodes/types/{hid}")
-    Call<CommonResponse> updateExistingNodeType(@Path("hid")String hid, @Body NodeTypeRegistrationModel model);
+    Call<CommonResponse> updateExistingNodeType(@Path("hid") String hid, @Body NodeTypeRegistrationModel model);
 
     // device - type api
 
@@ -298,7 +297,7 @@ public interface IotConnectAPIService {
 
     @NonNull
     @PUT("/api/v1/kronos/devices/types/{hid}")
-    Call<CommonResponse> updateExistingDeviceType(@Path("hid")String hid, @Body DeviceTypeRegistrationModel body);
+    Call<CommonResponse> updateExistingDeviceType(@Path("hid") String hid, @Body DeviceTypeRegistrationModel body);
 
     @NonNull
     @GET("/api/v1/kronos/devices/{hid}/state")
@@ -313,6 +312,7 @@ public interface IotConnectAPIService {
     @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/succeeded")
     Call<MessageStatusResponse> deviceStateTransactionSucceeded(@Path("hid") String hid,
                                                                 @Path("transHid") String transId);
+
     @NonNull
     @PUT("/api/v1/kronos/devices/{hid}/state/trans/{transHid}/failed")
     Call<MessageStatusResponse> deviceStateTransactionFailed(@Path("hid") String hid,

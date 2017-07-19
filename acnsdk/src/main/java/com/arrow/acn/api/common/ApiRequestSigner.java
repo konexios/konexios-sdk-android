@@ -15,21 +15,14 @@ import android.support.annotation.Nullable;
 
 import com.arrow.acn.api.Constants;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import timber.log.Timber;
 
-import static com.arrow.acn.api.common.Utils.bytesToHex;
-
 /**
- * Created by osminin on 4/8/2016.
+ * class for signing requests to cloud
  */
 public class ApiRequestSigner {
 

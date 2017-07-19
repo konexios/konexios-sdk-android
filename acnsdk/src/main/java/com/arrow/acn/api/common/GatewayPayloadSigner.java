@@ -19,7 +19,7 @@ import timber.log.Timber;
 import static com.arrow.acn.api.Constants.Api.X_ARROW_VERSION_1;
 
 /**
- * Created by osminin on 5/22/2017.
+ * class for signing payload received as a command from cloud
  */
 
 public final class GatewayPayloadSigner {
