@@ -17,7 +17,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 4/14/2016.
+ * Response model for Account request
  */
 public final class AccountResponse implements Parcelable {
     @SuppressWarnings("unused")
@@ -40,10 +40,19 @@ public final class AccountResponse implements Parcelable {
      */
     @SerializedName("hid")
     private String hid;
+    /**
+     * server message
+     */
     @SerializedName("message")
     private String message;
+    /**
+     * user name
+     */
     @SerializedName("name")
     private String name;
+    /**
+     * user email
+     */
     @SerializedName("email")
     private String email;
     @SerializedName("code")

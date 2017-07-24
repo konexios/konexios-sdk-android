@@ -17,7 +17,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 4/14/2016.
+ * response for configuration request
  */
 public final class ConfigResponse implements Parcelable {
     @SuppressWarnings("unused")
@@ -44,10 +44,19 @@ public final class ConfigResponse implements Parcelable {
      */
     @SerializedName("key")
     private Key key;
+    /**
+     * config for AWS
+     */
     @SerializedName("aws")
     private Aws aws;
+    /**
+     * config for IBM
+     */
     @SerializedName("ibm")
     private Ibm ibm;
+    /**
+     * config for Azure
+     */
     @SerializedName("azure")
     private Azure azure;
 
