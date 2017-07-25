@@ -15,7 +15,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 /**
- * Created by osminin on 10/17/2016.
+ *  Model represents Telemetry object
  */
 
 public final class TelemetryModel implements Parcelable {
@@ -33,8 +33,17 @@ public final class TelemetryModel implements Parcelable {
             return new TelemetryModel[size];
         }
     };
+    /**
+     *  Json string contains telemetries keys - values pairs
+     */
     private String telemetry;
+    /**
+     *  device type string
+     */
     private String deviceType;
+    /**
+     *  external id from DeviceRegistrationResponse model
+     */
     private String deviceExternalId;
 
     public TelemetryModel() {

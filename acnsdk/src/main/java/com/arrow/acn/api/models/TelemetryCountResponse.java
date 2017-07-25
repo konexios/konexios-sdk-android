@@ -16,7 +16,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 3/31/2017.
+ *  Response model for TelemetryCountRequest
  */
 
 public class TelemetryCountResponse implements Parcelable {
@@ -32,10 +32,19 @@ public class TelemetryCountResponse implements Parcelable {
             return new TelemetryCountResponse[size];
         }
     };
+    /**
+     *  device hid
+     */
     @SerializedName("deviceHid")
     private String deviceHid;
+    /**
+     *  the name of telemetry
+     */
     @SerializedName("name")
     private String name;
+    /**
+     *  count of telemetries
+     */
     @SerializedName("value")
     private String value;
 
