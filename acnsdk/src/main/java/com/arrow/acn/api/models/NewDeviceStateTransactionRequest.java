@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Created by osminin on 4/24/2017.
+ * Model for new device state request transaction
  */
 
 public class NewDeviceStateTransactionRequest implements Parcelable {
