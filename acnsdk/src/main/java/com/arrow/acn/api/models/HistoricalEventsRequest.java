@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by osminin on 3/30/2017.
+ * Request for historical device events
  */
 
 public class HistoricalEventsRequest implements Parcelable {
@@ -33,14 +33,38 @@ public class HistoricalEventsRequest implements Parcelable {
             return new HistoricalEventsRequest[size];
         }
     };
+    /**
+     *  device hid
+     */
     private String hid;
+    /**
+     *  start date (optional)
+     */
     private String createdDateFrom;
+    /**
+     *  end date (optional)
+     */
     private String createdDateTo;
+    /**
+     *  sorting field (optional)
+     */
     private String sortField;
+    /**
+     *  sorting direction (optional)
+     */
     private String sortDirection;
+    /**
+     *  list of statuses (optional)
+     */
     private List<String> statuses;
     private List<String> systemNames;
+    /**
+     *  page number (required)
+     */
     private int _page;
+    /**
+     *  size (required, max 200)
+     */
     private int _size;
 
     protected HistoricalEventsRequest(Parcel in) {

@@ -22,7 +22,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 10/11/2016.
+ * Model which is representing node
  */
 
 public final class NodeModel implements Parcelable {
@@ -52,6 +52,9 @@ public final class NodeModel implements Parcelable {
     @SerializedName("enabled")
     @Expose
     private boolean enabled;
+    /**
+     * node hid
+     */
     @SerializedName("hid")
     @Expose
     private String hid;

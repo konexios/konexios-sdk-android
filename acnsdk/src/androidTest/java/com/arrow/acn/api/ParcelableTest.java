@@ -40,13 +40,11 @@ import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayEventModel;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.HistoricalEventsRequest;
-import com.arrow.acn.api.models.HistoricalTelemetryModel;
 import com.arrow.acn.api.models.MessageStatusResponse;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
-import com.arrow.acn.api.models.SendTelemetryRequestBody;
 import com.arrow.acn.api.models.StateModel;
 import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryCountResponse;
@@ -236,13 +234,11 @@ public class ParcelableTest {
                 FindTelemetryRequest.class,
                 GatewayCommand.class,
                 GatewayModel.class,
-                HistoricalTelemetryModel.class,
                 MessageStatusResponse.class,
                 NodeModel.class,
                 NodeRegistrationModel.class,
                 NodeTypeModel.class,
                 NodeTypeRegistrationModel.class,
-                SendTelemetryRequestBody.class,
                 StateModel.class,
                 TelemetryCountRequest.class,
                 TelemetryCountResponse.class,

@@ -20,6 +20,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ *  Model which is representing found Telemetry item
+ */
+
 public class TelemetryItemModel implements Parcelable {
 
     @SuppressWarnings("unused")
@@ -37,18 +41,33 @@ public class TelemetryItemModel implements Parcelable {
     @SerializedName("links")
     @Expose
     private JsonElement links;
+    /**
+     *  Device hid
+     */
     @SerializedName("deviceHid")
     @Expose
     private String deviceHid;
+    /**
+     *  Telemetry name
+     */
     @SerializedName("name")
     @Expose
     private String name;
+    /**
+     * the type of telemetry
+     */
     @SerializedName("type")
     @Expose
     private String type;
+    /**
+     *  timestamp telemetry has been pushed to cloud
+     */
     @SerializedName("timestamp")
     @Expose
     private String timestamp;
+    /**
+     *  value of telemetry
+     */
     @SerializedName("floatValue")
     @Expose
     private Float floatValue;
