@@ -29,10 +29,6 @@ import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_MESSAGE;
 import static com.arrow.acn.api.models.ApiError.NETWORK_ERROR_CODE;
 import static com.arrow.acn.api.models.ApiError.NETWORK_ERROR_MESSAGE;
 
-/**
- * Created by osminin on 11/7/2016.
- */
-
 public final class ErrorUtils {
     static ApiError parseError(@NonNull Response<?> response, Retrofit retrofit) {
         Timber.v("parseError: ");

@@ -40,28 +40,22 @@ import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayEventModel;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.HistoricalEventsRequest;
-import com.arrow.acn.api.models.HistoricalTelemetryModel;
 import com.arrow.acn.api.models.MessageStatusResponse;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
-import com.arrow.acn.api.models.SendTelemetryRequestBody;
 import com.arrow.acn.api.models.StateModel;
 import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryCountResponse;
-import com.arrow.acn.api.models.TelemetryEventCount;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
-import com.arrow.acn.api.models.TelemetryStatsModel;
 import com.google.gson.JsonObject;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -219,23 +213,6 @@ public class ParcelableTest {
     }
 
     @Test
-    public void telemetryStats() throws Exception {
-        TelemetryStatsModel model = new TelemetryStatsModel();
-        model.setDeviceEventCount(10);
-        model.setTelemetryItemCount(5);
-        ArrayList<TelemetryEventCount> list = new ArrayList(10);
-        for (int i = 0; i < 10; i++) {
-            list.add(mFactory.manufacturePojo(TelemetryEventCount.class));
-        }
-        model.setTelemetryEventCounts(list);
-        Parcel parcel = Parcel.obtain();
-        model.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
-        TelemetryStatsModel fromParcel = TelemetryStatsModel.CREATOR.createFromParcel(parcel);
-        assertEquals(model, fromParcel);
-    }
-
-    @Test
     public void commonPojoParcelabelTest() throws Exception {
         Class[] classes = {
                 AccountRequest.class,
@@ -257,17 +234,14 @@ public class ParcelableTest {
                 FindTelemetryRequest.class,
                 GatewayCommand.class,
                 GatewayModel.class,
-                HistoricalTelemetryModel.class,
                 MessageStatusResponse.class,
                 NodeModel.class,
                 NodeRegistrationModel.class,
                 NodeTypeModel.class,
                 NodeTypeRegistrationModel.class,
-                SendTelemetryRequestBody.class,
                 StateModel.class,
                 TelemetryCountRequest.class,
                 TelemetryCountResponse.class,
-                TelemetryEventCount.class,
                 TelemetryItemModel.class,
                 TelemetryModel.class};
         for (Class clazz : classes) {

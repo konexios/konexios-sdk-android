@@ -15,10 +15,6 @@ import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.rest.IotConnectAPIService;
 
-/**
- * Created by osminin on 26.05.2017.
- */
-
 public interface SenderServiceArgsProvider {
 
     RetrofitHolder getRetrofitHolder();

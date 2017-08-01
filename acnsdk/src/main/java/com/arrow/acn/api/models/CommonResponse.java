@@ -22,7 +22,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 10/11/2016.
+ * Common response model
  */
 
 public class CommonResponse implements Parcelable {
@@ -41,12 +41,21 @@ public class CommonResponse implements Parcelable {
             return new CommonResponse[size];
         }
     };
+    /**
+     * response hid
+     */
     @SerializedName("hid")
     @Expose
     private String hid;
+    /**
+     * json links
+     */
     @SerializedName("links")
     @Expose
     private JsonElement links;
+    /**
+     * server message
+     */
     @SerializedName("message")
     @Expose
     private String message;

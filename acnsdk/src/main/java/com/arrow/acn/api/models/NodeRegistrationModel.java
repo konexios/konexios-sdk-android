@@ -17,7 +17,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 10/11/2016.
+ *  Request for registering new node
  */
 
 public final class NodeRegistrationModel implements Parcelable {
@@ -33,18 +33,33 @@ public final class NodeRegistrationModel implements Parcelable {
             return new NodeRegistrationModel[size];
         }
     };
+    /**
+     *  node description
+     */
     @SerializedName("description")
     @Expose
     private String description;
+    /**
+     *  flag is node enabled
+     */
     @SerializedName("enabled")
     @Expose
     private boolean enabled;
+    /**
+     *  name of the node
+     */
     @SerializedName("name")
     @Expose
     private String name;
+    /**
+     *  hid of node type
+     */
     @SerializedName("nodeTypeHid")
     @Expose
     private String nodeTypeHid;
+    /**
+     *  parent node hid
+     */
     @SerializedName("parentNodeHid")
     @Expose
     private String parentNodeHid;

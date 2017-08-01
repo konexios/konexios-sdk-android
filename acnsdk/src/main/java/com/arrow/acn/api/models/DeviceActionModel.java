@@ -18,7 +18,7 @@ import android.support.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 8/2/2016.
+ * New Action model
  */
 
 public final class DeviceActionModel implements Parcelable {

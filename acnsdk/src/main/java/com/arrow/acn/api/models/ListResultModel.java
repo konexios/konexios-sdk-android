@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by osminin on 10/11/2016.
+ * common model for list results
  */
 
 public class ListResultModel<T> {

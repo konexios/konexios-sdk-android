@@ -16,6 +16,10 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Model for registering new gateway or updating existing one
+ */
+
 public final class GatewayModel implements Parcelable {
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<GatewayModel> CREATOR = new Parcelable.Creator<GatewayModel>() {
@@ -31,22 +35,49 @@ public final class GatewayModel implements Parcelable {
             return new GatewayModel[size];
         }
     };
+    /**
+     * unique Id for gateway
+     */
     @SerializedName("uid")
     private String uid;
+    /**
+     * gateway name
+     */
     @SerializedName("name")
     private String name;
+    /**
+     * gateway type (Local, Cloud or Mobile)
+     */
     @SerializedName("type")
     private GatewayType type;
+    /**
+     * user's hid
+     */
     @SerializedName("userHid")
     private String userHid;
+    /**
+     * Operating System name
+     */
     @SerializedName("osName")
     private String osName;
+    /**
+     * software name
+     */
     @SerializedName("softwareName")
     private String softwareName;
+    /**
+     * software version
+     */
     @SerializedName("softwareVersion")
     private String softwareVersion;
+    /**
+     * application hid from AccountResponse
+     */
     @SerializedName("applicationHid")
     private String applicationHid;
+    /**
+     * version of sdk
+     */
     @SerializedName("sdkVersion")
     private String sdkVersion;
 

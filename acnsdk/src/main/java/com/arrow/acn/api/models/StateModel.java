@@ -17,7 +17,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 5/2/2017.
+ *  Model which is representing state
  */
 
 public class StateModel implements Parcelable {

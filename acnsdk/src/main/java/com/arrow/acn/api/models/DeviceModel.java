@@ -21,6 +21,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * New Device model
+ */
+
 public class DeviceModel implements Parcelable {
 
     @SuppressWarnings("unused")
@@ -40,36 +44,78 @@ public class DeviceModel implements Parcelable {
     @SerializedName("createdDate")
     @Expose
     private String createdDate;
+    /**
+     * is device enabled flag
+     */
     @SerializedName("enabled")
     @Expose
     private boolean enabled;
+    /**
+     * hid of gateway
+     */
     @SerializedName("gatewayHid")
     @Expose
     private String gatewayHid;
     @SerializedName("hid")
     @Expose
     private String hid;
+    /**
+     * device info Json string like:
+     *
+     * {
+     *    "type": "android",
+     *    "name": "AndroidInternal",
+     *    "bleAddress": "",
+     *    "uid": "android-bded-1030-0033-c5870033c587"
+     * }
+     */
     @SerializedName("info")
     @Expose
     private JsonElement info;
     @SerializedName("links")
     @Expose
     private JsonElement links;
+    /**
+     * device name
+     */
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("pri")
     @Expose
     private String pri;
+    /**
+     * Json string represents enabled/disabled sensors like:
+     * {
+     *    "HumiditySensor/enabled": true,
+     *    "HeartRateSensor/enabled": true,
+     *    "GyroscopeSensor/enabled": true,
+     *    "PedometerSensor/enabled": true,
+     *    "AccelerometerSensor/enabled": true,
+     *    "TemperatureSensor/enabled": true,
+     *    "PressureSensor/enabled": true,
+     *    "LightSensor/enabled": true,
+     *    "Magnetometer/enabled": true
+     *}
+     */
     @SerializedName("properties")
     @Expose
     private JsonElement properties;
+    /**
+     * device type
+     */
     @SerializedName("type")
     @Expose
     private String type;
+    /**
+     * unique id for this device
+     */
     @SerializedName("uid")
     @Expose
     private String uid;
+    /**
+     * user's hid
+     */
     @SerializedName("userHid")
     @Expose
     private String userHid;

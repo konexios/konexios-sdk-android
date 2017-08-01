@@ -25,6 +25,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  Model for registering new device or updating existing one
+ */
+
 public class DeviceRegistrationModel implements Parcelable {
 
     @SuppressWarnings("unused")
@@ -41,21 +45,57 @@ public class DeviceRegistrationModel implements Parcelable {
             return new DeviceRegistrationModel[size];
         }
     };
+    /**
+     * is device enabled flag
+     */
     @SerializedName("enabled")
     @Expose
     private boolean enabled;
+    /**
+     * hid of gateway
+     */
     @SerializedName("gatewayHid")
     @Expose
     private String gatewayHid;
+    /**
+     * device info Json string like:
+     *
+     * {
+     *    "type": "android",
+     *    "name": "AndroidInternal",
+     *    "bleAddress": "",
+     *    "uid": "android-bded-1030-0033-c5870033c587"
+     * }
+     */
     @SerializedName("info")
     @Expose
     private JsonElement info;
+    /**
+     * device name
+     */
     @SerializedName("name")
     @Expose
     private String name;
+    /**
+     * node hid
+     */
     @SerializedName("nodeHid")
     @Expose
     private String nodeHid;
+    /**
+     * Json string represents enabled/disabled sensors like:
+     * {
+     *    "HumiditySensor/enabled": true,
+     *    "HeartRateSensor/enabled": true,
+     *    "GyroscopeSensor/enabled": true,
+     *    "PedometerSensor/enabled": true,
+     *    "AccelerometerSensor/enabled": true,
+     *    "TemperatureSensor/enabled": true,
+     *    "PressureSensor/enabled": true,
+     *    "LightSensor/enabled": true,
+     *    "Magnetometer/enabled": true
+     *}
+     */
     @SerializedName("properties")
     @Expose
     private JsonElement properties;
@@ -63,12 +103,21 @@ public class DeviceRegistrationModel implements Parcelable {
     @SerializedName("tags")
     @Expose
     private List<String> tags = new ArrayList<>();
+    /**
+     * device type
+     */
     @SerializedName("type")
     @Expose
     private String type;
+    /**
+     * unique id for this device
+     */
     @SerializedName("uid")
     @Expose
     private String uid;
+    /**
+     * user's hid
+     */
     @SerializedName("userHid")
     @Expose
     private String userHid;

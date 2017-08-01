@@ -46,7 +46,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
 
 /**
- * Created by osminin on 3/15/2016.
+ * holds retrofit stuff
  */
 public class RetrofitHolderImpl implements RetrofitHolder {
     @NonNull

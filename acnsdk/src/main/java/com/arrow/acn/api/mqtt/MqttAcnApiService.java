@@ -22,7 +22,7 @@ import com.arrow.acn.api.rest.IotConnectAPIService;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 /**
- * Created by osminin on 6/22/2016.
+ * telemetry sender based on pure mqtt
  */
 
 @Keep
