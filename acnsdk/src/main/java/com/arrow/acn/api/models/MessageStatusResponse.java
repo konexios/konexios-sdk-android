@@ -17,7 +17,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 4/24/2017.
+ * Response model contains only message and status
  */
 
 public class MessageStatusResponse implements Parcelable {

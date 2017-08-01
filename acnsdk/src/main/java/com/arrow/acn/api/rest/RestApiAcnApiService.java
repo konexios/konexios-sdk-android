@@ -30,7 +30,7 @@ import retrofit2.Response;
 import timber.log.Timber;
 
 /**
- * Created by osminin on 6/17/2016.
+ * rest telemetry sender
  */
 
 public final class RestApiAcnApiService extends AbstractTelemetrySenderService {

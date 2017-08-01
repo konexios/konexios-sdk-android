@@ -18,7 +18,7 @@ import com.arrow.acn.api.models.TelemetryModel;
 import java.util.List;
 
 /**
- * Created by osminin on 10/26/2016.
+ * Common class for different types of telemetry senders like aws, azure, ibm and mqtt
  */
 
 @Keep

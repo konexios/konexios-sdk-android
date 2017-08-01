@@ -57,6 +57,10 @@ public final class AccountRequest implements Parcelable {
         return code;
     }
 
+    /**
+     * Sets the code
+     * @param code - string to switch between platforms
+     */
     public void setCode(String code) {
         this.code = code;
     }
@@ -65,6 +69,10 @@ public final class AccountRequest implements Parcelable {
         return name;
     }
 
+    /**
+     * Sets the name
+     * @param name - string representing user's name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -73,6 +81,10 @@ public final class AccountRequest implements Parcelable {
         return email;
     }
 
+    /**
+     * email setter
+     * @param email - email like "user@someemail.com"
+     */
     public void setEmail(String email) {
         this.email = email;
     }
@@ -81,6 +93,10 @@ public final class AccountRequest implements Parcelable {
         return password;
     }
 
+    /**
+     * Sets the password
+     * @param password - password string
+     */
     public void setPassword(String password) {
         this.password = password;
     }

@@ -21,10 +21,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import timber.log.Timber;
 
-/**
- * Created by osminin on 5/22/2017.
- */
-
 final class Utils {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 

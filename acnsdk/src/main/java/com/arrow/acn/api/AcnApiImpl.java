@@ -86,7 +86,7 @@ import timber.log.Timber;
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
 
 /**
- * Created by osminin on 6/17/2016.
+ * Implementation of public api methods
  */
 
 @Keep
@@ -226,7 +226,8 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getDeviceActionTypes(@NonNull final ListResultListener<DeviceActionTypeModel> listener) {
-        mRestService.getActionTypes().enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
+        Call<ListResultModel<DeviceActionTypeModel>> call =  mRestService.getActionTypes();
+        call.enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, @NonNull Response<ListResultModel<DeviceActionTypeModel>> response) {
                 Timber.d("getActionTypes response");

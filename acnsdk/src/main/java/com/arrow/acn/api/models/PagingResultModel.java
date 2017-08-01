@@ -17,20 +17,40 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  Pagination model
+ * @param <T> - any model to be represented as paging result
+ */
+
 public class PagingResultModel<T> {
 
+    /**
+     *  list of results
+     */
     @SerializedName("data")
     @Expose
     private List<T> data = new ArrayList<>();
+    /**
+     *  number of page
+     */
     @SerializedName("page")
     @Expose
     private Integer page;
+    /**
+     *  count of items in page
+     */
     @SerializedName("size")
     @Expose
     private Integer size;
+    /**
+     *  total amount of pages
+     */
     @SerializedName("totalPages")
     @Expose
     private Integer totalPages;
+    /**
+     *  total size
+     */
     @SerializedName("totalSize")
     @Expose
     private Integer totalSize;

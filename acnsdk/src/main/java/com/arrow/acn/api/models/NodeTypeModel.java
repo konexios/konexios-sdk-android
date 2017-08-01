@@ -21,6 +21,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ *  Represents node type model
+ */
+
 public class NodeTypeModel implements Parcelable {
 
     @SuppressWarnings("unused")

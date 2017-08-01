@@ -47,7 +47,7 @@ import retrofit2.Callback;
 import timber.log.Timber;
 
 /**
- * Created by osminin on 6/17/2016.
+ * base class for all telemetry senders which are using mqtt
  */
 
 @Keep

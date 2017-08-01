@@ -16,7 +16,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by osminin on 3/31/2017.
+ *  Request model for finding count of sent telemetry
  */
 
 public class TelemetryCountRequest implements Parcelable {
@@ -32,12 +32,28 @@ public class TelemetryCountRequest implements Parcelable {
             return new TelemetryCountRequest[size];
         }
     };
+
+    /**
+     * hid of device
+     */
     @SerializedName("deviceHid")
     private String deviceHid;
+
+    /**
+     *  name of exact telemetry (* for any)
+     */
     @SerializedName("telemetryName")
     private String telemetryName;
+
+    /**
+     *  start time in "yyyy-MM-dd'T'HH:mm:ss'Z'" format
+     */
     @SerializedName("fromTimestamp")
     private String fromTimestamp;
+
+    /**
+     *  end time in "yyyy-MM-dd'T'HH:mm:ss'Z'" format
+     */
     @SerializedName("toTimestamp")
     private String toTimestamp;
 
