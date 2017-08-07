@@ -2,6 +2,12 @@
 Arrow Connect SDK for Android
 
 ### Add AcnSDK to Project ###
+
+Add repository to the main build file
+```xml
+maven { url "https://dl.bintray.com/arrow-acs/acn-sdk/" }
+```
+
 grab via Maven:
 ```xml
 <dependency> 
@@ -85,9 +91,52 @@ acnApiService.getGatewayConfig(gatewayHid, new GetGatewayConfigListener() {
 acnApiService.connect(new ConnectionListener() {
     @Override
     public void onConnectionSuccess() {
-        //now you are able to send some telemetry to the cloud
+        //now you are able to send some telemetry to the cloud or to get some commands from cloud
     }
     ...
+```
+
+### Register a new device ###
+
+```java
+DeviceRegistrationModel payload = new DeviceRegistrationModel();
+payload.setUid("unique device user id");
+payload.setName("some name");
+payload.setGatewayHid(gatewayHid);
+payload.setUserHid("user hid from account response");
+payload.setType("device type name");
+payload.setEnabled(true);
+acnApiService.registerDevice(payload, new RegisterDeviceListener() {
+    @Override
+    public void onDeviceRegistered(@NonNull DeviceRegistrationResponse response) {
+        //new device is registered 
+    }
+    ...
+```
+
+### Send a telemetry ###
+
+```java
+String telemetryJson = 
+"{
+	"_|timestamp": 1502113061590,
+	"_|deviceHid": "211f793a3bfd00244b28f1c519c19bf702e356e6",
+	"f|light": "63.663162",
+	"f|magnometerZ": "-29.759216",
+	"f|accelerometerX": "0.61331177",
+	"f|gyroscopeX": "0.33015442",
+	"f|gyroscopeZ": "0.5884552",
+	"f|accelerometerZ": "4.2137146",
+	"f|accelerometerY": "8.158783",
+	"f|gyroscopeY": "0.37690735",
+	"f|magnometerY": "-54.359436",
+	"f|magnometerX": "-31.019592"
+}";
+TelemetryModel telemetryModel = new TelemetryModel();
+telemetryModel.setTelemetry(telemetryJson);
+telemetryModel.setDeviceType("device type");
+mSender.sendTelemetry(telemetryModel);
+...
 ```
 
 License
