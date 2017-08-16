@@ -13,7 +13,7 @@ grab via Maven:
 <dependency> 
     <groupId>com.arrow.acn.api</groupId>
     <artifactId>acnsdk</artifactId>
-    <version>0.9.3</version>
+    <version>1.0.0</version>
     <type>pom</type>
 </dependency>
 ```
