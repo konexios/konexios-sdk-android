@@ -13,13 +13,13 @@ grab via Maven:
 <dependency> 
     <groupId>com.arrow.acn.api</groupId>
     <artifactId>acnsdk</artifactId>
-    <version>0.9.1</version>
+    <version>0.9.3</version>
     <type>pom</type>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.arrow.acn.api:acnsdk:0.9.1'
+compile 'com.arrow.acn.api:acnsdk:0.9.3'
 ```
 ### Create new instance of sdk ###
 
