@@ -17,6 +17,9 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by osminin on 12.10.2016.
  */
@@ -36,9 +39,9 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
             return new DeviceTypeTelemetryModel[size];
         }
     };
-    @SerializedName("controllable")
+    @SerializedName("variables")
     @Expose
-    private boolean controllable;
+    private Map<String, String> variables = new HashMap<>();
     @SerializedName("description")
     @Expose
     private String description;
@@ -54,24 +57,29 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     }
 
     protected DeviceTypeTelemetryModel(@NonNull Parcel in) {
-        controllable = in.readByte() != 0x00;
+        int size = in.readInt();
+        for(int i = 0; i < size; i++){
+            String key = in.readString();
+            String value = in.readString();
+            variables.put(key,value);
+        }
         description = in.readString();
         name = in.readString();
         type = in.readString();
     }
 
     /**
-     * @return The controllable
+     * @return The variables
      */
-    public boolean isControllable() {
-        return controllable;
+    public Map<String, String> isVariables() {
+        return variables;
     }
 
     /**
-     * @param controllable The controllable
+     * @param variables The variables
      */
-    public void setControllable(boolean controllable) {
-        this.controllable = controllable;
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 
     /**
@@ -123,7 +131,8 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
 
         DeviceTypeTelemetryModel that = (DeviceTypeTelemetryModel) o;
 
-        if (controllable != that.controllable) return false;
+        if (variables != null ? !variables.equals(that.variables) : that.variables != null)
+            return false;
         if (description != null ? !description.equals(that.description) : that.description != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -133,7 +142,7 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
 
     @Override
     public int hashCode() {
-        int result = (controllable ? 1 : 0);
+        int result = variables != null ? variables.hashCode() : 0;
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
@@ -147,7 +156,11 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeByte((byte) (controllable ? 0x01 : 0x00));
+        dest.writeInt(variables.size());
+        for(Map.Entry<String,String> entry : variables.entrySet()){
+            dest.writeString(entry.getKey());
+            dest.writeString(entry.getValue());
+        }
         dest.writeString(description);
         dest.writeString(name);
         dest.writeString(type);
