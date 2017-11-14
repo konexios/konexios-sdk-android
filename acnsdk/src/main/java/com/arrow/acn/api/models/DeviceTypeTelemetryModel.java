@@ -71,7 +71,7 @@ final public class DeviceTypeTelemetryModel implements Parcelable {
     /**
      * @return The variables
      */
-    public Map<String, String> isVariables() {
+    public Map<String, String> getVariables() {
         return variables;
     }
 
