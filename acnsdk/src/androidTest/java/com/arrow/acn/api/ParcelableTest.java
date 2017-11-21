@@ -148,7 +148,14 @@ public class ParcelableTest {
         model.setLinks(new JsonObject());
         ArrayList<DeviceTypeTelemetryModel> list = new ArrayList(10);
         for (int i = 0; i < 10; i++) {
-            list.add(mFactory.manufacturePojo(DeviceTypeTelemetryModel.class));
+            DeviceTypeTelemetryModel telemetryModel = new DeviceTypeTelemetryModel();
+            telemetryModel.setName("name");
+            telemetryModel.setDescription("description");
+            telemetryModel.setType("type");
+            Map<String, String> keyMap = new HashMap<>();
+            keyMap.put("key", "value");
+            telemetryModel.setVariables(keyMap);
+            list.add(telemetryModel);
         }
         model.setTelemetries(list);
         Parcel parcel = Parcel.obtain();
@@ -166,7 +173,14 @@ public class ParcelableTest {
         model.setDescription("description");
         ArrayList<DeviceTypeTelemetryModel> list = new ArrayList(10);
         for (int i = 0; i < 10; i++) {
-            list.add(mFactory.manufacturePojo(DeviceTypeTelemetryModel.class));
+            DeviceTypeTelemetryModel telemetryModel = new DeviceTypeTelemetryModel();
+            telemetryModel.setName("name");
+            telemetryModel.setDescription("description");
+            telemetryModel.setType("type");
+            Map<String, String> keyMap = new HashMap<>();
+            keyMap.put("key", "value");
+            telemetryModel.setVariables(keyMap);
+            list.add(telemetryModel);
         }
         model.setTelemetries(list);
         Parcel parcel = Parcel.obtain();
@@ -227,7 +241,6 @@ public class ParcelableTest {
                 DeviceActionTypeModel.class,
                 DeviceModel.class,
                 DeviceRegistrationResponse.class,
-                DeviceTypeTelemetryModel.class,
                 ErrorBodyModel.class,
                 FindDevicesRequest.class,
                 FindDeviceStateResponse.class,
