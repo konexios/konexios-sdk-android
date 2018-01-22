@@ -32,6 +32,7 @@ import com.arrow.acn.api.listeners.ListResultListener;
 import com.arrow.acn.api.listeners.MessageStatusListener;
 import com.arrow.acn.api.listeners.PagingResultListener;
 import com.arrow.acn.api.listeners.PostDeviceActionListener;
+import com.arrow.acn.api.listeners.RegisterAccount2Listener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
@@ -39,7 +40,9 @@ import com.arrow.acn.api.listeners.TelemetryCountListener;
 import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
+import com.arrow.acn.api.models.AccountRequest2;
 import com.arrow.acn.api.models.AccountResponse;
+import com.arrow.acn.api.models.AccountResponse2;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.models.AuditLogModel;
 import com.arrow.acn.api.models.AuditLogsQuery;
@@ -118,6 +121,11 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
         mRetrofitHolder.setDefaultApiSecret(apiSecret);
         mRetrofitHolder.setSecretKey(null);
         mRetrofitHolder.setApiKey(null);
+        mRestService = mRetrofitHolder.getIotConnectAPIService(endpoint);
+    }
+
+    void resetRestEndpoint(@NonNull String endpoint) {
+        Timber.d("resetRestEndpoint: " + endpoint);
         mRestService = mRetrofitHolder.getIotConnectAPIService(endpoint);
     }
 
@@ -219,6 +227,38 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
             public void onFailure(Call<AccountResponse> call, Throwable t) {
                 listener.onAccountRegisterFailed(ErrorUtils.parseError(t));
                 Timber.e("registerAccount() failed");
+                Timber.e(t);
+            }
+        });
+    }
+
+    @Override
+    public void registerAccount2(@NonNull AccountRequest2 accountRequest, @NonNull final RegisterAccount2Listener listener) {
+        Timber.d("registerAccount2() email: " + accountRequest.getUsername()
+                + ", code: " + accountRequest.getApplicationCode());
+        Call<AccountResponse2> call = mRestService.registerAccount2(accountRequest);
+        call.enqueue(new Callback<AccountResponse2>() {
+            @Override
+            public void onResponse(Call<AccountResponse2> call, @NonNull Response<AccountResponse2> response) {
+                Timber.d("registerAccount2: " + response.code());
+                try {
+                    if (response.body() != null && response.code() == HttpURLConnection.HTTP_OK) {
+                        listener.onAccountRegistered(response.body());
+                    } else {
+                        ApiError error = mRetrofitHolder.convertToApiError(response);
+                        listener.onAccountRegisterFailed(error);
+                    }
+                } catch (Exception e) {
+                    listener.onAccountRegisterFailed(ErrorUtils.parseError(e));
+                    e.printStackTrace();
+                    Timber.e(e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AccountResponse2> call, Throwable t) {
+                listener.onAccountRegisterFailed(ErrorUtils.parseError(t));
+                Timber.e("registerAccount2() failed");
                 Timber.e(t);
             }
         });
