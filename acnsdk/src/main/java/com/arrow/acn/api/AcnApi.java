@@ -38,6 +38,7 @@ public final class AcnApi {
 
         private Executor mCallbackExecutor;
         private ExecutorService mHttpExecutorService;
+        private static AcnApiService mService;
 
         /**
          * sets endpoint server environment url and user credentials. Should be called before any other calls
@@ -97,12 +98,17 @@ public final class AcnApi {
             return this;
         }
 
+        public static AcnApiService resetRestEndpoint(String endpoint) {
+            ((AcnApiImpl) mService).resetRestEndpoint(endpoint);
+            return mService;
+        }
+
         public AcnApiService build() {
-            AcnApiImpl service = new AcnApiImpl(new RetrofitHolderImpl(mCallbackExecutor, mHttpExecutorService),
+            mService = new AcnApiImpl(new RetrofitHolderImpl(mCallbackExecutor, mHttpExecutorService),
                     new SenderServiceFactoryImpl(), isDebug);
-            service.setRestEndpoint(mEndpoint, mApiKey, mApiSecret);
-            service.setMqttEndpoint(mMqttHost, mMqttPrefix);
-            return service;
+            ((AcnApiImpl) mService).setRestEndpoint(mEndpoint, mApiKey, mApiSecret);
+            ((AcnApiImpl) mService).setMqttEndpoint(mMqttHost, mMqttPrefix);
+            return mService;
         }
     }
 }

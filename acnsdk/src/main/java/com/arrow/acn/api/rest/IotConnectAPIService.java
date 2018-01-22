@@ -15,7 +15,9 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.models.AccountRequest;
+import com.arrow.acn.api.models.AccountRequest2;
 import com.arrow.acn.api.models.AccountResponse;
+import com.arrow.acn.api.models.AccountResponse2;
 import com.arrow.acn.api.models.AuditLogModel;
 import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.ConfigResponse;
@@ -67,6 +69,11 @@ public interface IotConnectAPIService {
     @NonNull
     @POST("/api/v1/kronos/accounts")
     Call<AccountResponse> registerAccount(@Body AccountRequest accountRequest);
+
+    //Account api
+    @NonNull
+    @POST("/api/v1/pegasus/users/auth2")
+    Call<AccountResponse2> registerAccount2(@Body AccountRequest2 accountRequest);
 
     //GatewayApi
     @NonNull

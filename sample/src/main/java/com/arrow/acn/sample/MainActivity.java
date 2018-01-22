@@ -37,6 +37,7 @@ import com.arrow.acn.api.listeners.GetGatewayConfigListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
 import com.arrow.acn.api.listeners.TelemetryRequestListener;
 import com.arrow.acn.api.models.AccountResponse;
+import com.arrow.acn.api.models.AccountResponse2;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.models.ConfigResponse;
 import com.arrow.acn.api.models.DeviceRegistrationModel;
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
     @BindString(R.string.device_details_steps)
     String mStepsUnit;
     private AcnApiService mTelemetrySendService;
-    private AccountResponse mAccountResponse;
+    private AccountResponse2 mAccountResponse;
     private String mGatewayHid;
     private DeviceAndroid mDevice;
 
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
         //device creation
         mDevice = new DeviceAndroid(this);
         mDevice.setView(this);
-        mDevice.setUserHid(mAccountResponse.getHid());
+        mDevice.setUserHid(mAccountResponse.getUserHid());
         mDevice.setSender(this);
     }
 
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
         String name = String.format("%s %s", Build.MANUFACTURER, Build.MODEL);
         String osName = String.format("Android %s", Build.VERSION.RELEASE);
         String swName = SOFTWARE_NAME;
-        String userHid = mAccountResponse.getHid();
+        String userHid = mAccountResponse.getUserHid();
 
         GatewayModel gatewayModel = new GatewayModel();
         gatewayModel.setName(name);
