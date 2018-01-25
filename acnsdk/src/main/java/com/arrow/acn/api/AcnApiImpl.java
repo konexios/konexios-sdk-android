@@ -15,6 +15,8 @@ import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
+import com.arrow.acn.api.listeners.AvailableFirmwareListener;
+import com.arrow.acn.api.listeners.AvailableFirmwareVersionListener;
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
@@ -34,6 +36,7 @@ import com.arrow.acn.api.listeners.PagingResultListener;
 import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
+import com.arrow.acn.api.listeners.RequestedFirmwareListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryCountListener;
 import com.arrow.acn.api.listeners.TelemetryRequestListener;
@@ -43,8 +46,10 @@ import com.arrow.acn.api.models.AccountResponse;
 import com.arrow.acn.api.models.ApiError;
 import com.arrow.acn.api.models.AuditLogModel;
 import com.arrow.acn.api.models.AuditLogsQuery;
+import com.arrow.acn.api.models.AvailableFirmwareResponse;
 import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.ConfigResponse;
+import com.arrow.acn.api.models.CreateAndStartSoftwareReleaseScheduleRequest;
 import com.arrow.acn.api.models.DeviceActionModel;
 import com.arrow.acn.api.models.DeviceActionTypeModel;
 import com.arrow.acn.api.models.DeviceEventModel;
@@ -57,6 +62,7 @@ import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
 import com.arrow.acn.api.models.FindDevicesRequest;
 import com.arrow.acn.api.models.FindTelemetryRequest;
+import com.arrow.acn.api.models.FirmwareVersionModel;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
@@ -69,6 +75,7 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.RequestedFirmwareResponse;
 import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
@@ -685,6 +692,28 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     }
 
     @Override
+    public void getAvailableFirmwareForGatewayByHid(String hid, final AvailableFirmwareVersionListener listener) {
+        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<FirmwareVersionModel>> call, Response<ListResultModel<FirmwareVersionModel>> response) {
+                Timber.d("getAvailableFirmwareForGatewayByHid response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onAvailableFirmwareVersionSuccess(response.body().getData());
+                } else {
+                    Timber.e("getAvailableFirmwareForGatewayByHid error");
+                    listener.onAvailableFirmwareVersionFailure(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<FirmwareVersionModel>> call, Throwable t) {
+                Timber.e("getAvailableFirmwareForGatewayByHid error");
+                listener.onAvailableFirmwareVersionFailure(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
     public void deleteDeviceAction(@NonNull String deviceHid, int index, @NonNull final DeleteDeviceActionListener listener) {
         mRestService.deleteAction(deviceHid, index).enqueue(new Callback<CommonResponse>() {
             @Override
@@ -824,6 +853,28 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("sendDeviceError error");
                 listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void getAvailableFirmwareForDeviceByHid(String hid, final AvailableFirmwareVersionListener listener) {
+        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
+            @Override
+            public void onResponse(Call<ListResultModel<FirmwareVersionModel>> call, Response<ListResultModel<FirmwareVersionModel>> response) {
+                Timber.d("getAvailableFirmwareForDeviceByHid response");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onAvailableFirmwareVersionSuccess(response.body().getData());
+                } else {
+                    Timber.e("getAvailableFirmwareForDeviceByHid error");
+                    listener.onAvailableFirmwareVersionFailure(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResultModel<FirmwareVersionModel>> call, Throwable t) {
+                Timber.e("getAvailableFirmwareForDeviceByHid error");
+                listener.onAvailableFirmwareVersionFailure(ErrorUtils.parseError(t));
             }
         });
     }
@@ -1173,7 +1224,6 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
             }
         });
     }
-
     //telemetry api
     @Override
     public void findTelemetryByApplicationHid(@NonNull FindTelemetryRequest request, @NonNull final PagingResultListener<TelemetryItemModel> listener) {
@@ -1341,4 +1391,94 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     public IotConnectAPIService getIotConnectApiService() {
         return mRestService;
     }
+
+    // RTU FIRMWARE API
+    @Override
+    public void getListRequestedFirmware(String status, int page, int size, final RequestedFirmwareListener listener) {
+        mRestService.getListRequestedFirmware(status, page, size).enqueue(new Callback<RequestedFirmwareResponse>() {
+            @Override
+            public void onResponse(Call<RequestedFirmwareResponse> call, Response<RequestedFirmwareResponse> response) {
+                Timber.d("getListRequestedFirmware");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onListRequestedFirmwareSuccess(response.body());
+                } else {
+                    Timber.e("getListRequestedFirmware error");
+                    listener.onListRequestedFirmwareFailure(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RequestedFirmwareResponse> call, Throwable t) {
+                Timber.e("getListRequestedFirmware error");
+                listener.onListRequestedFirmwareFailure(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void getListAvailableFirmware(String deviceTypeHid, final AvailableFirmwareListener listener) {
+        mRestService.getListAvailableFirmware(deviceTypeHid).enqueue(new Callback<AvailableFirmwareResponse>() {
+            @Override
+            public void onResponse(Call<AvailableFirmwareResponse> call, Response<AvailableFirmwareResponse> response) {
+                Timber.d("getListAvailableFirmware");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onAvailableFirmwareSuccess(response.body());
+                } else {
+                    Timber.e("getListAvailableFirmware error");
+                    listener.onAvailableFirmwareFailure(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AvailableFirmwareResponse> call, Throwable t) {
+                Timber.e("getListRequestedFirmware error");
+                listener.onAvailableFirmwareFailure(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void requireRightToUseFirmware(String softwareReleaseHid, final MessageStatusListener listener) {
+        mRestService.requireRightToUseFirmware(softwareReleaseHid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("requireRightToUseFirmware");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("requireRightToUseFirmware error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("requireRightToUseFirmware error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void createAndStartNewSoftwareReleaseSchedule(CreateAndStartSoftwareReleaseScheduleRequest request, final CommonRequestListener listener) {
+        mRestService.createAndStartNewSoftwareReleaseSchedule(request).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                Timber.d("createAndStartNewSoftwareReleaseSchedule");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onRequestSuccess(response.body());
+                } else {
+                    Timber.e("createAndStartNewSoftwareReleaseSchedule error");
+                    listener.onRequestError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Timber.e("createAndStartNewSoftwareReleaseSchedule error");
+                listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
 }
