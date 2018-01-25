@@ -33,9 +33,12 @@ import android.widget.TextView;
 
 import com.arrow.acn.api.AcnApi;
 import com.arrow.acn.api.AcnApiService;
+import com.arrow.acn.api.listeners.RegisterAccount2Listener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.models.AccountRequest;
+import com.arrow.acn.api.models.AccountRequest2;
 import com.arrow.acn.api.models.AccountResponse;
+import com.arrow.acn.api.models.AccountResponse2;
 import com.arrow.acn.api.models.ApiError;
 
 
@@ -139,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            AccountRequest model = new AccountRequest();
+            /*AccountRequest model = new AccountRequest();
             model.setName("Some Name");
             model.setEmail(email.toLowerCase());
             model.setPassword(password);
@@ -161,6 +164,32 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onAccountRegisterFailed(ApiError e) {
+                    Log.v(TAG, "onAccountRegisterFailed");
+                    mPasswordView.setError(getString(R.string.error_fatal));
+                    mPasswordView.requestFocus();
+                    showProgress(false);
+                }
+            });*/
+            AccountRequest2 model = new AccountRequest2();
+            model.setUsername("ew2018-1011@arrowconnect.io");
+            model.setPassword("X6c5o8P7J=Fb5f9~");
+            model.setApplicationCode("JEZ546");
+            mAcnApiService.registerAccount2(model, new RegisterAccount2Listener() {
+                @Override
+                public void onAccountRegistered(AccountResponse2 response) {
+                    Log.v(TAG, "onAccountRegistered");
+                    saveCredentials(email, password, code);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra(ACCOUNT_RESPONSE_EXTRA, response);
+                    AcnApi.Builder.resetRestEndpoint("http://" + response.getZoneSystemName()
+                            + ".arrowconnect.io");
+                    startActivity(intent);
+                    finish();
+                    showProgress(false);
+                }
+
+                @Override
+                public void onAccountRegisterFailed(ApiError error) {
                     Log.v(TAG, "onAccountRegisterFailed");
                     mPasswordView.setError(getString(R.string.error_fatal));
                     mPasswordView.requestFocus();
@@ -236,6 +265,11 @@ public class LoginActivity extends AppCompatActivity {
             mCode.setText(code);
             attemptLogin();
         }
+
+        //todo: remove
+        mEmailView.setText("ew2018-1011@arrowconnect.io");
+        mPasswordView.setText("X6c5o8P7J=Fb5f9~");
+        mCode.setText("JEZ546");
     }
 }
 
