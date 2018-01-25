@@ -17,8 +17,10 @@ import android.support.annotation.NonNull;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AccountResponse;
 import com.arrow.acn.api.models.AuditLogModel;
+import com.arrow.acn.api.models.AvailableFirmwareResponse;
 import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.ConfigResponse;
+import com.arrow.acn.api.models.CreateAndStartSoftwareReleaseScheduleRequest;
 import com.arrow.acn.api.models.DeviceActionModel;
 import com.arrow.acn.api.models.DeviceActionTypeModel;
 import com.arrow.acn.api.models.DeviceEventModel;
@@ -29,6 +31,7 @@ import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
+import com.arrow.acn.api.models.FirmwareVersionModel;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
@@ -40,6 +43,7 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.RequestedFirmwareResponse;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 
@@ -121,6 +125,10 @@ public interface IotConnectAPIService {
     @POST("/api/v1/kronos/gateways/{hid}/errors")
     Call<CommonResponse> sendGatewayError(@Path("hid") String gatewayHid,
                                           @Body ErrorBodyModel error);
+
+    @NonNull
+    @GET("api/v1/kronos/devices/{hid}/firmware/available")
+    Call<ListResultModel<FirmwareVersionModel>> getAvailableFirmwareForGatewayByHid(@Path("hid") String hid);
 
     //telemetry api
     @NonNull
@@ -257,6 +265,10 @@ public interface IotConnectAPIService {
                                                                @Query("sortDirection") String sortDirection,
                                                                @Query("_page") int page,
                                                                @Query("_size") int size);
+    @NonNull
+    @GET("/api/v1/kronos/devices/{hid}/firmware/available")
+    Call<ListResultModel<FirmwareVersionModel>> getAvailableFirmwareForDeviceByHid(@Path("hid") String hid);
+
     //node api
 
     @NonNull
@@ -328,4 +340,26 @@ public interface IotConnectAPIService {
     @POST("/api/v1/kronos/devices/{hid}/state/update")
     Call<CommonResponse> updateDeviceStateTransaction(@Path("hid") String hid,
                                                       @Body NewDeviceStateTransactionRequest body);
+
+    // RTU FIRMWARE API
+
+    @NonNull
+    @GET("/api/v1/kronos/rtu/find")
+    Call<RequestedFirmwareResponse> getListRequestedFirmware(@Query("status") String status,
+                                                             @Query("_page") int page,
+                                                             @Query("_size") int size);
+
+    @NonNull
+    @GET("/api/v1/kronos/rtu/find/available")
+    Call<AvailableFirmwareResponse> getListAvailableFirmware(@Query("deviceTypeHid") String deviceTypeHid);
+
+    @NonNull
+    @PUT ("/api/v1/kronos/rtu/request/{softwareReleaseHid}")
+    Call<MessageStatusResponse> requireRightToUseFirmware(@Path("softwareReleaseHid") String softwareReleaseHid);
+
+    // Software Release Schedule ApI
+
+    @NonNull
+    @POST ("/api/v1/kronos/software/releases/schedules/start")
+    Call<CommonResponse> createAndStartNewSoftwareReleaseSchedule(@Body CreateAndStartSoftwareReleaseScheduleRequest body);
 }

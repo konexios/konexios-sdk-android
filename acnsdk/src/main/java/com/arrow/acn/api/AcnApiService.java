@@ -12,6 +12,8 @@ package com.arrow.acn.api;
 
 import android.support.annotation.Keep;
 
+import com.arrow.acn.api.listeners.AvailableFirmwareListener;
+import com.arrow.acn.api.listeners.AvailableFirmwareVersionListener;
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
@@ -31,6 +33,7 @@ import com.arrow.acn.api.listeners.PagingResultListener;
 import com.arrow.acn.api.listeners.PostDeviceActionListener;
 import com.arrow.acn.api.listeners.RegisterAccountListener;
 import com.arrow.acn.api.listeners.RegisterDeviceListener;
+import com.arrow.acn.api.listeners.RequestedFirmwareListener;
 import com.arrow.acn.api.listeners.ServerCommandsListener;
 import com.arrow.acn.api.listeners.TelemetryCountListener;
 import com.arrow.acn.api.listeners.TelemetryRequestListener;
@@ -38,6 +41,7 @@ import com.arrow.acn.api.listeners.UpdateDeviceActionListener;
 import com.arrow.acn.api.models.AccountRequest;
 import com.arrow.acn.api.models.AuditLogModel;
 import com.arrow.acn.api.models.AuditLogsQuery;
+import com.arrow.acn.api.models.CreateAndStartSoftwareReleaseScheduleRequest;
 import com.arrow.acn.api.models.DeviceActionModel;
 import com.arrow.acn.api.models.DeviceActionTypeModel;
 import com.arrow.acn.api.models.DeviceEventModel;
@@ -260,6 +264,13 @@ public interface AcnApiService {
      */
     void sendDeviceError(String deviceHid, ErrorBodyModel error, CommonRequestListener listener);
 
+    /**
+     * Get available firmware for device by hid.
+     * @param hid - device hid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void getAvailableFirmwareForDeviceByHid(String hid, AvailableFirmwareVersionListener listener);
+
     //Core-event api
 
     /**
@@ -366,6 +377,13 @@ public interface AcnApiService {
      * @param listener - listener interface implementation, should be not null
      */
     void getGatewayLogs(String hid, AuditLogsQuery query, PagingResultListener<AuditLogModel> listener);
+
+    /**
+     * Get available firmware for gateway by hid.
+     * @param hid gateway hid
+     * @param listener listener - listener interface implementation, should be not null
+     */
+    void getAvailableFirmwareForGatewayByHid(String hid, AvailableFirmwareVersionListener listener);
 
     //Node api
 
@@ -491,4 +509,38 @@ public interface AcnApiService {
     void updateDeviceStateTransaction(String hid,
                                       NewDeviceStateTransactionRequest request,
                                       CommonRequestListener listener);
+
+    // RTU FIRMWARE API
+
+    /**
+     * Get list of requested firmware.
+     * @param status - status should be "Requested", "Approved", "Declined", "Revoked" or empty
+     * @param page - num of page
+     * @param size
+     * @param listener - listener interface implementation, should be not null
+     */
+    void getListRequestedFirmware(String status, int page, int size, RequestedFirmwareListener listener);
+
+    /**
+     *  Get list available firmware.
+     * @param deviceTypeHid - device type hid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void getListAvailableFirmware(String deviceTypeHid, AvailableFirmwareListener listener);
+
+    /**
+     *  Check rights to use firmware.
+     * @param softwareReleaseHid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void requireRightToUseFirmware(String softwareReleaseHid, MessageStatusListener listener);
+
+    // Software Release Schedule ApI
+
+    /**
+     *
+     * @param request
+     * @param listener
+     */
+    void createAndStartNewSoftwareReleaseSchedule(CreateAndStartSoftwareReleaseScheduleRequest request, CommonRequestListener listener);
 }
