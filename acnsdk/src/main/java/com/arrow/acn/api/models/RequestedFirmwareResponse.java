@@ -16,7 +16,7 @@ public class RequestedFirmwareResponse implements Parcelable {
     @SerializedName("size")
     private int size;
 
-    @SerializedName("")
+    @SerializedName("data")
     private ArrayList<RequestedFirmware> data;
 
     @SerializedName("page")
