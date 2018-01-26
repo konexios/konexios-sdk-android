@@ -46,6 +46,7 @@ import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.RequestedFirmwareResponse;
+import com.arrow.acn.api.models.StateModel;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 
@@ -369,4 +370,26 @@ public interface IotConnectAPIService {
     @NonNull
     @POST ("/api/v1/kronos/software/releases/schedules/start")
     Call<CommonResponse> createAndStartNewSoftwareReleaseSchedule(@Body CreateAndStartSoftwareReleaseScheduleRequest body);
+
+    // Software Release Trans Api
+
+    @NonNull
+    @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/failed")
+    Call<MessageStatusResponse> markSoftwareReleaseTransFailed(@Path("hid") String hid);
+
+    @NonNull
+    @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/received")
+    Call<MessageStatusResponse> markSoftwareReleaseTransReceived(@Path("hid") String hid);
+
+    @NonNull
+    @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/succeeded")
+    Call<MessageStatusResponse> markSoftwareReleaseTransSecceeded(@Path("hid") String hid);
+
+    @NonNull
+    @POST ("/api/v1/kronos/software/releases/transactions/{hid}/start")
+    Call<MessageStatusResponse> startSoftwareReleaseTrans(@Path("hid") String hid);
+
+    @NonNull
+    @GET ("/api/v1/kronos/software/releases/transactions/{hid}/{token}/file")
+    Call<ResponseBody> downloadSoftwareReleaseFile(@Path("hid") String hid, @Path("token") String token);
 }

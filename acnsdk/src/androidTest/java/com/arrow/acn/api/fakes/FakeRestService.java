@@ -13,7 +13,9 @@ package com.arrow.acn.api.fakes;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.models.AccountRequest;
+import com.arrow.acn.api.models.AccountRequest2;
 import com.arrow.acn.api.models.AccountResponse;
+import com.arrow.acn.api.models.AccountResponse2;
 import com.arrow.acn.api.models.AuditLogModel;
 import com.arrow.acn.api.models.AvailableFirmwareResponse;
 import com.arrow.acn.api.models.CommonResponse;
@@ -72,6 +74,12 @@ public final class FakeRestService implements IotConnectAPIService {
     @NonNull
     @Override
     public Call<AccountResponse> registerAccount(@Body AccountRequest accountRequest) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<AccountResponse2> registerAccount2(AccountRequest2 accountRequest) {
         return null;
     }
 
@@ -398,4 +406,35 @@ public final class FakeRestService implements IotConnectAPIService {
     public Call<CommonResponse> createAndStartNewSoftwareReleaseSchedule(CreateAndStartSoftwareReleaseScheduleRequest body) {
         return null;
     }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> markSoftwareReleaseTransFailed(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> markSoftwareReleaseTransReceived(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> markSoftwareReleaseTransSecceeded(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> startSoftwareReleaseTrans(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<ResponseBody> downloadSoftwareReleaseFile(String hid, String token) {
+        return null;
+    }
+
 }
