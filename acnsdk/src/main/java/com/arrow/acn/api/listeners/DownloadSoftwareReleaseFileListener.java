@@ -17,7 +17,16 @@ import com.arrow.acn.api.models.ApiError;
  */
 
 public interface DownloadSoftwareReleaseFileListener {
+    /**
+     * Call request was successfully done and provide received software release file as byte array.
+     * @param bytes - received file as byte array
+     * @param md5 - checksum for received file
+     */
     void onDownloadSoftwareReleaseFileListenerSuccess(byte[] bytes, String md5);
 
+    /**
+     * Call on failure
+     * @param apiError - received ApiError
+     */
     void onDownloadSoftwareReleaseFileListenerError(ApiError apiError);
 }
