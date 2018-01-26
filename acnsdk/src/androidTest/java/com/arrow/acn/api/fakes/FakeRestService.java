@@ -13,10 +13,14 @@ package com.arrow.acn.api.fakes;
 import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.models.AccountRequest;
+import com.arrow.acn.api.models.AccountRequest2;
 import com.arrow.acn.api.models.AccountResponse;
+import com.arrow.acn.api.models.AccountResponse2;
 import com.arrow.acn.api.models.AuditLogModel;
+import com.arrow.acn.api.models.AvailableFirmwareResponse;
 import com.arrow.acn.api.models.CommonResponse;
 import com.arrow.acn.api.models.ConfigResponse;
+import com.arrow.acn.api.models.CreateAndStartSoftwareReleaseScheduleRequest;
 import com.arrow.acn.api.models.DeviceActionModel;
 import com.arrow.acn.api.models.DeviceActionTypeModel;
 import com.arrow.acn.api.models.DeviceEventModel;
@@ -27,6 +31,7 @@ import com.arrow.acn.api.models.DeviceTypeModel;
 import com.arrow.acn.api.models.DeviceTypeRegistrationModel;
 import com.arrow.acn.api.models.ErrorBodyModel;
 import com.arrow.acn.api.models.FindDeviceStateResponse;
+import com.arrow.acn.api.models.FirmwareVersionModel;
 import com.arrow.acn.api.models.GatewayCommand;
 import com.arrow.acn.api.models.GatewayModel;
 import com.arrow.acn.api.models.GatewayResponse;
@@ -38,6 +43,7 @@ import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
+import com.arrow.acn.api.models.RequestedFirmwareResponse;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.rest.IotConnectAPIService;
@@ -68,6 +74,12 @@ public final class FakeRestService implements IotConnectAPIService {
     @NonNull
     @Override
     public Call<AccountResponse> registerAccount(@Body AccountRequest accountRequest) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<AccountResponse2> registerAccount2(AccountRequest2 accountRequest) {
         return null;
     }
 
@@ -135,6 +147,12 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @Override
     public Call<CommonResponse> sendGatewayError(@Path("hid") String gatewayHid, @Body ErrorBodyModel error) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<ListResultModel<FirmwareVersionModel>> getAvailableFirmwareForGatewayByHid(String hid) {
         return null;
     }
 
@@ -271,6 +289,12 @@ public final class FakeRestService implements IotConnectAPIService {
 
     @NonNull
     @Override
+    public Call<ListResultModel<FirmwareVersionModel>> getAvailableFirmwareForDeviceByHid(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
     public Call<ListResultModel<NodeModel>> getListExistingNodes() {
         return null;
     }
@@ -358,4 +382,59 @@ public final class FakeRestService implements IotConnectAPIService {
     public Call<CommonResponse> updateDeviceStateTransaction(@Path("hid") String hid, @Body NewDeviceStateTransactionRequest body) {
         return null;
     }
+
+    @NonNull
+    @Override
+    public Call<RequestedFirmwareResponse> getListRequestedFirmware(String status, int page, int size) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<AvailableFirmwareResponse> getListAvailableFirmware(String deviceTypeHid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> requireRightToUseFirmware(String softwareReleaseHid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<CommonResponse> createAndStartNewSoftwareReleaseSchedule(CreateAndStartSoftwareReleaseScheduleRequest body) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> markSoftwareReleaseTransFailed(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> markSoftwareReleaseTransReceived(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> markSoftwareReleaseTransSecceeded(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<MessageStatusResponse> startSoftwareReleaseTrans(String hid) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Call<ResponseBody> downloadSoftwareReleaseFile(String hid, String token) {
+        return null;
+    }
+
 }
