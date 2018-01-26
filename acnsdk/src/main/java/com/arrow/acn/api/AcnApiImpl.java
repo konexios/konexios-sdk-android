@@ -15,12 +15,14 @@ import android.support.annotation.NonNull;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
+import com.arrow.acn.api.common.Utils;
 import com.arrow.acn.api.listeners.AvailableFirmwareListener;
 import com.arrow.acn.api.listeners.AvailableFirmwareVersionListener;
 import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.DeleteDeviceActionListener;
+import com.arrow.acn.api.listeners.DownloadSoftwareReleaseFileListener;
 import com.arrow.acn.api.listeners.FindDeviceListener;
 import com.arrow.acn.api.listeners.FindDeviceStateListener;
 import com.arrow.acn.api.listeners.FindGatewayListener;
@@ -85,9 +87,14 @@ import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
 import com.arrow.acn.api.rest.IotConnectAPIService;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -1517,6 +1524,152 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Timber.e("createAndStartNewSoftwareReleaseSchedule error");
                 listener.onRequestError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    // Software Release Trans Api
+
+    @Override
+    public void markSoftwareReleaseTransFailed(String hid, final MessageStatusListener listener) {
+        mRestService.markSoftwareReleaseTransFailed(hid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("markSoftwareReleaseTransFailed");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("markSoftwareReleaseTransFailed error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("markSoftwareReleaseTransFailed error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void markSoftwareReleaseTransReceived(String hid, final MessageStatusListener listener) {
+        mRestService.markSoftwareReleaseTransReceived(hid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("markSoftwareReleaseTransReceived");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("markSoftwareReleaseTransReceived error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("markSoftwareReleaseTransReceived error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void markSoftwareReleaseTransSucceeded(String hid, final MessageStatusListener listener) {
+        mRestService.markSoftwareReleaseTransSecceeded(hid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("markSoftwareReleaseTransSucceeded");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("markSoftwareReleaseTransSucceeded error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("markSoftwareReleaseTransSucceeded error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void startSoftwareReleaseTrans(String hid, final MessageStatusListener listener) {
+        mRestService.startSoftwareReleaseTrans(hid).enqueue(new Callback<MessageStatusResponse>() {
+            @Override
+            public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
+                Timber.d("startSoftwareReleaseTrans");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    listener.onResponse(response.body());
+                } else {
+                    Timber.e("startSoftwareReleaseTrans error");
+                    listener.onError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageStatusResponse> call, Throwable t) {
+                Timber.e("startSoftwareReleaseTrans error");
+                listener.onError(ErrorUtils.parseError(t));
+            }
+        });
+    }
+
+    @Override
+    public void downloadSoftwareReleaseFile(String hid, String token, final DownloadSoftwareReleaseFileListener listener) {
+
+
+        mRestService.downloadSoftwareReleaseFile(hid, token).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String md5Checksum;
+                ResponseBody body = response.body();
+                Timber.d("downloadSoftwareReleaseFile");
+                if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    InputStream inputStream = new BufferedInputStream(body.byteStream());
+                    try {
+                        md5Checksum = Utils.getMD5(inputStream);
+
+                        byte[] buffer = new byte[1024];
+                        ByteArrayOutputStream output = new ByteArrayOutputStream();
+                        boolean error = false;
+                        try {
+                            int numRead;
+                            while ((numRead = inputStream.read(buffer)) > -1) {
+                                output.write(buffer, 0, numRead);
+                            }
+                        } catch (IOException | RuntimeException e) {
+                            error = true;
+                            e.printStackTrace();
+                            throw e;
+                        } finally {
+                            try {
+                                inputStream.close();
+                            } catch (IOException e) {
+                                if (!error) throw e;
+                            }
+                        }
+                        output.flush();
+                        byte[] bytes = output.toByteArray();
+
+                        listener.onDownloadSoftwareReleaseFileListenerSuccess(bytes, md5Checksum);
+                    } catch (IOException aE) {
+                        aE.printStackTrace();
+                        listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
+                    }
+                } else {
+                    Timber.e("downloadSoftwareReleaseFile error");
+                    listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Timber.e("downloadSoftwareReleaseFile error");
+                listener.onDownloadSoftwareReleaseFileListenerError(ErrorUtils.parseError(t));
             }
         });
     }
