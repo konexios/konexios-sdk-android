@@ -10,10 +10,6 @@
 
 package com.arrow.acn.api;
 
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
@@ -284,7 +280,7 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getDeviceActionTypes(@NonNull final ListResultListener<DeviceActionTypeModel> listener) {
-        Call<ListResultModel<DeviceActionTypeModel>> call = mRestService.getActionTypes();
+        Call<ListResultModel<DeviceActionTypeModel>> call =  mRestService.getActionTypes();
         call.enqueue(new Callback<ListResultModel<DeviceActionTypeModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<DeviceActionTypeModel>> call, @NonNull Response<ListResultModel<DeviceActionTypeModel>> response) {
@@ -1275,7 +1271,6 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
             }
         });
     }
-
     //telemetry api
     @Override
     public void findTelemetryByApplicationHid(@NonNull FindTelemetryRequest request, @NonNull final PagingResultListener<TelemetryItemModel> listener) {
@@ -1625,15 +1620,17 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void downloadSoftwareReleaseFile(String hid, String token, final DownloadSoftwareReleaseFileListener listener) {
+
+
         mRestService.downloadSoftwareReleaseFile(hid, token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                final ResponseBody body = response.body();
+                String md5Checksum;
+                ResponseBody body = response.body();
                 Timber.d("downloadSoftwareReleaseFile");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                    InputStream inputStream = new BufferedInputStream(body.byteStream());
                     try {
-                        InputStream inputStream = new BufferedInputStream(body.byteStream());
-                        String md5Checksum;
                         md5Checksum = Utils.getMD5(inputStream);
 
                         byte[] buffer = new byte[1024];
