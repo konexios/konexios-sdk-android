@@ -18,6 +18,7 @@ import com.arrow.acn.api.listeners.CheckinGatewayListener;
 import com.arrow.acn.api.listeners.CommonRequestListener;
 import com.arrow.acn.api.listeners.ConnectionListener;
 import com.arrow.acn.api.listeners.DeleteDeviceActionListener;
+import com.arrow.acn.api.listeners.DownloadSoftwareReleaseFileListener;
 import com.arrow.acn.api.listeners.FindDeviceListener;
 import com.arrow.acn.api.listeners.FindDeviceStateListener;
 import com.arrow.acn.api.listeners.FindGatewayListener;
@@ -581,7 +582,7 @@ public interface AcnApiService {
 
     /**
      *  Check rights to use firmware.
-     * @param softwareReleaseHid
+     * @param softwareReleaseHid - software release hid
      * @param listener - listener interface implementation, should be not null
      */
     void requireRightToUseFirmware(String softwareReleaseHid, MessageStatusListener listener);
@@ -589,9 +590,47 @@ public interface AcnApiService {
     // Software Release Schedule ApI
 
     /**
-     *
+     * Create and start new software release schedule.
      * @param request
-     * @param listener
+     * @param listener - listener interface implementation, should be not null
      */
     void createAndStartNewSoftwareReleaseSchedule(CreateAndStartSoftwareReleaseScheduleRequest request, CommonRequestListener listener);
+
+    // Software Release Trans Api
+
+    /**
+     * Mark software release transaction failed.
+     * @param hid - job hid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void markSoftwareReleaseTransFailed(String hid, MessageStatusListener listener);
+
+    /**
+     * Mark software release transaction received.
+     * @param hid - job hid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void markSoftwareReleaseTransReceived(String hid, MessageStatusListener listener);
+
+    /**
+     * Mark software release transaction succeeded.
+     * @param hid - job hid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void markSoftwareReleaseTransSucceeded(String hid, MessageStatusListener listener);
+
+    /**
+     * Start software release transaction.
+     * @param hid - job hid
+     * @param listener - listener interface implementation, should be not null
+     */
+    void startSoftwareReleaseTrans(String hid, MessageStatusListener listener);
+
+    /**
+     * Download software release file and return received file as byte array in success listener case.
+     * @param hid - job hid
+     * @param token - token from event
+     * @param listener - listener interface implementation, should be not null
+     */
+    void downloadSoftwareReleaseFile(String hid, String token, DownloadSoftwareReleaseFileListener listener);
 }
