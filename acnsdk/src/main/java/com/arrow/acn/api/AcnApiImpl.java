@@ -1620,8 +1620,6 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void downloadSoftwareReleaseFile(String hid, String token, final DownloadSoftwareReleaseFileListener listener) {
-
-
         mRestService.downloadSoftwareReleaseFile(hid, token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

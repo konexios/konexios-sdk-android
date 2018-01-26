@@ -627,7 +627,7 @@ public interface AcnApiService {
     void startSoftwareReleaseTrans(String hid, MessageStatusListener listener);
 
     /**
-     * Download software release file.
+     * Download software release file and return received file as byte array in listener success case.
      * @param hid - job hid
      * @param token - token from event
      * @param listener - listener interface implementation, should be not null
