@@ -13,6 +13,8 @@ package com.arrow.acn.api.common;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -21,7 +23,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import timber.log.Timber;
 
-final class Utils {
+final public class Utils {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     @Nullable
@@ -65,5 +67,35 @@ final class Utils {
             Timber.e(e);
         }
         return "";
+    }
+
+    @NonNull
+    public static String getMD5(@NonNull InputStream is) throws IOException {
+        String md5 = "";
+
+        try {
+            byte[] bytes = new byte[4096];
+            int read = 0;
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+
+            while ((read = is.read(bytes)) != -1) {
+                digest.update(bytes, 0, read);
+            }
+
+            byte[] messageDigest = digest.digest();
+
+            StringBuilder sb = new StringBuilder(32);
+
+            for (byte b : messageDigest) {
+                sb.append(hexArray[(b >> 4) & 0x0f]);
+                sb.append(hexArray[b & 0x0f]);
+            }
+
+            md5 = sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return md5;
     }
 }
