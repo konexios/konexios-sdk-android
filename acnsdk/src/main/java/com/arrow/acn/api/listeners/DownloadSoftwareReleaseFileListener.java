@@ -17,12 +17,6 @@ import com.arrow.acn.api.models.ApiError;
  */
 
 public interface DownloadSoftwareReleaseFileListener {
-
-    /**
-     * Call if request for downloading file was successfully done.
-     * @param bytes - byte array that represent received file from response body
-     * @param md5 - checksum for received file
-     */
     void onDownloadSoftwareReleaseFileListenerSuccess(byte[] bytes, String md5);
 
     void onDownloadSoftwareReleaseFileListenerError(ApiError apiError);
