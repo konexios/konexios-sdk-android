@@ -46,6 +46,7 @@ import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.RequestedFirmwareResponse;
+import com.arrow.acn.api.models.SocialEventDevice;
 import com.arrow.acn.api.models.StateModel;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
@@ -62,6 +63,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import rx.Observable;
 
 /**
  * main retrofit service
@@ -392,4 +394,8 @@ public interface IotConnectAPIService {
     @NonNull
     @GET ("/api/v1/kronos/software/releases/transactions/{hid}/{token}/file")
     Call<ResponseBody> downloadSoftwareReleaseFile(@Path("hid") String hid, @Path("token") String token);
+
+    @NonNull
+    @POST("/api/v1/kronos/social/event/devices/device/type/simba-pro ")
+    Observable<List<SocialEventDevice>> getSocialEventDevices();
 }
