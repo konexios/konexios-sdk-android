@@ -62,11 +62,14 @@ import com.arrow.acn.api.models.NewDeviceStateTransactionRequest;
 import com.arrow.acn.api.models.NodeModel;
 import com.arrow.acn.api.models.NodeRegistrationModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
+import com.arrow.acn.api.models.SocialEventDevice;
 import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryItemModel;
 import com.arrow.acn.api.models.TelemetryModel;
 
 import java.util.List;
+
+import rx.Observable;
 
 /**
  * Created by osminin on 6/17/2016.
@@ -633,4 +636,6 @@ public interface AcnApiService {
      * @param listener - listener interface implementation, should be not null
      */
     void downloadSoftwareReleaseFile(String hid, String token, DownloadSoftwareReleaseFileListener listener);
+
+    Observable<List<SocialEventDevice>> getSocialEventDevices();
 }

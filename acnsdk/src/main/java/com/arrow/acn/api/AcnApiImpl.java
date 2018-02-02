@@ -81,6 +81,7 @@ import com.arrow.acn.api.models.NodeTypeModel;
 import com.arrow.acn.api.models.NodeTypeRegistrationModel;
 import com.arrow.acn.api.models.PagingResultModel;
 import com.arrow.acn.api.models.RequestedFirmwareResponse;
+import com.arrow.acn.api.models.SocialEventDevice;
 import com.arrow.acn.api.models.TelemetryCountRequest;
 import com.arrow.acn.api.models.TelemetryCountResponse;
 import com.arrow.acn.api.models.TelemetryItemModel;
@@ -98,6 +99,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 import timber.log.Timber;
 
 import static com.arrow.acn.api.models.ApiError.COMMON_ERROR_CODE;
@@ -1672,4 +1674,8 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
         });
     }
 
+    @Override
+    public Observable<List<SocialEventDevice>> getSocialEventDevices() {
+        return mRestService.getSocialEventDevices();
+    }
 }

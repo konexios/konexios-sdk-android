@@ -61,6 +61,11 @@ dependencies {
     compile 'com.madgag.spongycastle:prov:1.54.0.0'
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
 
+    //RxJava
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
+
     testCompile 'junit:junit:4.12'
     androidTestCompile('uk.co.jemos.podam:podam:7.0.5.RELEASE', {
         exclude group: 'javax.annotation', module: 'jsr250-api'
