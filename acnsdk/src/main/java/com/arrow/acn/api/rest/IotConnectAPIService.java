@@ -396,6 +396,6 @@ public interface IotConnectAPIService {
     Call<ResponseBody> downloadSoftwareReleaseFile(@Path("hid") String hid, @Path("token") String token);
 
     @NonNull
-    @POST("/api/v1/kronos/social/event/devices/device/type/simba-pro ")
+    @GET("/api/v1/kronos/social/event/devices/device/type/simba-pro ")
     Observable<List<SocialEventDevice>> getSocialEventDevices();
 }
