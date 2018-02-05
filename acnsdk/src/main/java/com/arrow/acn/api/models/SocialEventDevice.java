@@ -13,6 +13,10 @@ package com.arrow.acn.api.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -23,7 +27,7 @@ public class SocialEventDevice implements Parcelable {
     private String hid;
     @SerializedName("links")
     @Expose
-    private String links;
+    private JsonElement links;
     @SerializedName("pinCode")
     @Expose
     private String pinCode;
@@ -54,11 +58,14 @@ public class SocialEventDevice implements Parcelable {
         this.hid = hid;
     }
 
-    public String getLinks() {
+    public JsonElement getLinks() {
+        if (links == null) {
+            links = new JsonObject();
+        }
         return links;
     }
 
-    public void setLinks(String links) {
+    public void setLinks(JsonElement links) {
         this.links = links;
     }
 
@@ -121,7 +128,8 @@ public class SocialEventDevice implements Parcelable {
 
     protected SocialEventDevice(Parcel in) {
         hid = in.readString();
-        links = in.readString();
+        JsonParser parser = new JsonParser();
+        links = parser.parse(in.readString()).getAsJsonObject();
         pinCode = in.readString();
         macAddress = in.readString();
         deviceTypeHid = in.readString();
@@ -139,7 +147,8 @@ public class SocialEventDevice implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(hid);
-        dest.writeString(links);
+        String str = new Gson().toJson(getLinks());
+        dest.writeString(str);
         dest.writeString(pinCode);
         dest.writeString(macAddress);
         dest.writeString(deviceTypeHid);
