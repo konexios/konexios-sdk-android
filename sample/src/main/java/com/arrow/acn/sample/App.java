@@ -10,7 +10,7 @@
 
 package com.arrow.acn.sample;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
 import com.arrow.acn.api.AcnApi;
 import com.arrow.acn.api.AcnApiService;
@@ -19,14 +19,14 @@ import com.arrow.acn.api.AcnApiService;
  * Created by osminin on 4/20/2017.
  */
 
-public final class App extends Application {
+public final class App extends MultiDexApplication {
     // DEV
-    public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:12001";
+    public static final String BASE_IOT_CONNECT_URL_DEV = "http://pgsdev01.arrowconnect.io:11003";
     //TODO: define ApiKey and ApiSecret variables in gradle.properties file
     public static final String DEFAULT_API_KEY = BuildConfig.API_KEY;
     public static final String DEFAULT_API_SECRET = BuildConfig.API_SECRET;
-    public static final String MQTT_CONNECT_URL_DEV = "tcp://pgsdev01.arrowconnect.io:1883";
-    public static final String MQTT_CLIENT_PREFIX_DEV = "/themis.dev";
+    public static final String MQTT_CONNECT_URL_DEV = "ssl://mqtt-a01.arrowconnect.io";
+    public static final String MQTT_CLIENT_PREFIX_DEV = "/pegasus";
 
     private static AcnApiService mAcnApiService;
 
