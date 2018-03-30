@@ -121,28 +121,20 @@ public class DeviceRegistrationModel implements Parcelable {
     @SerializedName("userHid")
     @Expose
     private String userHid;
+    /**
+     * device firmware info
+     */
+    @SerializedName("softwareName")
+    @Expose
+    private String softwareName;
+    @SerializedName("softwareVersion")
+    @Expose
+    private String softwareVersion;
 
     public DeviceRegistrationModel() {
     }
 
-    protected DeviceRegistrationModel(@NonNull Parcel in) {
-        enabled = in.readByte() != 0x00;
-        gatewayHid = in.readString();
-        JsonParser parser = new JsonParser();
-        info = parser.parse(in.readString()).getAsJsonObject();
-        name = in.readString();
-        nodeHid = in.readString();
-        properties = parser.parse(in.readString()).getAsJsonObject();
-        if (in.readByte() == 0x01) {
-            tags = new ArrayList<>();
-            in.readList(tags, String.class.getClassLoader());
-        } else {
-            tags = null;
-        }
-        type = in.readString();
-        uid = in.readString();
-        userHid = in.readString();
-    }
+
 
     /**
      * @return The enabled
@@ -291,6 +283,34 @@ public class DeviceRegistrationModel implements Parcelable {
         this.userHid = userHid;
     }
 
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    protected DeviceRegistrationModel(@NonNull Parcel in) {
+        enabled = in.readByte() != 0x00;
+        gatewayHid = in.readString();
+        JsonParser parser = new JsonParser();
+        info = parser.parse(in.readString()).getAsJsonObject();
+        name = in.readString();
+        nodeHid = in.readString();
+        properties = parser.parse(in.readString()).getAsJsonObject();
+        if (in.readByte() == 0x01) {
+            tags = new ArrayList<>();
+            in.readList(tags, String.class.getClassLoader());
+        } else {
+            tags = null;
+        }
+        type = in.readString();
+        uid = in.readString();
+        userHid = in.readString();
+        softwareName = in.readString();
+        softwareVersion = in.readString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -301,15 +321,18 @@ public class DeviceRegistrationModel implements Parcelable {
         if (enabled != that.enabled) return false;
         if (gatewayHid != null ? !gatewayHid.equals(that.gatewayHid) : that.gatewayHid != null)
             return false;
-        if (!getInfo().equals(that.getInfo())) return false;
+        if (info != null ? !info.equals(that.info) : that.info != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (nodeHid != null ? !nodeHid.equals(that.nodeHid) : that.nodeHid != null) return false;
-        if (!getProperties().equals(that.getProperties())) return false;
+        if (properties != null ? !properties.equals(that.properties) : that.properties != null)
+            return false;
         if (tags != null ? !tags.equals(that.tags) : that.tags != null) return false;
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (uid != null ? !uid.equals(that.uid) : that.uid != null) return false;
-        return userHid != null ? userHid.equals(that.userHid) : that.userHid == null;
-
+        if (userHid != null ? !userHid.equals(that.userHid) : that.userHid != null) return false;
+        if (softwareName != null ? !softwareName.equals(that.softwareName) : that.softwareName != null)
+            return false;
+        return softwareVersion != null ? softwareVersion.equals(that.softwareVersion) : that.softwareVersion == null;
     }
 
     @Override
@@ -324,15 +347,10 @@ public class DeviceRegistrationModel implements Parcelable {
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (uid != null ? uid.hashCode() : 0);
         result = 31 * result + (userHid != null ? userHid.hashCode() : 0);
+        result = 31 * result + (softwareName != null ? softwareName.hashCode() : 0);
+        result = 31 * result + (softwareVersion != null ? softwareVersion.hashCode() : 0);
         return result;
     }
-
-    @Override
-
-    public int describeContents() {
-        return 0;
-    }
-
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
@@ -353,5 +371,8 @@ public class DeviceRegistrationModel implements Parcelable {
         dest.writeString(type);
         dest.writeString(uid);
         dest.writeString(userHid);
+        dest.writeString(softwareName);
+        dest.writeString(softwareVersion);
     }
+
 }
