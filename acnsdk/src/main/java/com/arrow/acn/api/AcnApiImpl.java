@@ -742,7 +742,7 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getAvailableFirmwareForGatewayByHid(String hid, final AvailableFirmwareVersionListener listener) {
-        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
+        mRestService.getAvailableFirmwareForGatewayByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<FirmwareVersionModel>> call, Response<ListResultModel<FirmwareVersionModel>> response) {
                 Timber.d("getAvailableFirmwareForGatewayByHid response");
@@ -750,14 +750,18 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                     listener.onAvailableFirmwareVersionSuccess(response.body().getData());
                 } else {
                     Timber.e("getAvailableFirmwareForGatewayByHid error");
-                    listener.onAvailableFirmwareVersionFailure(mRetrofitHolder.convertToApiError(response));
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
+                    error.setMessage("onResponseError");
+                    listener.onAvailableFirmwareVersionFailure(error);
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<FirmwareVersionModel>> call, Throwable t) {
                 Timber.e("getAvailableFirmwareForGatewayByHid error");
-                listener.onAvailableFirmwareVersionFailure(ErrorUtils.parseError(t));
+                ApiError error = ErrorUtils.parseError(t);
+                error.setMessage(t.getMessage());
+                listener.onAvailableFirmwareVersionFailure(error);
             }
         });
     }
@@ -908,22 +912,27 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getAvailableFirmwareForDeviceByHid(String hid, final AvailableFirmwareVersionListener listener) {
-        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
+        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<List<FirmwareVersionModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<FirmwareVersionModel>> call, Response<ListResultModel<FirmwareVersionModel>> response) {
+            public void onResponse(Call<List<FirmwareVersionModel>> call, Response<List<FirmwareVersionModel>> response) {
                 Timber.d("getAvailableFirmwareForDeviceByHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onAvailableFirmwareVersionSuccess(response.body().getData());
+                    listener.onAvailableFirmwareVersionSuccess(response.body());
                 } else {
                     Timber.e("getAvailableFirmwareForDeviceByHid error");
-                    listener.onAvailableFirmwareVersionFailure(mRetrofitHolder.convertToApiError(response));
+                    Timber.e("getAvailableFirmwareForGatewayByHid error");
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
+                    error.setMessage("onResponseError");
+                    listener.onAvailableFirmwareVersionFailure(error);
                 }
             }
 
             @Override
-            public void onFailure(Call<ListResultModel<FirmwareVersionModel>> call, Throwable t) {
+            public void onFailure(Call<List<FirmwareVersionModel>> call, Throwable t) {
                 Timber.e("getAvailableFirmwareForDeviceByHid error");
-                listener.onAvailableFirmwareVersionFailure(ErrorUtils.parseError(t));
+                ApiError error = ErrorUtils.parseError(t);
+                error.setMessage(t.getMessage());
+                listener.onAvailableFirmwareVersionFailure(error);
             }
         });
     }

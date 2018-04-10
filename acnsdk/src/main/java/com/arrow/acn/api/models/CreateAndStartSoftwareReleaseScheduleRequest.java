@@ -14,7 +14,7 @@ import java.util.List;
 public class CreateAndStartSoftwareReleaseScheduleRequest implements Parcelable {
 
     @SerializedName("deviceCategory")
-    private String deviceCategory;
+    private String deviceCategory = "GATEWAY";
 
     @SerializedName("objectHids")
     private List<String> objectHids;
@@ -25,7 +25,7 @@ public class CreateAndStartSoftwareReleaseScheduleRequest implements Parcelable 
     @SerializedName("userHid")
     private String userHid;
 
-    protected CreateAndStartSoftwareReleaseScheduleRequest(Parcel in) {
+    public CreateAndStartSoftwareReleaseScheduleRequest(Parcel in) {
         deviceCategory = in.readString();
         objectHids = in.createStringArrayList();
         softwareReleaseHid = in.readString();

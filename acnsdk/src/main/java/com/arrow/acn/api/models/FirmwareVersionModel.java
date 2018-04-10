@@ -10,14 +10,14 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class FirmwareVersionModel implements Parcelable {
-    @SerializedName("softwareReleaseHid")
-    private String softwareReleaseHid;
+    @SerializedName("softwareReleaseHID")
+    private String softwareReleaseHID;
 
     @SerializedName("softwareReleaseName")
     private String softwareReleaseName;
 
     protected FirmwareVersionModel(Parcel in) {
-        softwareReleaseHid = in.readString();
+        softwareReleaseHID = in.readString();
         softwareReleaseName = in.readString();
     }
 
@@ -40,7 +40,7 @@ public class FirmwareVersionModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel aParcel, int aI) {
-        aParcel.writeString(softwareReleaseHid);
+        aParcel.writeString(softwareReleaseHID);
         aParcel.writeString(softwareReleaseName);
     }
 
@@ -51,24 +51,24 @@ public class FirmwareVersionModel implements Parcelable {
 
         FirmwareVersionModel that = (FirmwareVersionModel) aO;
 
-        if (softwareReleaseHid != null ? !softwareReleaseHid.equals(that.softwareReleaseHid) : that.softwareReleaseHid != null)
+        if (softwareReleaseHID != null ? !softwareReleaseHID.equals(that.softwareReleaseHID) : that.softwareReleaseHID != null)
             return false;
         return softwareReleaseName != null ? softwareReleaseName.equals(that.softwareReleaseName) : that.softwareReleaseName == null;
     }
 
     @Override
     public int hashCode() {
-        int result = softwareReleaseHid != null ? softwareReleaseHid.hashCode() : 0;
+        int result = softwareReleaseHID != null ? softwareReleaseHID.hashCode() : 0;
         result = 31 * result + (softwareReleaseName != null ? softwareReleaseName.hashCode() : 0);
         return result;
     }
 
-    public String getSoftwareReleaseHid() {
-        return softwareReleaseHid;
+    public String getSoftwareReleaseHID() {
+        return softwareReleaseHID;
     }
 
-    public void setSoftwareReleaseHid(String aSoftwareReleaseHid) {
-        softwareReleaseHid = aSoftwareReleaseHid;
+    public void setSoftwareReleaseHID(String aSoftwareReleaseHid) {
+        softwareReleaseHID = aSoftwareReleaseHid;
     }
 
     public String getSoftwareReleaseName() {

@@ -277,7 +277,7 @@ public interface IotConnectAPIService {
                                                                @Query("_size") int size);
     @NonNull
     @GET("/api/v1/kronos/devices/{hid}/firmware/available")
-    Call<ListResultModel<FirmwareVersionModel>> getAvailableFirmwareForDeviceByHid(@Path("hid") String hid);
+    Call<List<FirmwareVersionModel>> getAvailableFirmwareForDeviceByHid(@Path("hid") String hid);
 
     //node api
 
