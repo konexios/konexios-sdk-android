@@ -377,7 +377,8 @@ public interface IotConnectAPIService {
 
     @NonNull
     @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/failed")
-    Call<MessageStatusResponse> markSoftwareReleaseTransFailed(@Path("hid") String hid);
+    Call<MessageStatusResponse> markSoftwareReleaseTransFailed(@Path("hid") String hid,
+                                                               @Body ErrorBodyModel model);
 
     @NonNull
     @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/received")

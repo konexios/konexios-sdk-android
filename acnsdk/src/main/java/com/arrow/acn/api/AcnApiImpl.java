@@ -1542,8 +1542,10 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     // Software Release Trans Api
 
     @Override
-    public void markSoftwareReleaseTransFailed(String hid, final MessageStatusListener listener) {
-        mRestService.markSoftwareReleaseTransFailed(hid).enqueue(new Callback<MessageStatusResponse>() {
+    public void markSoftwareReleaseTransFailed(String hid, String errorMessage, final MessageStatusListener listener) {
+        ErrorBodyModel error = new ErrorBodyModel();
+        error.setError(errorMessage);
+        mRestService.markSoftwareReleaseTransFailed(hid, error).enqueue(new Callback<MessageStatusResponse>() {
             @Override
             public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
                 Timber.d("markSoftwareReleaseTransFailed");
