@@ -17,7 +17,7 @@ public class CreateAndStartSoftwareReleaseScheduleRequest implements Parcelable 
     private String deviceCategory = "GATEWAY";
 
     @SerializedName("objectHids")
-    private List<String> objectHids;
+    private String[] objectHids;
 
     @SerializedName("softwareReleaseHid")
     private String softwareReleaseHid;
@@ -25,17 +25,20 @@ public class CreateAndStartSoftwareReleaseScheduleRequest implements Parcelable 
     @SerializedName("userHid")
     private String userHid;
 
-    public CreateAndStartSoftwareReleaseScheduleRequest(Parcel in) {
+    private CreateAndStartSoftwareReleaseScheduleRequest(Parcel in) {
         deviceCategory = in.readString();
-        objectHids = in.createStringArrayList();
+        objectHids = in.createStringArray();
         softwareReleaseHid = in.readString();
         userHid = in.readString();
+    }
+
+    public CreateAndStartSoftwareReleaseScheduleRequest(){
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(deviceCategory);
-        dest.writeStringList(objectHids);
+        dest.writeStringArray(objectHids);
         dest.writeString(softwareReleaseHid);
         dest.writeString(userHid);
     }
@@ -66,11 +69,11 @@ public class CreateAndStartSoftwareReleaseScheduleRequest implements Parcelable 
         deviceCategory = aDeviceCategory;
     }
 
-    public List<String> getObjectHids() {
+    public String[] getObjectHids() {
         return objectHids;
     }
 
-    public void setObjectHids(List<String> aObjectHids) {
+    public void setObjectHids(String[] aObjectHids) {
         objectHids = aObjectHids;
     }
 
