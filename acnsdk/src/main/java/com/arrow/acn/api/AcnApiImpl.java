@@ -919,8 +919,8 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     listener.onAvailableFirmwareVersionSuccess(response.body());
                 } else {
-                    Timber.e("getAvailableFirmwareForDeviceByHid error");
-                    Timber.e("getAvailableFirmwareForGatewayByHid error");
+                    Timber.e("getAvailableFirmwareForDeviceByHid error HTTP code:" + response.code());
+                    Timber.e("getAvailableFirmwareForDeviceByHid error code: " + response.body());
                     ApiError error = mRetrofitHolder.convertToApiError(response);
                     error.setMessage("onResponseError");
                     listener.onAvailableFirmwareVersionFailure(error);
@@ -1655,12 +1655,14 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                         } catch (IOException | RuntimeException e) {
                             error = true;
                             e.printStackTrace();
+                            listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
                             throw e;
                         } finally {
                             try {
                                 inputStream.close();
                             } catch (IOException e) {
                                 if (!error) throw e;
+                                listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
                             }
                         }
                         output.flush();
