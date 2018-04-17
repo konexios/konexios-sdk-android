@@ -606,7 +606,7 @@ public interface AcnApiService {
      * @param hid - job hid
      * @param listener - listener interface implementation, should be not null
      */
-    void markSoftwareReleaseTransFailed(String hid, MessageStatusListener listener);
+    void markSoftwareReleaseTransFailed(String hid, String errorMessage, MessageStatusListener listener);
 
     /**
      * Mark software release transaction received.
