@@ -98,4 +98,27 @@ final public class Utils {
 
         return md5;
     }
+
+    @NonNull
+    public static String getMD5(@NonNull byte[] bytes) throws IOException {
+        String md5 = "";
+
+        try {
+
+            byte[] messageDigest = MessageDigest.getInstance("MD5").digest(bytes);
+
+            StringBuilder sb = new StringBuilder(32);
+
+            for (byte b : messageDigest) {
+                sb.append(hexArray[(b >> 4) & 0x0f]);
+                sb.append(hexArray[b & 0x0f]);
+            }
+
+            md5 = sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return md5;
+    }
 }

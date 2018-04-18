@@ -921,6 +921,7 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                 } else {
                     Timber.e("getAvailableFirmwareForDeviceByHid error HTTP code:" + response.code());
                     Timber.e("getAvailableFirmwareForDeviceByHid error code: " + response.body());
+                    Timber.e("getAvailableFirmwareForDeviceByHid error HTTP message: " + response.message());
                     ApiError error = mRetrofitHolder.convertToApiError(response);
                     error.setMessage("onResponseError");
                     listener.onAvailableFirmwareVersionFailure(error);
@@ -1640,34 +1641,9 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                 ResponseBody body = response.body();
                 Timber.d("downloadSoftwareReleaseFile");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    InputStream inputStream = new BufferedInputStream(body.byteStream());
                     try {
-                        md5Checksum = Utils.getMD5(inputStream);
-
-                        byte[] buffer = new byte[1024];
-                        ByteArrayOutputStream output = new ByteArrayOutputStream();
-                        boolean error = false;
-                        try {
-                            int numRead;
-                            while ((numRead = inputStream.read(buffer)) > -1) {
-                                output.write(buffer, 0, numRead);
-                            }
-                        } catch (IOException | RuntimeException e) {
-                            error = true;
-                            e.printStackTrace();
-                            listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
-                            throw e;
-                        } finally {
-                            try {
-                                inputStream.close();
-                            } catch (IOException e) {
-                                if (!error) throw e;
-                                listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
-                            }
-                        }
-                        output.flush();
-                        byte[] bytes = output.toByteArray();
-
+                        byte[] bytes = body.bytes();
+                        md5Checksum = Utils.getMD5(bytes);
                         listener.onDownloadSoftwareReleaseFileListenerSuccess(bytes, md5Checksum);
                     } catch (IOException aE) {
                         aE.printStackTrace();
