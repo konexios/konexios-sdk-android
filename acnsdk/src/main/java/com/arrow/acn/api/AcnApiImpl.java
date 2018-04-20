@@ -12,6 +12,7 @@ package com.arrow.acn.api;
 
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
@@ -94,6 +95,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -1637,6 +1639,12 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
         mRestService.downloadSoftwareReleaseFile(hid, token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Map<String, List<String>> map = response.headers().toMultimap();
+                List<String> list = map.get("content-length");
+                long fileLength = 0;
+                if (list != null) {
+                    fileLength = Long.parseLong(list.get(0));
+                }
                 String md5Checksum;
                 ResponseBody body = response.body();
                 Timber.d("downloadSoftwareReleaseFile");
@@ -1644,7 +1652,7 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                     try {
                         byte[] bytes = body.bytes();
                         md5Checksum = Utils.getMD5(bytes);
-                        listener.onDownloadSoftwareReleaseFileListenerSuccess(bytes, md5Checksum);
+                        listener.onDownloadSoftwareReleaseFileListenerSuccess(fileLength, bytes, md5Checksum);
                     } catch (IOException aE) {
                         aE.printStackTrace();
                         listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));
