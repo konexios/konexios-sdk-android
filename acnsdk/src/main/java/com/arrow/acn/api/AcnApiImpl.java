@@ -12,6 +12,7 @@ package com.arrow.acn.api;
 
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.arrow.acn.api.common.ErrorUtils;
 import com.arrow.acn.api.common.RetrofitHolder;
@@ -94,6 +95,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -742,7 +744,7 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getAvailableFirmwareForGatewayByHid(String hid, final AvailableFirmwareVersionListener listener) {
-        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
+        mRestService.getAvailableFirmwareForGatewayByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
             @Override
             public void onResponse(Call<ListResultModel<FirmwareVersionModel>> call, Response<ListResultModel<FirmwareVersionModel>> response) {
                 Timber.d("getAvailableFirmwareForGatewayByHid response");
@@ -750,14 +752,18 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
                     listener.onAvailableFirmwareVersionSuccess(response.body().getData());
                 } else {
                     Timber.e("getAvailableFirmwareForGatewayByHid error");
-                    listener.onAvailableFirmwareVersionFailure(mRetrofitHolder.convertToApiError(response));
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
+                    error.setMessage("onResponseError");
+                    listener.onAvailableFirmwareVersionFailure(error);
                 }
             }
 
             @Override
             public void onFailure(Call<ListResultModel<FirmwareVersionModel>> call, Throwable t) {
                 Timber.e("getAvailableFirmwareForGatewayByHid error");
-                listener.onAvailableFirmwareVersionFailure(ErrorUtils.parseError(t));
+                ApiError error = ErrorUtils.parseError(t);
+                error.setMessage(t.getMessage());
+                listener.onAvailableFirmwareVersionFailure(error);
             }
         });
     }
@@ -908,22 +914,28 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
 
     @Override
     public void getAvailableFirmwareForDeviceByHid(String hid, final AvailableFirmwareVersionListener listener) {
-        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<ListResultModel<FirmwareVersionModel>>() {
+        mRestService.getAvailableFirmwareForDeviceByHid(hid).enqueue(new Callback<List<FirmwareVersionModel>>() {
             @Override
-            public void onResponse(Call<ListResultModel<FirmwareVersionModel>> call, Response<ListResultModel<FirmwareVersionModel>> response) {
+            public void onResponse(Call<List<FirmwareVersionModel>> call, Response<List<FirmwareVersionModel>> response) {
                 Timber.d("getAvailableFirmwareForDeviceByHid response");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    listener.onAvailableFirmwareVersionSuccess(response.body().getData());
+                    listener.onAvailableFirmwareVersionSuccess(response.body());
                 } else {
-                    Timber.e("getAvailableFirmwareForDeviceByHid error");
-                    listener.onAvailableFirmwareVersionFailure(mRetrofitHolder.convertToApiError(response));
+                    Timber.e("getAvailableFirmwareForDeviceByHid error HTTP code:" + response.code());
+                    Timber.e("getAvailableFirmwareForDeviceByHid error code: " + response.body());
+                    Timber.e("getAvailableFirmwareForDeviceByHid error HTTP message: " + response.message());
+                    ApiError error = mRetrofitHolder.convertToApiError(response);
+                    error.setMessage("onResponseError");
+                    listener.onAvailableFirmwareVersionFailure(error);
                 }
             }
 
             @Override
-            public void onFailure(Call<ListResultModel<FirmwareVersionModel>> call, Throwable t) {
+            public void onFailure(Call<List<FirmwareVersionModel>> call, Throwable t) {
                 Timber.e("getAvailableFirmwareForDeviceByHid error");
-                listener.onAvailableFirmwareVersionFailure(ErrorUtils.parseError(t));
+                ApiError error = ErrorUtils.parseError(t);
+                error.setMessage(t.getMessage());
+                listener.onAvailableFirmwareVersionFailure(error);
             }
         });
     }
@@ -1533,8 +1545,10 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
     // Software Release Trans Api
 
     @Override
-    public void markSoftwareReleaseTransFailed(String hid, final MessageStatusListener listener) {
-        mRestService.markSoftwareReleaseTransFailed(hid).enqueue(new Callback<MessageStatusResponse>() {
+    public void markSoftwareReleaseTransFailed(String hid, String errorMessage, final MessageStatusListener listener) {
+        ErrorBodyModel error = new ErrorBodyModel();
+        error.setError(errorMessage);
+        mRestService.markSoftwareReleaseTransFailed(hid, error).enqueue(new Callback<MessageStatusResponse>() {
             @Override
             public void onResponse(Call<MessageStatusResponse> call, Response<MessageStatusResponse> response) {
                 Timber.d("markSoftwareReleaseTransFailed");
@@ -1625,37 +1639,20 @@ final class AcnApiImpl implements AcnApiService, SenderServiceArgsProvider {
         mRestService.downloadSoftwareReleaseFile(hid, token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Map<String, List<String>> map = response.headers().toMultimap();
+                List<String> list = map.get("content-length");
+                long fileLength = 0;
+                if (list != null) {
+                    fileLength = Long.parseLong(list.get(0));
+                }
                 String md5Checksum;
                 ResponseBody body = response.body();
                 Timber.d("downloadSoftwareReleaseFile");
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                    InputStream inputStream = new BufferedInputStream(body.byteStream());
                     try {
-                        md5Checksum = Utils.getMD5(inputStream);
-
-                        byte[] buffer = new byte[1024];
-                        ByteArrayOutputStream output = new ByteArrayOutputStream();
-                        boolean error = false;
-                        try {
-                            int numRead;
-                            while ((numRead = inputStream.read(buffer)) > -1) {
-                                output.write(buffer, 0, numRead);
-                            }
-                        } catch (IOException | RuntimeException e) {
-                            error = true;
-                            e.printStackTrace();
-                            throw e;
-                        } finally {
-                            try {
-                                inputStream.close();
-                            } catch (IOException e) {
-                                if (!error) throw e;
-                            }
-                        }
-                        output.flush();
-                        byte[] bytes = output.toByteArray();
-
-                        listener.onDownloadSoftwareReleaseFileListenerSuccess(bytes, md5Checksum);
+                        byte[] bytes = body.bytes();
+                        md5Checksum = Utils.getMD5(bytes);
+                        listener.onDownloadSoftwareReleaseFileListenerSuccess(fileLength, bytes, md5Checksum);
                     } catch (IOException aE) {
                         aE.printStackTrace();
                         listener.onDownloadSoftwareReleaseFileListenerError(mRetrofitHolder.convertToApiError(response));

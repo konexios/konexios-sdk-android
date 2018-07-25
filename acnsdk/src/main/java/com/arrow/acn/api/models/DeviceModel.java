@@ -60,6 +60,15 @@ public class DeviceModel implements Parcelable {
     @Expose
     private String hid;
     /**
+     * device firmware info
+     */
+    @SerializedName("softwareName")
+    @Expose
+    private String softwareName;
+    @SerializedName("softwareVersion")
+    @Expose
+    private String softwareVersion;
+    /**
      * device info Json string like:
      *
      * {
@@ -128,6 +137,8 @@ public class DeviceModel implements Parcelable {
         enabled = in.readByte() != 0x00;
         gatewayHid = in.readString();
         hid = in.readString();
+        softwareName = in.readString();
+        softwareVersion = in.readString();
         name = in.readString();
         pri = in.readString();
         type = in.readString();
@@ -145,6 +156,8 @@ public class DeviceModel implements Parcelable {
         dest.writeByte((byte) (enabled ? 0x01 : 0x00));
         dest.writeString(gatewayHid);
         dest.writeString(hid);
+        dest.writeString(softwareName);
+        dest.writeString(softwareVersion);
         dest.writeString(name);
         dest.writeString(pri);
         dest.writeString(type);
@@ -157,6 +170,22 @@ public class DeviceModel implements Parcelable {
         dest.writeString(str);
         str = gson.toJson(getProperties());
         dest.writeString(str);
+    }
+
+    public String getSoftwareName() {
+        return softwareName;
+    }
+
+    public void setSoftwareName(String softwareName) {
+        this.softwareName = softwareName;
+    }
+
+    public String getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public void setSoftwareVersion(String softwareVersion) {
+        this.softwareVersion = softwareVersion;
     }
 
     /**
@@ -344,6 +373,8 @@ public class DeviceModel implements Parcelable {
             return false;
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (uid != null ? !uid.equals(that.uid) : that.uid != null) return false;
+        if (softwareName != null ? !softwareName.equals(that.softwareName) : that.softwareName != null) return false;
+        if (softwareVersion != null ? !softwareVersion.equals(that.softwareVersion) : that.softwareVersion != null) return false;
         return userHid != null ? userHid.equals(that.userHid) : that.userHid == null;
 
     }
@@ -362,6 +393,8 @@ public class DeviceModel implements Parcelable {
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (uid != null ? uid.hashCode() : 0);
         result = 31 * result + (userHid != null ? userHid.hashCode() : 0);
+        result = 31 * result + (softwareName != null ? softwareName.hashCode() : 0);
+        result = 31 * result + (softwareVersion != null ? softwareVersion.hashCode() : 0);
         return result;
     }
 }

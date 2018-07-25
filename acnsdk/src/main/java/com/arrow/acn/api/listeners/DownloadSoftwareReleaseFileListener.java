@@ -22,7 +22,7 @@ public interface DownloadSoftwareReleaseFileListener {
      * @param bytes - received file as byte array
      * @param md5 - checksum for received file
      */
-    void onDownloadSoftwareReleaseFileListenerSuccess(byte[] bytes, String md5);
+    void onDownloadSoftwareReleaseFileListenerSuccess(long fileLength,byte[] bytes, String md5);
 
     /**
      * Call on failure

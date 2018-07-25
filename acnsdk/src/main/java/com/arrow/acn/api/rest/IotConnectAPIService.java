@@ -277,7 +277,7 @@ public interface IotConnectAPIService {
                                                                @Query("_size") int size);
     @NonNull
     @GET("/api/v1/kronos/devices/{hid}/firmware/available")
-    Call<ListResultModel<FirmwareVersionModel>> getAvailableFirmwareForDeviceByHid(@Path("hid") String hid);
+    Call<List<FirmwareVersionModel>> getAvailableFirmwareForDeviceByHid(@Path("hid") String hid);
 
     //node api
 
@@ -377,7 +377,8 @@ public interface IotConnectAPIService {
 
     @NonNull
     @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/failed")
-    Call<MessageStatusResponse> markSoftwareReleaseTransFailed(@Path("hid") String hid);
+    Call<MessageStatusResponse> markSoftwareReleaseTransFailed(@Path("hid") String hid,
+                                                               @Body ErrorBodyModel model);
 
     @NonNull
     @PUT ("/api/v1/kronos/software/releases/transactions/{hid}/received")
