@@ -213,7 +213,7 @@ public abstract class AbstractMqttAcnApiService extends AbstractTelemetrySenderS
     }
 
     protected String getClientId() {
-        return MqttClient.generateClientId();
+        return mGatewayId;
     }
 
     @NonNull
