@@ -1,5 +1,5 @@
-# AcnSDK #
-Arrow Connect SDK for Android
+# KonexiosSDK #
+Konexios SDK for Android
 
 ### Add AcnSDK to Project ###
 
