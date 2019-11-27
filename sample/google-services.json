@@ -1,70 +1,45 @@
 {
   "project_info": {
-    "project_number": "621198320726",
-    "firebase_url": "https://kronos-gateway-for-android.firebaseio.com",
-    "project_id": "kronos-gateway-for-android",
-    "storage_bucket": "kronos-gateway-for-android.appspot.com"
+    "project_number": "693223326064",
+    "firebase_url": "https://konexios-sdk-android.firebaseio.com",
+    "project_id": "konexios-sdk-android",
+    "storage_bucket": "konexios-sdk-android.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:621198320726:android:7e680d8b1bd1d43c",
+        "mobilesdk_app_id": "1:693223326064:android:9bad9fa3e211be983d0fb5",
         "android_client_info": {
-          "package_name": "com.arrow.jmyiotgateway"
+          "package_name": "com.konexios.sample"
         }
       },
       "oauth_client": [
         {
-          "client_id": "621198320726-e5lbamaja50414rbbpk2gemnjoad0kfl.apps.googleusercontent.com",
+          "client_id": "693223326064-uoacfj4ddqhijq8h51dcb5tkr534snvu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.konexios.sample",
+            "certificate_hash": "2d3906312853f7d654e910c6b9c3b5cb9fd5c5e4"
+          }
+        },
+        {
+          "client_id": "693223326064-67ciehhb755upbcej273bj9fgv00bcvo.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAZaFYJDRIkDBgRa8XGZBvL8tbwSfJX9wM"
+          "current_key": "AIzaSyAWGBRobWGARrxTqN2kwi8zvDDiEmvXHng"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:621198320726:android:f0ee975464b0df91",
-        "android_client_info": {
-          "package_name": "com.arrow.acn.sample"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "621198320726-e5lbamaja50414rbbpk2gemnjoad0kfl.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAZaFYJDRIkDBgRa8XGZBvL8tbwSfJX9wM"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "693223326064-67ciehhb755upbcej273bj9fgv00bcvo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

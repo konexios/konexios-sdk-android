@@ -11,7 +11,7 @@ maven { url "https://dl.bintray.com/arrow-acs/acn-sdk/" }
 grab via Maven:
 ```xml
 <dependency> 
-    <groupId>com.arrow.acn.api</groupId>
+    <groupId>com.konexios.api</groupId>
     <artifactId>acnsdk</artifactId>
     <version>1.0.0</version>
     <type>pom</type>
@@ -19,7 +19,7 @@ grab via Maven:
 ```
 or Gradle:
 ```groovy
-compile 'com.arrow.acn.api:acnsdk:0.9.3'
+compile 'com.konexios.api:acnsdk:0.9.3'
 ```
 ### Create new instance of sdk ###
 
