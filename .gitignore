@@ -5,3 +5,4 @@ local.properties
 *.iml
 sample/.DS_Store
 .DS_Store
+sample/google-services.json
