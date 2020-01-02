@@ -28,7 +28,7 @@ android {
             minifyEnabled false
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
         }
         each {
         }
@@ -73,6 +73,6 @@ dependencies {
 
     implementation 'junit:junit:4.12'
     androidTestImplementation('uk.co.jemos.podam:podam:7.2.3.RELEASE', {
-        exclude group: 'javax.annotation', module: 'jsr250-com.konexios.api'
+        exclude group: 'javax.annotation', module: 'jsr250-api'
     })
 }

@@ -24,8 +24,8 @@ public final class Constants {
         String X_ARROW_VERSION_2 = "2";
 
         String DEFAULT_ADMIN_API_URL = "https://admin-api.konexios.io";
-        String DEFAULT_GATEWAY_API_URL = "https://api.konexios.io";
-        String DEFAULT_MQTT_URL = "ssl://mqtt.konexios.io";
+        String DEFAULT_GATEWAY_API_URL = "https://api-helios.konexios.io";
+        String DEFAULT_MQTT_URL = "ssl://mqtt-helios.konexios.io";
         String DEFAULT_MQTT_VIRTUAL_HOST = "/pegasus";
     }
 

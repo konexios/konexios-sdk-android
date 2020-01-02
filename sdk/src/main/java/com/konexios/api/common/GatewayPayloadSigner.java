@@ -19,6 +19,7 @@ import java.util.List;
 import timber.log.Timber;
 
 import static com.konexios.api.Constants.Api.X_ARROW_VERSION_1;
+import static com.konexios.api.Constants.Api.X_ARROW_VERSION_2;
 
 /**
  * class for signing payload received as a command from cloud
@@ -79,6 +80,20 @@ public final class GatewayPayloadSigner {
         stringToSign.append(X_ARROW_VERSION_1);
 
         String signingKey = Utils.hmacSha256Hex(X_ARROW_VERSION_1, Utils.hmacSha256Hex(apiKey, secretKey));
+
+        String signature = Utils.hmacSha256Hex(signingKey, stringToSign.toString());
+
+        return signature;
+    }
+
+    public String signV2() {
+        Timber.v("signV2: ");
+        StringBuilder stringToSign = new StringBuilder();
+        stringToSign.append(Utils.hash(buildCanonicalRequest())).append('\n');
+        stringToSign.append(apiKey).append('\n');
+        stringToSign.append(X_ARROW_VERSION_2);
+
+        String signingKey = Utils.hmacSha256Hex(X_ARROW_VERSION_2, Utils.hmacSha256Hex(secretKey, apiKey));
 
         String signature = Utils.hmacSha256Hex(signingKey, stringToSign.toString());
 

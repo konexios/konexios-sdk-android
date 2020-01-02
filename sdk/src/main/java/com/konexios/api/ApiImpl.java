@@ -503,26 +503,26 @@ final class ApiImpl implements ApiService, SenderServiceArgsProvider {
 
     @Override
     public void registerGateway(@NonNull final GatewayModel gatewayModel, @NonNull final GatewayRegisterListener listener) {
-        Timber.d("registerGateway(), uid: " + gatewayModel.getUid() +
+        Timber.i("registerGateway(), uid: " + gatewayModel.getUid() +
                 ", applicationHid: " + gatewayModel.getApplicationHid());
         mRestService.registerGateway(gatewayModel).enqueue(new Callback<GatewayResponse>() {
             @Override
             public void onResponse(Call<GatewayResponse> call, @NonNull final Response<GatewayResponse> response) {
-                Timber.d("registerGateway response");
+                Timber.e("registerGateway onResponse(), code: " + response.code() +  ", msg: " + response.message());
                 if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
                     onGatewayResponse(response.body());
                     mGatewayUid = gatewayModel.getUid();
                     listener.onGatewayRegistered(response.body());
 
                 } else {
-                    Timber.e("registerGateway error");
+                    Timber.e("registerGateway onResponse() error");
                     listener.onGatewayRegisterFailed(mRetrofitHolder.convertToApiError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<GatewayResponse> call, Throwable t) {
-                Timber.e("registerGateway error");
+                Timber.e("registerGateway - onFailure()");
                 listener.onGatewayRegisterFailed(ErrorUtils.parseError(t));
             }
         });

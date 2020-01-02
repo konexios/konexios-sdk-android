@@ -18,13 +18,17 @@ import androidx.annotation.NonNull;
 
 import com.konexios.api.models.ApiError;
 
+import org.eclipse.paho.client.mqttv3.internal.ExceptionHelper;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.Timer;
 
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import rx.internal.util.ExceptionsUtils;
 import timber.log.Timber;
 
 import static com.konexios.api.models.ApiError.COMMON_ERROR_CODE;
@@ -43,6 +47,7 @@ public final class ErrorUtils {
                 error.setMessage(response.message());
             }
         } catch (IOException e) {
+            Timber.e(e);
             return new ApiError(COMMON_ERROR_CODE, COMMON_ERROR_MESSAGE);
         }
         return error;
