@@ -26,11 +26,13 @@ public interface TelemetrySenderInterface {
 
     void disconnect();
 
-    void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener);
+    void sendSingleTelemetry(TelemetryModel telemetry);
 
-    void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener);
+    void sendBatchTelemetry(List<TelemetryModel> telemetry);
 
     boolean hasBatchMode();
 
     boolean isConnected();
+
+    void addTelemetryRequestListener(TelemetryRequestListener listener);
 }

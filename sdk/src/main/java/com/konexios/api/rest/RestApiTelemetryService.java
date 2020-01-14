@@ -22,7 +22,9 @@ import com.konexios.api.listeners.TelemetryRequestListener;
 import com.konexios.api.models.TelemetryModel;
 
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -40,6 +42,8 @@ public final class RestApiTelemetryService extends AbstractTelemetrySenderServic
 
     private CallbackHandler mCallbackHandler = new CallbackHandler();
 
+    private Set<TelemetryRequestListener> telemetryRequestListeners = new HashSet<>();
+
     public RestApiTelemetryService(RestApiService service) {
         mService = service;
     }
@@ -55,19 +59,26 @@ public final class RestApiTelemetryService extends AbstractTelemetrySenderServic
     }
 
     @Override
-    public void sendSingleTelemetry(@NonNull TelemetryModel telemetry, TelemetryRequestListener listener) {
-        String json = telemetry.getTelemetry();
-        RequestBody body = RequestBody.create(Constants.JSON, json);
-        Call<ResponseBody> call = mService.sendTelemetry(body);
-        call.enqueue(mCallbackHandler.setListener(listener));
+    public void addTelemetryRequestListener(@NonNull TelemetryRequestListener listener) {
+        if (listener != null) {
+            telemetryRequestListeners.add(listener);
+        }
     }
 
     @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener) {
+    public void sendSingleTelemetry(@NonNull TelemetryModel telemetry) {
+        String json = telemetry.getTelemetry();
+        RequestBody body = RequestBody.create(Constants.JSON, json);
+        Call<ResponseBody> call = mService.sendTelemetry(body);
+        call.enqueue(mCallbackHandler);
+    }
+
+    @Override
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
         String json = formatBatchPayload(telemetry);
         RequestBody body = RequestBody.create(Constants.JSON, json);
         Call<ResponseBody> call = mService.sendBatchTelemetry(body);
-        call.enqueue(mCallbackHandler.setListener(listener));
+        call.enqueue(mCallbackHandler);
     }
 
     @Override
@@ -81,33 +92,22 @@ public final class RestApiTelemetryService extends AbstractTelemetrySenderServic
     }
 
     private class CallbackHandler implements Callback<ResponseBody> {
-        TelemetryRequestListener mListener;
-
-        CallbackHandler setListener(TelemetryRequestListener listener) {
-            CallbackHandler callbackHandler;
-            //comparing references
-            if (listener == mListener) {
-                callbackHandler = this;
-            } else {
-                callbackHandler = new CallbackHandler();
-            }
-            callbackHandler.mListener = listener;
-            return callbackHandler;
-        }
-
         @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
             Timber.v("data sent to cloud: " + response.code());
-            if (mListener != null &&
-                    response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
-                mListener.onTelemetrySendSuccess();
+            if (response.code() == HttpURLConnection.HTTP_OK && response.body() != null) {
+                for(TelemetryRequestListener listener : telemetryRequestListeners) {
+                    listener.onTelemetrySendSuccess();
+                }
             }
         }
 
         @Override
         public void onFailure(Call<ResponseBody> call, Throwable t) {
             Timber.e("data sent to cloud failed: " + t.toString());
-            mListener.onTelemetrySendError(ErrorUtils.parseError(t));
+            for(TelemetryRequestListener listener : telemetryRequestListeners) {
+                listener.onTelemetrySendError(ErrorUtils.parseError(t));
+            }
         }
     }
 }

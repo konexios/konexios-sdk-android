@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -122,5 +124,13 @@ final public class Utils {
         }
 
         return md5;
+    }
+
+    @NonNull
+    public static String getStackTrace(@NonNull Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 }

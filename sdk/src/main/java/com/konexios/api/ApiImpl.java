@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2017-2019 Arrow Electronics, Inc.
  * All rights reserved. This program and the accompanying materials
@@ -188,13 +189,13 @@ final class ApiImpl implements ApiService, SenderServiceArgsProvider {
     }
 
     @Override
-    public void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener) {
-        mSenderService.sendSingleTelemetry(telemetry, listener);
+    public void sendSingleTelemetry(TelemetryModel telemetry) {
+        mSenderService.sendSingleTelemetry(telemetry);
     }
 
     @Override
-    public void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener) {
-        mSenderService.sendBatchTelemetry(telemetry, listener);
+    public void sendBatchTelemetry(List<TelemetryModel> telemetry) {
+        mSenderService.sendBatchTelemetry(telemetry);
     }
 
     protected void onGatewayResponse(@NonNull GatewayResponse response) {
@@ -1673,5 +1674,12 @@ final class ApiImpl implements ApiService, SenderServiceArgsProvider {
     @Override
     public Observable<List<SocialEventDevice>> getSocialEventDevices() {
         return mRestService.getSocialEventDevices();
+    }
+
+    @Override
+    public void setTelemetryRequestListener(@NonNull TelemetryRequestListener listener) {
+        if (listener != null && mSenderService != null) {
+            mSenderService.addTelemetryRequestListener(listener);
+        }
     }
 }

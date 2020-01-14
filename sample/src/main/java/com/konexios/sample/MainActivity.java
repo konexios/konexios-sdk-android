@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
 
         //Once instance of ApiService is created it could be got by getAcnApiService() call
         mTelemetrySendService = App.getAcnApiService();
+        mTelemetrySendService.setTelemetryRequestListener(this);
 
         registerGateway();
 
@@ -303,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements InternalSensorsVi
 
     @Override
     public void sendTelemetry(TelemetryModel model) {
-        mTelemetrySendService.sendSingleTelemetry(model, this);
+        mTelemetrySendService.sendSingleTelemetry(model);
     }
 
     @Override

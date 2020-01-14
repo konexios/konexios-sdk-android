@@ -104,14 +104,14 @@ public interface ApiService {
      *
      * @param telemetry - telemetry model object
      */
-    void sendSingleTelemetry(TelemetryModel telemetry, TelemetryRequestListener listener);
+    void sendSingleTelemetry(TelemetryModel telemetry);
 
     /**
      * sends a scope of bundles with telemetry data
      *
      * @param telemetry - list of telemetries
      */
-    void sendBatchTelemetry(List<TelemetryModel> telemetry, TelemetryRequestListener listener);
+    void sendBatchTelemetry(List<TelemetryModel> telemetry);
 
     /**
      * Finds and returns the list of telemetry by application hid
@@ -651,4 +651,6 @@ public interface ApiService {
     void downloadSoftwareReleaseFile(String hid, String token, DownloadSoftwareReleaseFileListener listener);
 
     Observable<List<SocialEventDevice>> getSocialEventDevices();
+
+    void setTelemetryRequestListener(TelemetryRequestListener listener);
 }
