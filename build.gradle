@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2017 Arrow Electronics, Inc.
+ * Copyright (c) 2017-2019 Arrow Electronics, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License 2.0
  * which accompanies this distribution, and is available at
  * http://apache.org/licenses/LICENSE-2.0
  *
- * Contributors: Arrow Electronics, Inc.
+ * Contributors:
+ *     Arrow Electronics, Inc.
+ *     Konexios, Inc.
  */
-
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
     repositories {
@@ -17,17 +17,18 @@ buildscript {
             url 'https://maven.google.com/'
             name 'Google'
         }
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'io.fabric.tools:gradle:1.31.2'
     }
 }
 

@@ -1,41 +1,45 @@
 /*
- * Copyright (c) 2017 Arrow Electronics, Inc.
+ * Copyright (c) 2017-2019 Arrow Electronics, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License 2.0
  * which accompanies this distribution, and is available at
  * http://apache.org/licenses/LICENSE-2.0
  *
- * Contributors: Arrow Electronics, Inc.
+ * Contributors:
+ *     Arrow Electronics, Inc.
+ *     Konexios, Inc.
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 28
     defaultConfig {
-        applicationId "com.arrow.acn.sample"
-        minSdkVersion 19
-        targetSdkVersion 24
+        applicationId "com.konexios.sample"
+        minSdkVersion 21
+        targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_KEY', ApiKey
+            buildConfigField 'String', 'API_SECRET', ApiSecret
+
         }
-    }
-    buildTypes.each {
-        it.buildConfigField 'String', 'API_KEY', ApiKey
-        it.buildConfigField 'String', 'API_SECRET', ApiSecret
+        release {
+            minifyEnabled true
+            buildConfigField 'String', 'API_KEY', ApiKey
+            buildConfigField 'String', 'API_SECRET', ApiSecret
+        }
+        each {
+        }
     }
     productFlavors {
     }
@@ -43,31 +47,39 @@ android {
         // Prevent OutOfMemory with MultiDex during the build phase
         javaMaxHeapSize "4g"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.jakewharton:butterknife:8.4.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.jakewharton:butterknife:10.2.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha02'
+
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
+
     // RxJava
-    compile 'io.reactivex:rxjava:1.1.1'
-    compile 'io.reactivex:rxandroid:1.1.0'
+    implementation 'io.reactivex:rxjava:1.3.0'
+    implementation 'io.reactivex:rxandroid:1.2.1'
 
     // Firebase
-    compile 'com.google.android.gms:play-services:10.2.1'
-    compile 'com.google.firebase:firebase-core:10.2.1'
-    compile 'com.google.firebase:firebase-crash:10.2.1'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
 
-    compile 'com.android.support:multidex:1.0.1'
-    testCompile 'junit:junit:4.12'
-    compile project(':acnsdk')
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+    testImplementation 'junit:junit:4.12'
+    implementation project(':sdk')
 }
-
-// Goole play services
-apply plugin: 'com.google.gms.google-services'
